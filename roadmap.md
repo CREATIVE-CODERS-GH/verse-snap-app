@@ -36,3 +36,11 @@
 - [x] Rank and show matching verses in the existing search screen
 - [x] Route natural-language speech from voice into search
 - [x] Validate reference routing, phrase matches and topical queries
+
+## Phase 7 — First-time experience and mobile polish
+- [ ] Add short, locally remembered first-use onboarding
+- [ ] Add a restrained Verse Snap brand mark and app icon
+- [ ] Refine core mobile hierarchy, terminology and touch targets
+- [ ] Normalize loading, offline, empty and error states
+- [ ] Audit accessibility and resource cleanup
+- [ ] Validate first-use and returning-user journeys
