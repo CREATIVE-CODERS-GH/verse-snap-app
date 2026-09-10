@@ -44,3 +44,10 @@
 - [x] Normalize loading, offline, empty and error states
 - [x] Audit accessibility and resource cleanup
 - [x] Validate first-use and returning-user journeys
+
+## Reliability — Camera OCR and natural search
+- [x] Enhance captured images locally before OCR
+- [x] Add tolerant OCR reference normalization and review/edit recovery
+- [x] Accept unrestricted natural-language descriptions within safe length limits
+- [x] Improve candidate ranking, fallback guidance, and Gateway error handling
+- [x] Validate requested camera/reference and semantic-search cases

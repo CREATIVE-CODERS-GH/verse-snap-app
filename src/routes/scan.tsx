@@ -2,13 +2,24 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { findReferences, type FoundReference } from "@/lib/bible/find-references";
+import { parseReference } from "@/lib/bible/parse-reference";
 import { captureFrame, prepareImageFile } from "@/lib/ocr/capture";
 import { ocrService } from "@/lib/ocr/service";
 import { usePreferences } from "@/lib/preferences";
 
 type ScanState =
-  "starting" | "ready" | "reading" | "opening" | "choose" | "denied" | "unsupported" | "error";
+  | "starting"
+  | "ready"
+  | "reading"
+  | "opening"
+  | "confirm"
+  | "edit"
+  | "choose"
+  | "denied"
+  | "unsupported"
+  | "error";
 
 export const Route = createFileRoute("/scan")({
   head: () => ({
@@ -44,6 +55,8 @@ function ScanPage() {
   const [state, setState] = useState<ScanState>("starting");
   const [message, setMessage] = useState("");
   const [options, setOptions] = useState<FoundReference[]>([]);
+  const [detected, setDetected] = useState<FoundReference | null>(null);
+  const [editedReference, setEditedReference] = useState("");
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -79,6 +92,8 @@ function ScanPage() {
   const startCamera = useCallback(async () => {
     setMessage("");
     setOptions([]);
+    setDetected(null);
+    setEditedReference("");
     setState("starting");
     stopCamera();
 
@@ -130,15 +145,33 @@ function ScanPage() {
       }
       const only = references[0];
       if (references.length === 1 && only) {
-        openReference(only);
+        const isClear = confidence >= 72 && only.explicit;
+        if (isClear) {
+          openReference(only);
+          return;
+        }
+        stopCamera();
+        setDetected(only);
+        setEditedReference(referenceLabel(only));
+        setState("confirm");
+        setMessage("Check the reference before opening it.");
         return;
       }
       setOptions(references);
       setState("choose");
       setMessage("Multiple verses found");
     },
-    [openReference],
+    [openReference, stopCamera],
   );
+
+  const submitEditedReference = useCallback(() => {
+    const reference = parseReference(editedReference) ?? findReferences(editedReference, 1)[0];
+    if (!reference) {
+      setMessage("Enter a reference such as John 3:16.");
+      return;
+    }
+    openReference({ ...reference, raw: editedReference, explicit: true });
+  }, [editedReference, openReference]);
 
   const readImage = useCallback(
     async (image: Blob) => {
@@ -245,11 +278,68 @@ function ScanPage() {
           </div>
         ) : null}
 
+        {state === "confirm" && detected ? (
+          <section className="mt-3 border-y border-border py-5 text-center" aria-labelledby="detected-reference">
+            <p className="text-[0.9375rem] text-muted-foreground">We found something that looks like:</p>
+            <h2 id="detected-reference" className="mt-2 font-serif text-2xl font-semibold">
+              {referenceLabel(detected)}
+            </h2>
+            <p className="mt-2 text-[0.9375rem]">Is this correct?</p>
+          </section>
+        ) : null}
+
+        {state === "edit" ? (
+          <form
+            className="mt-3 border-y border-border py-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitEditedReference();
+            }}
+          >
+            <label htmlFor="corrected-reference" className="text-sm font-medium">
+              Edit Reference
+            </label>
+            <Input
+              id="corrected-reference"
+              value={editedReference}
+              onChange={(event) => setEditedReference(event.target.value)}
+              placeholder="John 3:16"
+              autoComplete="off"
+              autoFocus
+              maxLength={80}
+              className="mt-2 h-12 text-base"
+            />
+            <Button type="submit" className="mt-3 h-12 w-full">
+              Open Verse
+            </Button>
+          </form>
+        ) : null}
+
         <div className="mt-6 space-y-3">
           {state === "ready" ? (
             <Button type="button" className="h-14 w-full text-base" onClick={handleCapture}>
               Capture
             </Button>
+          ) : null}
+
+
+          {state === "confirm" && detected ? (
+            <>
+              <Button type="button" className="h-12 w-full" onClick={() => openReference(detected)}>
+                Open Verse
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-12 w-full bg-transparent"
+                onClick={() => {
+                  setState("edit");
+                  setMessage("Correct the reference, then open it.");
+                }}
+              >
+                Edit Reference
+              </Button>
+            </>
           ) : null}
 
           {state === "denied" || state === "error" || state === "choose" ? (
@@ -277,8 +367,14 @@ function ScanPage() {
 
           <div className="flex justify-center pt-1">
             <Button asChild variant="link">
-              <Link to={state === "ready" || state === "starting" ? "/" : "/search"}>
-                {state === "ready" || state === "starting" ? "Cancel" : "Search manually"}
+              <Link
+                to={
+                  state === "ready" || state === "starting" || state === "confirm" ? "/" : "/search"
+                }
+              >
+                {state === "ready" || state === "starting" || state === "confirm"
+                  ? "Cancel"
+                  : "Search manually"}
               </Link>
             </Button>
           </div>

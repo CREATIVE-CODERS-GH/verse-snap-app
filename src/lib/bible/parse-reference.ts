@@ -52,13 +52,32 @@ const TENS: Record<string, number> = {
 function normalise(input: string): string {
   return input
     .toLowerCase()
-    .replace(/[-–—]/g, " ")
-    .replace(/[.,'"]/g, " ")
+    .replace(/([a-z])(?=\d)/g, "$1 ")
+    .replace(/(\d)(?=[a-z])/g, "$1 ")
+    .replace(/(\d)\s*[:;.-]\s*(\d)/g, "$1 verse $2")
+    .replace(/[-–—;,]/g, " ")
+    .replace(/[.'"]/g, " ")
     .replace(/\bpsalms\b/g, "psalm")
     .replace(/\brevelations\b/g, "revelation")
     .replace(/\bsong of songs\b/g, "song of solomon")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function editDistance(left: string, right: string): number {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let row = 1; row <= left.length; row += 1) {
+    const current = [row];
+    for (let column = 1; column <= right.length; column += 1) {
+      current[column] = Math.min(
+        (current[column - 1] ?? 0) + 1,
+        (previous[column] ?? 0) + 1,
+        (previous[column - 1] ?? 0) + (left[row - 1] === right[column - 1] ? 0 : 1),
+      );
+    }
+    previous.splice(0, previous.length, ...current);
+  }
+  return previous[right.length] ?? Math.max(left.length, right.length);
 }
 
 function matchBook(raw: string): BibleBook | undefined {
@@ -77,6 +96,16 @@ function matchBook(raw: string): BibleBook | undefined {
       book.name.toLowerCase().replace(/\s+/g, "").startsWith(key),
     );
     if (prefixed.length === 1) return prefixed[0];
+  }
+
+  // OCR commonly substitutes a single character in a book name (e.g. Psa1m).
+  // Only accept a unique close match, so natural-language input is not guessed.
+  if (key.length >= 4 && !/\d$/.test(key)) {
+    const close = BIBLE_BOOKS.filter((book) => {
+      const names = [book.id, book.name.toLowerCase().replace(/\s+/g, ""), ...book.aliases];
+      return names.some((name) => name.length >= 4 && editDistance(key, name) <= 1);
+    });
+    if (close.length === 1) return close[0];
   }
   return undefined;
 }
@@ -147,6 +176,10 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
     return makeReference(book, chapter, verse);
   }
 
+  if (words.length === 2 && /^\d{1,3}$/.test(words[0] ?? "") && /^\d{1,3}$/.test(words[1] ?? "")) {
+    return makeReference(book, Number(words[0]), Number(words[1]));
+  }
+
   const isSingleCompoundNumber =
     words.length === 1 ||
     (words.length === 2 &&
@@ -181,7 +214,7 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
 export function parseReference(input: string): ParsedReference | null {
   if (!input) return null;
 
-  let text = normalise(input).replace(/(\d)\s*[v:]\s*(\d)/g, "$1 verse $2");
+  let text = normalise(input).replace(/(\d)\s+v\s*(\d)/g, "$1 verse $2");
 
   // Leading ordinal words: "first john 1 9" -> "1 john 1 9"
   const words = text.split(" ");

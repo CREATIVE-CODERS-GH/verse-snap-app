@@ -22,10 +22,11 @@ export interface ScriptureSearchResponse {
   results: ScriptureSearchResult[];
   /** True when the lookup itself failed rather than simply finding nothing. */
   failed: boolean;
+  errorMessage?: string;
 }
 
 const Input = z.object({
-  query: z.string().min(2).max(200),
+  query: z.string().trim().min(1).max(500),
   translation: z.string().min(2).max(12).optional(),
 });
 
@@ -62,9 +63,14 @@ const SYSTEM_PROMPT = [
   "Never write, quote or paraphrase scripture text.",
   `Return the ${MAX_CANDIDATES} most likely references, best match first.`,
   "If the description clearly matches one famous verse, put it first.",
+  "Interpret exact quotations, partial quotations, paraphrases, topics, singular/plural variants,",
+  "punctuation differences and small spelling mistakes. Do not require exact wording.",
   "People often quote modern translations while the text shown is the King James Version,",
   "so match on meaning and passage, not King James wording: for example 'love is patient'",
   "is 1 Corinthians 13:4 even though that verse reads 'charity suffereth long'.",
+  "Examples: 'I can do all things through Christ' is Philippians 4:13; 'renewing your mind'",
+  "is Romans 12:2; 'being anxious' likely includes Philippians 4:6; 'all things together for good'",
+  "is Romans 8:28; 'be strong and courageous' likely includes Joshua 1:9.",
   "If nothing plausibly matches, return an empty list.",
 ].join(" ");
 
@@ -72,6 +78,19 @@ interface Candidate {
   book: string;
   chapter: number;
   verse: number;
+}
+
+class SearchGatewayError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+
+function delay(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 /** Reads the streamed Responses API body and returns the joined output text. */
@@ -116,37 +135,62 @@ async function readStream(response: Response): Promise<string> {
 
 async function askForCandidates(query: string): Promise<Candidate[]> {
   const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) return [];
+  if (!apiKey) {
+    throw new SearchGatewayError(401, "Scripture search is not configured.");
+  }
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": apiKey,
-      "X-Lovable-AIG-SDK": "fetch",
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-6-astra",
-      stream: true,
-      reasoning: { effort: "low" },
-      input: [
-        { role: "system", content: [{ type: "input_text", text: SYSTEM_PROMPT }] },
-        { role: "user", content: [{ type: "input_text", text: query }] },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "bible_references",
-          strict: true,
-          schema: SCHEMA,
-        },
+  let response: Response | undefined;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Lovable-API-Key": apiKey,
+        "X-Lovable-AIG-SDK": "fetch",
       },
-    }),
-  });
+      body: JSON.stringify({
+        model: "openai/gpt-6-astra",
+        stream: true,
+        reasoning: { effort: "low" },
+        input: [
+          { role: "system", content: [{ type: "input_text", text: SYSTEM_PROMPT }] },
+          { role: "user", content: [{ type: "input_text", text: query }] },
+        ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "bible_references",
+            strict: true,
+            schema: SCHEMA,
+          },
+        },
+      }),
+    });
 
-  if (!response.ok) {
-    console.error("Scripture search upstream failed", response.status, await response.text());
-    throw new Error("scripture-search-failed");
+    if (response.ok) break;
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === 2) break;
+    const retryAfter = Number(response.headers.get("Retry-After"));
+    const wait = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1000
+      : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
+    await response.body?.cancel();
+    await delay(wait);
+  }
+
+  if (!response?.ok) {
+    const status = response?.status ?? 503;
+    const body = response ? await response.text().catch(() => "") : "";
+    let message = "Scripture search is unavailable right now.";
+    try {
+      const parsed = JSON.parse(body) as { message?: unknown; error?: { message?: unknown } };
+      const supplied = parsed.message ?? parsed.error?.message;
+      if (typeof supplied === "string" && supplied.trim()) message = supplied.trim();
+    } catch {
+      if (body.trim() && body.length < 240) message = body.trim();
+    }
+    console.error("Scripture search upstream failed", status, message);
+    throw new SearchGatewayError(status, message);
   }
 
   const raw = await readStream(response);
@@ -171,7 +215,8 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
 function normalise(value: string): string {
   return value
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, " ")
+    .normalize("NFKD")
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -200,6 +245,37 @@ const STOP_WORDS = new Set([
   "god",
 ]);
 
+function stem(word: string): string {
+  if (word.length > 5 && word.endsWith("ing")) return word.slice(0, -3);
+  if (word.length > 4 && word.endsWith("ed")) return word.slice(0, -2);
+  if (word.length > 4 && word.endsWith("es")) return word.slice(0, -2);
+  if (word.length > 3 && word.endsWith("s")) return word.slice(0, -1);
+  return word;
+}
+
+function withinOneEdit(left: string, right: string): boolean {
+  if (Math.abs(left.length - right.length) > 1) return false;
+  let leftIndex = 0;
+  let rightIndex = 0;
+  let edits = 0;
+  while (leftIndex < left.length && rightIndex < right.length) {
+    if (left[leftIndex] === right[rightIndex]) {
+      leftIndex += 1;
+      rightIndex += 1;
+      continue;
+    }
+    edits += 1;
+    if (edits > 1) return false;
+    if (left.length > right.length) leftIndex += 1;
+    else if (right.length > left.length) rightIndex += 1;
+    else {
+      leftIndex += 1;
+      rightIndex += 1;
+    }
+  }
+  return true;
+}
+
 /** Exact wording wins, then overlapping words, then the order suggested upstream. */
 function score(query: string, verse: Verse, order: number): number {
   const text = normalise(verse.text);
@@ -211,7 +287,13 @@ function score(query: string, verse: Verse, order: number): number {
 
   const words = cleaned.split(" ").filter((word) => word.length > 2 && !STOP_WORDS.has(word));
   if (words.length > 0) {
-    const hits = words.filter((word) => text.includes(word)).length;
+    const textWords = text.split(" ").map(stem);
+    const hits = words.filter((word) => {
+      const queryWord = stem(word);
+      return textWords.some(
+        (textWord) => textWord === queryWord || (queryWord.length >= 5 && withinOneEdit(queryWord, textWord)),
+      );
+    }).length;
     value += Math.round((hits / words.length) * 40);
     if (hits === words.length) value += 20;
   }
@@ -222,8 +304,12 @@ async function runSearch(query: string, translation: string): Promise<ScriptureS
   let candidates: Candidate[];
   try {
     candidates = await askForCandidates(query);
-  } catch {
-    return { results: [], failed: true };
+  } catch (error) {
+    return {
+      results: [],
+      failed: true,
+      errorMessage: error instanceof SearchGatewayError ? error.message : "Scripture search is unavailable right now.",
+    };
   }
 
   const seen = new Set<string>();
@@ -268,6 +354,15 @@ async function runSearch(query: string, translation: string): Promise<ScriptureS
     }));
 
   return { results, failed: false };
+}
+
+/** Internal entry point kept separate so reliability checks can exercise the full server pipeline. */
+export async function runScriptureSearch(
+  query: string,
+  translation = DEFAULT_TRANSLATION,
+): Promise<ScriptureSearchResponse> {
+  const data = Input.parse({ query, translation });
+  return runSearch(data.query, data.translation ?? DEFAULT_TRANSLATION);
 }
 
 /**
