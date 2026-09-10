@@ -13,7 +13,7 @@ interface AppShellProps {
  */
 export function AppShell({ title, action, children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 pt-[env(safe-area-inset-top)]">
       <div className="mx-auto w-full max-w-[30rem] px-5">
         {title ? (
           <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 pb-4 pt-7">

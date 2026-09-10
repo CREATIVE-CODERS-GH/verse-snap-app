@@ -47,6 +47,7 @@ function ScanPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const mountedRef = useRef(true);
+  const readingRef = useRef(false);
   const [state, setState] = useState<ScanState>("starting");
   const [message, setMessage] = useState("");
   const [options, setOptions] = useState<FoundReference[]>([]);
@@ -148,6 +149,9 @@ function ScanPage() {
 
   const readImage = useCallback(
     async (image: Blob) => {
+      // One read at a time; a second tap while reading is ignored.
+      if (readingRef.current) return;
+      readingRef.current = true;
       setState("reading");
       setMessage("Reading reference…");
       try {
@@ -158,6 +162,8 @@ function ScanPage() {
         if (!mountedRef.current) return;
         setState("error");
         setMessage("Couldn't read the reference clearly.");
+      } finally {
+        readingRef.current = false;
       }
     },
     [handleText],
@@ -172,6 +178,8 @@ function ScanPage() {
       setMessage("Couldn't read the reference clearly.");
       return;
     }
+    // Hold the captured frame on screen while it is read.
+    video.pause();
     await readImage(frame);
   }, [readImage]);
 
