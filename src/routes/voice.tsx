@@ -219,6 +219,7 @@ function VoicePage() {
 
     recognition.onend = () => {
       recognitionRef.current = null;
+      startingRef.current = false;
       if (mountedRef.current) {
         setState((current) => {
           if (current !== "listening") return current;
@@ -233,6 +234,7 @@ function VoicePage() {
       recognition.start();
     } catch {
       recognitionRef.current = null;
+      startingRef.current = false;
       setState("error");
       setMessage("Voice search couldn't start. Try again.");
     }
