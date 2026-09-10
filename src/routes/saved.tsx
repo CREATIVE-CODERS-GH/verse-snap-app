@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { SignInPrompt } from "@/components/sign-in-prompt";
 import { VerseRow } from "@/components/verse-row";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
@@ -26,12 +25,12 @@ function SavedPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["saved", user?.id],
-    queryFn: () => library.listSaved(),
-    enabled: Boolean(user),
+    queryFn: () => library.listSaved(user?.id),
+    enabled: !loading,
   });
 
   const remove = useMutation({
-    mutationFn: (id: string) => library.removeSaved(id),
+    mutationFn: (id: string) => library.removeSaved(id, user?.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["saved"] });
       toast("Removed from saved");
@@ -41,9 +40,7 @@ function SavedPage() {
 
   return (
     <AppShell title="Saved Verses">
-      {loading ? null : !user ? (
-        <SignInPrompt message="Sign in to save verses and see them on every device." />
-      ) : isLoading ? (
+      {loading || isLoading ? (
         <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
       ) : !data || data.length === 0 ? (
         <div className="border-t border-border pt-8">
