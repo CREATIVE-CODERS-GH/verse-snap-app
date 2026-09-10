@@ -1,6 +1,6 @@
 # Verse Snap — first build
 
-A calm, mobile-first Bible lookup app. Six screens, bottom navigation, sample Bible text, and a swappable Bible data layer ready for the real API and accounts later.
+A calm, mobile-first Bible lookup app with real accounts. Six screens plus sign-in, bottom navigation, sample Bible text, and a swappable Bible data layer ready for the real API.
 
 ## Screens
 
