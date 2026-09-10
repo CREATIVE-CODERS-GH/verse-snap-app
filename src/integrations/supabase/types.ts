@@ -14,7 +14,129 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      history: {
+        Row: {
+          book_id: string
+          book_name: string
+          chapter: number
+          id: string
+          translation: string
+          user_id: string
+          verse: number
+          verse_text: string
+          viewed_at: string
+        }
+        Insert: {
+          book_id: string
+          book_name: string
+          chapter: number
+          id?: string
+          translation?: string
+          user_id: string
+          verse: number
+          verse_text?: string
+          viewed_at?: string
+        }
+        Update: {
+          book_id?: string
+          book_name?: string
+          chapter?: number
+          id?: string
+          translation?: string
+          user_id?: string
+          verse?: number
+          verse_text?: string
+          viewed_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          text_size: string
+          theme: string
+          translation: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          text_size?: string
+          theme?: string
+          translation?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          text_size?: string
+          theme?: string
+          translation?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_verses: {
+        Row: {
+          book_id: string
+          book_name: string
+          chapter: number
+          created_at: string
+          id: string
+          translation: string
+          user_id: string
+          verse: number
+          verse_text: string
+        }
+        Insert: {
+          book_id: string
+          book_name: string
+          chapter: number
+          created_at?: string
+          id?: string
+          translation?: string
+          user_id: string
+          verse: number
+          verse_text?: string
+        }
+        Update: {
+          book_id?: string
+          book_name?: string
+          chapter?: number
+          created_at?: string
+          id?: string
+          translation?: string
+          user_id?: string
+          verse?: number
+          verse_text?: string
+        }
+        Relationships: []
+      }
+      translations: {
+        Row: {
+          code: string
+          language: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          code: string
+          language?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          code?: string
+          language?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
