@@ -10,18 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as VerseTranslationBookChapterVerseRouteImport } from './routes/verse.$translation.$book.$chapter.$verse'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SavedRoute = SavedRouteImport.update({
@@ -34,39 +48,91 @@ const SearchRoute = SearchRouteImport.update({
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerseTranslationBookChapterVerseRoute =
+  VerseTranslationBookChapterVerseRouteImport.update({
+    id: '/verse/$translation/$book/$chapter/$verse',
+    path: '/verse/$translation/$book/$chapter/$verse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
+  '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
+  '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/history': typeof HistoryRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
+  '/settings': typeof SettingsRoute
+  '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/history' | '/saved' | '/search'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/history'
+    | '/reset-password'
+    | '/saved'
+    | '/search'
+    | '/settings'
+    | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history' | '/saved' | '/search'
-  id: '__root__' | '/' | '/history' | '/saved' | '/search'
+  to:
+    | '/'
+    | '/auth'
+    | '/history'
+    | '/reset-password'
+    | '/saved'
+    | '/search'
+    | '/settings'
+    | '/verse/$translation/$book/$chapter/$verse'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/history'
+    | '/reset-password'
+    | '/saved'
+    | '/search'
+    | '/settings'
+    | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   HistoryRoute: typeof HistoryRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
+  SettingsRoute: typeof SettingsRoute
+  VerseTranslationBookChapterVerseRoute: typeof VerseTranslationBookChapterVerseRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -78,11 +144,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/saved': {
@@ -99,14 +179,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verse/$translation/$book/$chapter/$verse': {
+      id: '/verse/$translation/$book/$chapter/$verse'
+      path: '/verse/$translation/$book/$chapter/$verse'
+      fullPath: '/verse/$translation/$book/$chapter/$verse'
+      preLoaderRoute: typeof VerseTranslationBookChapterVerseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   HistoryRoute: HistoryRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
+  SettingsRoute: SettingsRoute,
+  VerseTranslationBookChapterVerseRoute: VerseTranslationBookChapterVerseRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

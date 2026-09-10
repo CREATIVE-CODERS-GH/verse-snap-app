@@ -38,7 +38,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Row({ label, note, control }: { label: string; note?: string; control: ReactNode }) {
+function Row({
+  label,
+  note,
+  control,
+}: {
+  label: string;
+  note?: string | undefined;
+  control: ReactNode;
+}) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border py-3.5">
       <div className="min-w-0">
