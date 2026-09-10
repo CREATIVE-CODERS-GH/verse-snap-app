@@ -32,6 +32,24 @@ const Input = z.object({
 
 const cache = new Map<string, ScriptureSearchResponse>();
 
+const RATE_LIMIT = 20;
+const RATE_WINDOW_MS = 60_000;
+const requestLog = new Map<string, number[]>();
+
+/** Cheap per-caller throttle so the semantic endpoint cannot be hammered. */
+function withinRateLimit(caller: string): boolean {
+  const now = Date.now();
+  const recent = (requestLog.get(caller) ?? []).filter((at) => now - at < RATE_WINDOW_MS);
+  recent.push(now);
+  requestLog.set(caller, recent);
+  if (requestLog.size > 500) {
+    for (const [key, times] of requestLog) {
+      if (times.every((at) => now - at >= RATE_WINDOW_MS)) requestLog.delete(key);
+    }
+  }
+  return recent.length <= RATE_LIMIT;
+}
+
 function cacheKey(query: string, translation: string): string {
   return `${translation}::${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
 }
@@ -189,7 +207,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     } catch {
       if (body.trim() && body.length < 240) message = body.trim();
     }
-    console.error("Scripture search upstream failed", status, message);
+    console.error("Scripture search upstream failed", status);
     throw new SearchGatewayError(status, message);
   }
 
@@ -372,11 +390,23 @@ export async function runScriptureSearch(
  */
 export const searchScripture = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
-  .handler(async ({ data }): Promise<ScriptureSearchResponse> => {
+  .handler(async ({ data, request }): Promise<ScriptureSearchResponse> => {
     const translation = data.translation ?? DEFAULT_TRANSLATION;
     const key = cacheKey(data.query, translation);
     const cached = cache.get(key);
     if (cached) return cached;
+
+    const caller =
+      request?.headers.get("cf-connecting-ip") ??
+      request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown";
+    if (!withinRateLimit(caller)) {
+      return {
+        results: [],
+        failed: true,
+        errorMessage: "Too many searches just now. Wait a moment and try again.",
+      };
+    }
 
     const response = await runSearch(data.query, translation);
     if (!response.failed) {
