@@ -56,12 +56,14 @@ function HomePage() {
           </Link>
         </Button>
         <Button
+          asChild
           variant="outline"
           className="h-12 w-full justify-center gap-2.5 border-border bg-transparent text-[0.9375rem]"
-          onClick={() => setDialog("camera")}
         >
-          <Camera className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
-          Snap a Verse
+          <Link to="/scan">
+            <Camera className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
+            Snap a Verse
+          </Link>
         </Button>
         <Link
           to="/search"
