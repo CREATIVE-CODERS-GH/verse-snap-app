@@ -8,7 +8,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — Verse Snap" },
-      { name: "description", content: "Sign in to save verses and keep your reading history in sync." },
+      {
+        name: "description",
+        content: "Sign in to save verses and keep your reading history in sync.",
+      },
       { property: "og:title", content: "Sign in — Verse Snap" },
       { property: "og:description", content: "Save verses and keep your reading history in sync." },
       { property: "og:type", content: "website" },

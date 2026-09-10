@@ -52,7 +52,8 @@ async function requestJson(url: string): Promise<unknown | null> {
     throw new BibleServiceError("network", "Verse Snap couldn't reach the Bible right now.");
   }
   if (response.status === 404) return null;
-  if (!response.ok) throw new BibleServiceError("provider", "Verse Snap couldn't retrieve that passage.");
+  if (!response.ok)
+    throw new BibleServiceError("provider", "Verse Snap couldn't retrieve that passage.");
   try {
     return await response.json();
   } catch {
@@ -62,9 +63,13 @@ async function requestJson(url: string): Promise<unknown | null> {
 
 async function getBooks(): Promise<ApiBook[]> {
   booksPromise ??= requestJson(`${BASE_URL}/${API_TRANSLATION}/books.json`).then((data) => {
-    const books = data && typeof data === "object" ? (data as { books?: unknown }).books : undefined;
-    if (!Array.isArray(books)) throw new BibleServiceError("provider", "The Bible book list is unavailable.");
-    return books.filter((book): book is ApiBook => Boolean(book && typeof book === "object" && "id" in book));
+    const books =
+      data && typeof data === "object" ? (data as { books?: unknown }).books : undefined;
+    if (!Array.isArray(books))
+      throw new BibleServiceError("provider", "The Bible book list is unavailable.");
+    return books.filter((book): book is ApiBook =>
+      Boolean(book && typeof book === "object" && "id" in book),
+    );
   });
   return booksPromise;
 }
@@ -82,7 +87,8 @@ async function fetchChapter(
   if (!data || typeof data !== "object") return null;
   const response = data as ApiChapter;
   const content = response.chapter?.content;
-  if (!Array.isArray(content)) throw new BibleServiceError("provider", "The chapter text is unavailable.");
+  if (!Array.isArray(content))
+    throw new BibleServiceError("provider", "The chapter text is unavailable.");
 
   const verses = content.flatMap((block): Verse[] => {
     if (!block || typeof block !== "object") return [];
@@ -90,7 +96,9 @@ async function fetchChapter(
     if (item.type !== "verse" || typeof item.number !== "number") return [];
     const verseRef: VerseRef = { ...ref, bookName: localBook.name, verse: item.number };
     const text = readableText(item.content).replace(/\s+/g, " ").trim();
-    return text ? [{ ...verseRef, translation: DISPLAY_CODE, text, reference: formatReference(verseRef) }] : [];
+    return text
+      ? [{ ...verseRef, translation: DISPLAY_CODE, text, reference: formatReference(verseRef) }]
+      : [];
   });
 
   return {
@@ -106,7 +114,9 @@ async function fetchChapter(
 export const helloAoProvider: BibleProvider = {
   async listTranslations() {
     // The English Authorized Version is the one verified and enabled for this release.
-    return [{ code: DISPLAY_CODE, name: "King James (Authorized) Version", language: "English" }] satisfies Translation[];
+    return [
+      { code: DISPLAY_CODE, name: "King James (Authorized) Version", language: "English" },
+    ] satisfies Translation[];
   },
   async getChapter(ref, translation) {
     return fetchChapter(ref, translation);
@@ -137,7 +147,8 @@ export const helloAoProvider: BibleProvider = {
       if (!targetBook) return null;
       targetChapter = direction === 1 ? 1 : (targetBook.numberOfChapters ?? 1);
     }
-    const localTarget = fromApiBookId(targetBook.id) ?? BIBLE_BOOKS[targetBook.order ? targetBook.order - 1 : -1];
+    const localTarget =
+      fromApiBookId(targetBook.id) ?? BIBLE_BOOKS[targetBook.order ? targetBook.order - 1 : -1];
     if (!localTarget) return null;
     const target = await fetchChapter(
       { bookId: localTarget.id, bookName: localTarget.name, chapter: targetChapter },

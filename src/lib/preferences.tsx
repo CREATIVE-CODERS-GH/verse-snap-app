@@ -42,7 +42,12 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as Partial<Preferences>;
-        setPrefs({ ...DEFAULTS, ...parsed, translation: parsed.translation === "KJV" ? "KJAV" : (parsed.translation ?? DEFAULTS.translation) });
+        setPrefs({
+          ...DEFAULTS,
+          ...parsed,
+          translation:
+            parsed.translation === "KJV" ? "KJAV" : (parsed.translation ?? DEFAULTS.translation),
+        });
       }
     } catch {
       /* ignore unreadable storage */

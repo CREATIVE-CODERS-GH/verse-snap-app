@@ -119,7 +119,10 @@ export const library = {
   async save(verse: Verse, userId?: string): Promise<void> {
     if (!userId) {
       const entry = localEntry(verse);
-      writeLocal(SAVED_STORAGE_KEY, [entry, ...readLocal(SAVED_STORAGE_KEY).filter((item) => item.id !== entry.id)]);
+      writeLocal(SAVED_STORAGE_KEY, [
+        entry,
+        ...readLocal(SAVED_STORAGE_KEY).filter((item) => item.id !== entry.id),
+      ]);
       return;
     }
     const { error } = await supabase
@@ -131,7 +134,10 @@ export const library = {
   async unsave(ref: VerseRef, translation: string, userId?: string): Promise<void> {
     if (!userId) {
       const key = referenceKey(ref, translation);
-      writeLocal(SAVED_STORAGE_KEY, readLocal(SAVED_STORAGE_KEY).filter((entry) => entry.id !== key));
+      writeLocal(
+        SAVED_STORAGE_KEY,
+        readLocal(SAVED_STORAGE_KEY).filter((entry) => entry.id !== key),
+      );
       return;
     }
     const { error } = await supabase
@@ -146,7 +152,10 @@ export const library = {
 
   async removeSaved(id: string, userId?: string): Promise<void> {
     if (!userId) {
-      writeLocal(SAVED_STORAGE_KEY, readLocal(SAVED_STORAGE_KEY).filter((entry) => entry.id !== id));
+      writeLocal(
+        SAVED_STORAGE_KEY,
+        readLocal(SAVED_STORAGE_KEY).filter((entry) => entry.id !== id),
+      );
       return;
     }
     const { error } = await supabase.from("saved_verses").delete().eq("id", id);
@@ -167,7 +176,13 @@ export const library = {
   async recordView(verse: Verse, userId?: string): Promise<void> {
     if (!userId) {
       const entry = localEntry(verse);
-      writeLocal(HISTORY_STORAGE_KEY, [entry, ...readLocal(HISTORY_STORAGE_KEY).filter((item) => item.id !== entry.id)].slice(0, 100));
+      writeLocal(
+        HISTORY_STORAGE_KEY,
+        [entry, ...readLocal(HISTORY_STORAGE_KEY).filter((item) => item.id !== entry.id)].slice(
+          0,
+          100,
+        ),
+      );
       return;
     }
     const versePayload = payload(verse, userId);

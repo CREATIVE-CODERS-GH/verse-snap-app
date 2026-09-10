@@ -16,7 +16,7 @@ const CANDIDATE = new RegExp(
     "\\b",
     "((?:[1-3]|i{1,3}|first|second|third)\\s*)?", // optional book number
     "([a-z]+(?:\\s+of\\s+[a-z]+){0,2})", // book word(s), e.g. "song of solomon"
-    "\\s*", 
+    "\\s*",
     "(?:chapter\\s*)?",
     "(\\d{1,3})", // chapter
     "(?:\\s*(?::|\\.|v|verse|verses|\\s)\\s*(\\d{1,3}))?", // optional verse
