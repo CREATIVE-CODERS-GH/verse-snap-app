@@ -204,6 +204,7 @@ function VoicePage() {
 
     recognition.onerror = (event) => {
       recognitionRef.current = null;
+      startingRef.current = false;
       if (!mountedRef.current) return;
       const denied = event.error === "not-allowed" || event.error === "service-not-allowed";
       setMessage(
