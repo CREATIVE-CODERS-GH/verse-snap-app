@@ -16,6 +16,23 @@ export const sampleProvider: BibleProvider = {
     return TRANSLATIONS;
   },
 
+  async getChapter(ref, translation) {
+    const book = findBook(ref.bookId);
+    const chapter = SAMPLE_KJV[`${ref.bookId}.${ref.chapter}`];
+    if (!book || !chapter) return null;
+    const verses = Object.entries(chapter).map(([number, text]) =>
+      build({ ...ref, bookName: book.name, verse: Number(number) }, translation, text),
+    );
+    return {
+      translation,
+      bookId: book.id,
+      bookName: book.name,
+      chapter: ref.chapter,
+      reference: `${book.name} ${ref.chapter}`,
+      verses,
+    };
+  },
+
   async getVerse(ref, translation) {
     const book = findBook(ref.bookId);
     if (!book) return null;

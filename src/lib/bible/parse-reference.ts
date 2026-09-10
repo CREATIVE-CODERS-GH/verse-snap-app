@@ -81,5 +81,7 @@ export function parseReference(input: string): ParsedReference | null {
   if (chapter < 1 || chapter > book.chapters) return null;
   if (verse !== undefined && (verse < 1 || verse > 176)) return null;
 
-  return { bookId: book.id, bookName: book.name, chapter, verse };
+  return verse === undefined
+    ? { bookId: book.id, bookName: book.name, chapter }
+    : { bookId: book.id, bookName: book.name, chapter, verse };
 }
