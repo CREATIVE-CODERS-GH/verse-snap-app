@@ -132,6 +132,10 @@ function VoicePage() {
   }, []);
 
   const startListening = useCallback(() => {
+    // Guards against a second microphone session being opened by a fast
+    // double tap while one is still starting up.
+    if (startingRef.current) return;
+    startingRef.current = true;
     stopRecognition(true);
     setHeard("");
     setMessage("");
