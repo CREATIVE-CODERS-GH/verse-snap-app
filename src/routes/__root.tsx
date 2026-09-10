@@ -87,7 +87,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "A quiet, fast way to open and read any Bible verse.",
       },
       { property: "og:title", content: "Verse Snap — Find your verse. Instantly." },
-      { property: "og:description", content: "A quiet, fast way to open and read any Bible verse." },
+      {
+        property: "og:description",
+        content: "A quiet, fast way to open and read any Bible verse.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

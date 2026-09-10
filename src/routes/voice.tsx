@@ -61,7 +61,10 @@ export const Route = createFileRoute("/voice")({
       { title: "Say a Bible Verse — Verse Snap" },
       { name: "description", content: "Speak a Bible reference and open the verse directly." },
       { property: "og:title", content: "Say a Bible Verse — Verse Snap" },
-      { property: "og:description", content: "Speak a Bible reference and open the verse directly." },
+      {
+        property: "og:description",
+        content: "Speak a Bible reference and open the verse directly.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -93,31 +96,34 @@ function VoicePage() {
   const [message, setMessage] = useState("");
   const [options, setOptions] = useState<VoiceOption[]>([]);
 
-  const openReference = useCallback((reference: ParsedReference) => {
-    setState("processing");
-    if (reference.verse === undefined) {
+  const openReference = useCallback(
+    (reference: ParsedReference) => {
+      setState("processing");
+      if (reference.verse === undefined) {
+        navigate({
+          to: "/chapter/$translation/$book/$chapter",
+          params: { translation, book: reference.bookId, chapter: String(reference.chapter) },
+        });
+        return;
+      }
+      const verseReference: VerseRef = {
+        bookId: reference.bookId,
+        bookName: reference.bookName,
+        chapter: reference.chapter,
+        verse: reference.verse,
+      };
       navigate({
-        to: "/chapter/$translation/$book/$chapter",
-        params: { translation, book: reference.bookId, chapter: String(reference.chapter) },
+        to: "/verse/$translation/$book/$chapter/$verse",
+        params: {
+          translation,
+          book: verseReference.bookId,
+          chapter: String(verseReference.chapter),
+          verse: String(verseReference.verse),
+        },
       });
-      return;
-    }
-    const verseReference: VerseRef = {
-      bookId: reference.bookId,
-      bookName: reference.bookName,
-      chapter: reference.chapter,
-      verse: reference.verse,
-    };
-    navigate({
-      to: "/verse/$translation/$book/$chapter/$verse",
-      params: {
-        translation,
-        book: verseReference.bookId,
-        chapter: String(verseReference.chapter),
-        verse: String(verseReference.verse),
-      },
-    });
-  }, [navigate, translation]);
+    },
+    [navigate, translation],
+  );
 
   const stopRecognition = useCallback((abort = false) => {
     const recognition = recognitionRef.current;
@@ -250,15 +256,16 @@ function VoicePage() {
     };
   }, [startListening, stopRecognition]);
 
-  const status = state === "idle"
-    ? "Starting…"
-    : state === "listening"
-      ? "Listening…"
-      : state === "processing"
-        ? "Opening verse…"
-        : state === "ambiguous"
-          ? "Did you mean?"
-          : message;
+  const status =
+    state === "idle"
+      ? "Starting…"
+      : state === "listening"
+        ? "Listening…"
+        : state === "processing"
+          ? "Opening verse…"
+          : state === "ambiguous"
+            ? "Did you mean?"
+            : message;
 
   return (
     <AppShell title="Say a Verse">
@@ -275,7 +282,9 @@ function VoicePage() {
           className="mt-9 h-16 w-16 rounded-full"
           onClick={startListening}
           disabled={state === "processing"}
-          aria-label={state === "listening" ? "Listening for a Bible reference" : "Start voice search"}
+          aria-label={
+            state === "listening" ? "Listening for a Bible reference" : "Start voice search"
+          }
           aria-pressed={state === "listening"}
         >
           {state === "unsupported" || state === "error" ? (
@@ -308,12 +317,22 @@ function VoicePage() {
         ) : null}
 
         <div className="mt-8 flex items-center gap-5">
-          {(state === "error" || state === "ambiguous") ? (
-            <Button type="button" variant="outline" onClick={startListening}>Try again</Button>
+          {state === "error" || state === "ambiguous" ? (
+            <Button type="button" variant="outline" onClick={startListening}>
+              Try again
+            </Button>
           ) : null}
           <Button asChild variant="link">
-            <Link to={state === "unsupported" || state === "error" || state === "ambiguous" ? "/search" : "/"}>
-              {state === "unsupported" || state === "error" || state === "ambiguous" ? "Search manually" : "Cancel"}
+            <Link
+              to={
+                state === "unsupported" || state === "error" || state === "ambiguous"
+                  ? "/search"
+                  : "/"
+              }
+            >
+              {state === "unsupported" || state === "error" || state === "ambiguous"
+                ? "Search manually"
+                : "Cancel"}
             </Link>
           </Button>
         </div>

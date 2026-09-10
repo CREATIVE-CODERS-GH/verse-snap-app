@@ -98,7 +98,6 @@ function HomePage() {
           </p>
         ) : null}
       </section>
-
     </AppShell>
   );
 }

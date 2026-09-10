@@ -19,7 +19,10 @@ export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Verse Snap" },
-      { name: "description", content: "Choose your translation, text size, theme and account options." },
+      {
+        name: "description",
+        content: "Choose your translation, text size, theme and account options.",
+      },
       { property: "og:title", content: "Settings — Verse Snap" },
       { property: "og:description", content: "Translation, text size, theme and account options." },
       { property: "og:type", content: "website" },
@@ -53,7 +56,9 @@ function Row({
     <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border py-3.5">
       <div className="min-w-0">
         <p className="truncate text-[0.9375rem]">{label}</p>
-        {note ? <p className="mt-0.5 truncate text-[0.8125rem] text-muted-foreground">{note}</p> : null}
+        {note ? (
+          <p className="mt-0.5 truncate text-[0.8125rem] text-muted-foreground">{note}</p>
+        ) : null}
       </div>
       {control}
     </div>
@@ -91,13 +96,15 @@ function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(translations ?? [{ code: "KJAV", name: "King James (Authorized) Version", language: "English" }]).map(
-                  (item) => (
-                    <SelectItem key={item.code} value={item.code}>
-                      {item.code}
-                    </SelectItem>
-                  ),
-                )}
+                {(
+                  translations ?? [
+                    { code: "KJAV", name: "King James (Authorized) Version", language: "English" },
+                  ]
+                ).map((item) => (
+                  <SelectItem key={item.code} value={item.code}>
+                    {item.code}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           }

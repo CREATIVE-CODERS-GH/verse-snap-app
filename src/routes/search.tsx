@@ -50,7 +50,12 @@ function SearchPage() {
           } else {
             navigate({
               to: "/verse/$translation/$book/$chapter/$verse",
-              params: { translation, book: result.bookId, chapter: String(result.chapter), verse: String(result.verse) },
+              params: {
+                translation,
+                book: result.bookId,
+                chapter: String(result.chapter),
+                verse: String(result.verse),
+              },
             });
           }
         }}
@@ -72,15 +77,27 @@ function SearchPage() {
       <div className="mt-6">
         {result ? (
           <Link
-            to={result.verse === undefined ? "/chapter/$translation/$book/$chapter" : "/verse/$translation/$book/$chapter/$verse"}
-            params={result.verse === undefined
-              ? { translation, book: result.bookId, chapter: String(result.chapter) }
-              : { translation, book: result.bookId, chapter: String(result.chapter), verse: String(result.verse) }}
+            to={
+              result.verse === undefined
+                ? "/chapter/$translation/$book/$chapter"
+                : "/verse/$translation/$book/$chapter/$verse"
+            }
+            params={
+              result.verse === undefined
+                ? { translation, book: result.bookId, chapter: String(result.chapter) }
+                : {
+                    translation,
+                    book: result.bookId,
+                    chapter: String(result.chapter),
+                    verse: String(result.verse),
+                  }
+            }
             className="flex items-center justify-between border-y border-border py-4"
           >
             <span>
               <span className="block text-[0.9375rem] font-medium">
-                {result.bookName} {result.chapter}{result.verse === undefined ? "" : `:${result.verse}`}
+                {result.bookName} {result.chapter}
+                {result.verse === undefined ? "" : `:${result.verse}`}
               </span>
               <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
                 {translation}

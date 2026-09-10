@@ -10,14 +10,16 @@ import { bibleService } from "@/lib/bible/service";
 export const Route = createFileRoute("/chapter/$translation/$book/$chapter")({
   head: ({ params }) => {
     const reference = `${findBook(params.book)?.name ?? params.book} ${params.chapter}`;
-    return { meta: [
-      { title: `${reference} (${params.translation}) — Verse Snap` },
-      { name: "description", content: `Read ${reference} on Verse Snap.` },
-      { property: "og:title", content: `${reference} — Verse Snap` },
-      { property: "og:description", content: `Read the full chapter of ${reference}.` },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ] };
+    return {
+      meta: [
+        { title: `${reference} (${params.translation}) — Verse Snap` },
+        { name: "description", content: `Read ${reference} on Verse Snap.` },
+        { property: "og:title", content: `${reference} — Verse Snap` },
+        { property: "og:description", content: `Read the full chapter of ${reference}.` },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
+      ],
+    };
   },
   component: ChapterPage,
 });
@@ -34,19 +36,25 @@ function ChapterPage() {
     enabled: Boolean(book && Number.isInteger(chapterNumber) && chapterNumber > 0),
   });
 
-  const message = query.error instanceof BibleServiceError && query.error.kind === "network"
-    ? "Verse Snap couldn't reach the Bible right now. Check your connection and try again."
-    : "That Bible reference doesn't look right.";
+  const message =
+    query.error instanceof BibleServiceError && query.error.kind === "network"
+      ? "Verse Snap couldn't reach the Bible right now. Check your connection and try again."
+      : "That Bible reference doesn't look right.";
 
   return (
     <AppShell>
       <div className="pt-7">
-        <Link to="/search" className="flex items-center gap-1 text-[0.8125rem] text-muted-foreground hover:text-foreground">
+        <Link
+          to="/search"
+          className="flex items-center gap-1 text-[0.8125rem] text-muted-foreground hover:text-foreground"
+        >
           <ChevronLeft className="h-4 w-4" aria-hidden /> Search
         </Link>
       </div>
       <article className="mt-8">
-        <h1 className="font-serif text-xl font-semibold tracking-tight">{ref.bookName} {chapterNumber}</h1>
+        <h1 className="font-serif text-xl font-semibold tracking-tight">
+          {ref.bookName} {chapterNumber}
+        </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
           {query.data?.translation ?? params.translation} · King James (Authorized) Version
         </p>
@@ -60,7 +68,9 @@ function ChapterPage() {
                   to="/verse/$translation/$book/$chapter/$verse"
                   params={{ ...params, verse: String(verse.verse) }}
                   className="mr-2 align-super font-sans text-xs font-semibold text-primary"
-                >{verse.verse}</Link>
+                >
+                  {verse.verse}
+                </Link>
                 {verse.text}
               </p>
             ))}
@@ -68,7 +78,11 @@ function ChapterPage() {
         ) : (
           <div className="mt-6">
             <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">{message}</p>
-            {query.isError ? <Button variant="outline" className="mt-4" onClick={() => query.refetch()}>Try again</Button> : null}
+            {query.isError ? (
+              <Button variant="outline" className="mt-4" onClick={() => query.refetch()}>
+                Try again
+              </Button>
+            ) : null}
           </div>
         )}
       </article>

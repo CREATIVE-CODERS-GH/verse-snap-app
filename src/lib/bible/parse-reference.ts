@@ -147,9 +147,12 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
     return makeReference(book, chapter, verse);
   }
 
-  const isSingleCompoundNumber = words.length === 1
-    || (words.length === 2 && TENS[words[0] ?? ""] !== undefined && SMALL_NUMBERS[words[1] ?? ""] !== undefined)
-    || words.includes("hundred");
+  const isSingleCompoundNumber =
+    words.length === 1 ||
+    (words.length === 2 &&
+      TENS[words[0] ?? ""] !== undefined &&
+      SMALL_NUMBERS[words[1] ?? ""] !== undefined) ||
+    words.includes("hundred");
   if (isSingleCompoundNumber) {
     const whole = parseSpokenNumber(words);
     if (whole !== null && whole <= book.chapters) return makeReference(book, whole);

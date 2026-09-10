@@ -8,14 +8,7 @@ import { ocrService } from "@/lib/ocr/service";
 import { usePreferences } from "@/lib/preferences";
 
 type ScanState =
-  | "starting"
-  | "ready"
-  | "reading"
-  | "opening"
-  | "choose"
-  | "denied"
-  | "unsupported"
-  | "error";
+  "starting" | "ready" | "reading" | "opening" | "choose" | "denied" | "unsupported" | "error";
 
 export const Route = createFileRoute("/scan")({
   head: () => ({

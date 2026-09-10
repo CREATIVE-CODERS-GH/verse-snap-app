@@ -2,7 +2,14 @@ import { parseReference } from "./parse-reference";
 import { findReferences } from "./find-references";
 import { chapterCache } from "./chapter-cache";
 import { helloAoProvider } from "./helloao-provider";
-import { BibleServiceError, type BibleProvider, type Chapter, type Translation, type Verse, type VerseRef } from "./types";
+import {
+  BibleServiceError,
+  type BibleProvider,
+  type Chapter,
+  type Translation,
+  type Verse,
+  type VerseRef,
+} from "./types";
 
 /**
  * The single place the UI talks to for scripture.
