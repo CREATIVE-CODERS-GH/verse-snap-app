@@ -79,3 +79,23 @@ export const BIBLE_BOOKS: BibleBook[] = [
 export function findBook(id: string): BibleBook | undefined {
   return BIBLE_BOOKS.find((book) => book.id === id);
 }
+
+// USFM identifiers used by AO Lab, in canonical book order.
+const API_BOOK_IDS = [
+  "GEN", "EXO", "LEV", "NUM", "DEU", "JOS", "JDG", "RUT", "1SA", "2SA", "1KI",
+  "2KI", "1CH", "2CH", "EZR", "NEH", "EST", "JOB", "PSA", "PRO", "ECC", "SNG",
+  "ISA", "JER", "LAM", "EZK", "DAN", "HOS", "JOL", "AMO", "OBA", "JON", "MIC",
+  "NAM", "HAB", "ZEP", "HAG", "ZEC", "MAL", "MAT", "MRK", "LUK", "JHN", "ACT",
+  "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI",
+  "TIT", "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV",
+] as const;
+
+export function toApiBookId(bookId: string): string | undefined {
+  const index = BIBLE_BOOKS.findIndex((book) => book.id === bookId);
+  return index >= 0 ? API_BOOK_IDS[index] : undefined;
+}
+
+export function fromApiBookId(apiId: string): BibleBook | undefined {
+  const index = API_BOOK_IDS.indexOf(apiId.toUpperCase() as (typeof API_BOOK_IDS)[number]);
+  return index >= 0 ? BIBLE_BOOKS[index] : undefined;
+}

@@ -1,5 +1,10 @@
 import { BIBLE_BOOKS, type BibleBook } from "./books";
-import type { VerseRef } from "./types";
+export interface ParsedReference {
+  bookId: string;
+  bookName: string;
+  chapter: number;
+  verse?: number;
+}
 
 const NUMBER_WORDS: Record<string, string> = {
   first: "1",
@@ -46,7 +51,7 @@ function matchBook(raw: string): BibleBook | undefined {
  * Handles: "John 3:16", "john 3 16", "Jn 3v16", "1 Corinthians 13:4",
  * "John chapter 3 verse 16", "psalm 23".
  */
-export function parseReference(input: string): VerseRef | null {
+export function parseReference(input: string): ParsedReference | null {
   if (!input) return null;
 
   let text = normalise(input)
@@ -72,9 +77,9 @@ export function parseReference(input: string): VerseRef | null {
 
 
   const chapter = Number(match[2]);
-  const verse = match[3] ? Number(match[3]) : 1;
+  const verse = match[3] ? Number(match[3]) : undefined;
   if (chapter < 1 || chapter > book.chapters) return null;
-  if (verse < 1 || verse > 176) return null;
+  if (verse !== undefined && (verse < 1 || verse > 176)) return null;
 
   return { bookId: book.id, bookName: book.name, chapter, verse };
 }
