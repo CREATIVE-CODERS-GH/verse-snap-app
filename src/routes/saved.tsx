@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { VerseRow } from "@/components/verse-row";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
 
@@ -41,7 +42,7 @@ function SavedPage() {
   });
 
   return (
-    <AppShell title="Saved Verses">
+    <AppShell title="Saved">
       {loading || isLoading ? (
         <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
       ) : !data || data.length === 0 ? (
@@ -63,14 +64,16 @@ function SavedPage() {
                 verse={entry.verse}
                 preview={entry.verseText}
                 trailing={
-                  <button
+                  <Button
                     type="button"
+                    size="icon"
+                    variant="ghost"
                     aria-label={`Remove ${entry.bookName} ${entry.chapter}:${entry.verse}`}
                     onClick={() => remove.mutate(entry.id)}
-                    className="p-2 text-muted-foreground transition-colors hover:text-foreground"
+                    className="h-11 w-11 text-muted-foreground hover:text-foreground"
                   >
                     <X className="h-4 w-4" aria-hidden />
-                  </button>
+                  </Button>
                 }
               />
             </li>

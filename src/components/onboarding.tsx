@@ -1,5 +1,6 @@
 import { Camera, ChevronLeft, ChevronRight, Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { BrandMark } from "./brand-mark";
 import { Button } from "./ui/button";
 

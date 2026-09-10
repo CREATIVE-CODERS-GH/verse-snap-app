@@ -269,8 +269,8 @@ function VoicePage() {
       ? "Starting…"
       : state === "listening"
         ? "Listening…"
-        : state === "processing"
-          ? "Opening verse…"
+          : state === "processing"
+          ? "Finding verse…"
           : state === "ambiguous"
             ? "Did you mean?"
             : message;
@@ -278,16 +278,16 @@ function VoicePage() {
   return (
     <AppShell title="Say a Verse">
       <main className="flex min-h-[28rem] flex-col items-center pt-12 text-center">
-        <h2 className="font-serif text-2xl font-semibold">What verse are you looking for?</h2>
+        <h2 className="font-serif text-2xl font-semibold">Say the Bible reference.</h2>
         <p className="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-          Say a reference such as “Hebrews chapter two verse five,” or describe the verse.
+          Try “Hebrews chapter two verse five,” or describe the verse you remember.
         </p>
 
         <Button
           type="button"
           size="icon"
           variant={state === "listening" ? "default" : "outline"}
-          className="mt-9 h-16 w-16 rounded-full"
+          className="mt-9 h-16 w-16 rounded-full focus-visible:ring-2"
           onClick={startListening}
           disabled={state === "processing"}
           aria-label={

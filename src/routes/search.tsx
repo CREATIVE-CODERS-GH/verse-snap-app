@@ -244,13 +244,14 @@ function SearchPage() {
             <ul className="mt-1">
               {EXAMPLES.map((example) => (
                 <li key={example} className="border-b border-border last:border-b-0">
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
                     onClick={() => setQuery(example)}
-                    className="w-full py-3.5 text-left text-[0.9375rem]"
+                    className="h-auto min-h-12 w-full justify-start rounded-none px-0 py-3.5 text-left text-[0.9375rem] font-normal"
                   >
                     {example}
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
