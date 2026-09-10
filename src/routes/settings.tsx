@@ -160,9 +160,18 @@ function SettingsPage() {
       </Section>
 
       <Section title="Account">
-        {user ? (
+        {loading ? (
+          <div className="border-b border-border py-3.5 text-[0.875rem] text-muted-foreground">
+            Checking your account…
+          </div>
+        ) : user ? (
           <>
             <Row label="Signed in" note={user.email ?? undefined} control={<span />} />
+            <Row
+              label="Saved & History"
+              note="Private to this account and synced across your devices"
+              control={<span />}
+            />
             <div className="border-b border-border py-3.5">
               <button
                 type="button"
@@ -174,13 +183,9 @@ function SettingsPage() {
             </div>
           </>
         ) : (
-          <Link
-            to="/auth"
-            className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-border py-3.5"
-          >
-            <span className="truncate text-[0.9375rem]">Sign in or create an account</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
-          </Link>
+          <div className="border-b border-border">
+            <AuthForm idPrefix="settings" onSignedIn={() => navigate({ to: "/saved" })} />
+          </div>
         )}
       </Section>
 
