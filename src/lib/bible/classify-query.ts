@@ -50,6 +50,5 @@ export function classifyQuery(input: string): QueryIntent | null {
   }
 
   const query = stripped || trimmed;
-  if (query.split(" ").filter(Boolean).length < 2) return null;
   return { kind: "description", query };
 }

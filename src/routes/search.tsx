@@ -42,6 +42,11 @@ const EXAMPLES = [
   "the verse about renewing your mind",
   "Psalm 23:1",
 ];
+const FALLBACK_EXAMPLES = [
+  "love is patient",
+  "verse about renewing your mind",
+  "be strong and courageous",
+];
 
 function SearchPage() {
   const { q } = Route.useSearch();
@@ -70,6 +75,7 @@ function SearchPage() {
     queryFn: () => runSearch({ data: { query: description, translation } }),
     enabled: description.length > 0,
     staleTime: 60 * 60 * 1000,
+    retry: false,
   });
 
   const openReference = (reference: NonNullable<typeof result>) => {
@@ -120,6 +126,7 @@ function SearchPage() {
           placeholder="Enter a reference or describe a verse..."
           aria-label="Bible reference or description"
           autoComplete="off"
+          maxLength={500}
           className="h-12 rounded-md pl-9 text-base"
         />
       </form>
@@ -161,7 +168,9 @@ function SearchPage() {
               <p className="text-[0.9375rem] text-muted-foreground">Finding verses…</p>
             ) : failed ? (
               <div>
-                <p className="text-[0.9375rem]">Couldn't complete that search.</p>
+                <p className="text-[0.9375rem]">
+                  {search.data?.errorMessage ?? "Couldn't complete that search."}
+                </p>
                 <p className="mt-1 text-[0.9375rem] text-muted-foreground">
                   Try again, or search by reference.
                 </p>
@@ -176,10 +185,15 @@ function SearchPage() {
               </div>
             ) : results.length === 0 ? (
               <div>
-                <p className="text-[0.9375rem]">No matching verses found.</p>
+                <p className="text-[0.9375rem]">Try describing the verse differently.</p>
                 <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-                  Try a different description or search by reference.
+                  For example:
                 </p>
+                <ul className="mt-2 text-[0.875rem] text-muted-foreground">
+                  {FALLBACK_EXAMPLES.map((example) => (
+                    <li key={example}>“{example}”</li>
+                  ))}
+                </ul>
                 <Button
                   type="button"
                   variant="outline"

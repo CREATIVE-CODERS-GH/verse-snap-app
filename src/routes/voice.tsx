@@ -197,12 +197,14 @@ function VoicePage() {
       if (!mountedRef.current) return;
       const best = valid[0];
       if (!best) {
-        // Not a reference — treat it as a description of the verse.
-        const spoken = first?.transcript ?? "";
-        const intent = spoken ? classifyQuery(spoken) : null;
-        if (intent?.kind === "description") {
-          navigate({ to: "/search", search: { q: intent.query } });
-          return;
+        // Not a reference — use the first meaningful speech alternative as a description.
+        for (let index = 0; index < Math.min(latest.length, 3); index += 1) {
+          const spoken = latest[index]?.transcript ?? "";
+          const intent = spoken ? classifyQuery(spoken) : null;
+          if (intent?.kind === "description") {
+            navigate({ to: "/search", search: { q: intent.query } });
+            return;
+          }
         }
         setState("error");
         setMessage("Couldn't identify a Bible reference.");
