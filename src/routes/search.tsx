@@ -192,9 +192,7 @@ function SearchPage() {
             ) : results.length === 0 ? (
               <div>
                 <p className="text-[0.9375rem]">Try describing the verse differently.</p>
-                <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-                  For example:
-                </p>
+                <p className="mt-1 text-[0.9375rem] text-muted-foreground">For example:</p>
                 <ul className="mt-2 text-[0.875rem] text-muted-foreground">
                   {FALLBACK_EXAMPLES.map((example) => (
                     <li key={example}>“{example}”</li>

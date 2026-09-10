@@ -23,7 +23,10 @@ function drawForOcr(
   const cropHeight = cropToGuide ? dimensions.height * 0.34 : dimensions.height;
   const sourceX = (dimensions.width - cropWidth) / 2;
   const sourceY = (dimensions.height - cropHeight) / 2;
-  const scale = Math.min(MAX_EDGE / Math.max(cropWidth, cropHeight), Math.max(1, TARGET_WIDTH / cropWidth));
+  const scale = Math.min(
+    MAX_EDGE / Math.max(cropWidth, cropHeight),
+    Math.max(1, TARGET_WIDTH / cropWidth),
+  );
   const width = Math.max(1, Math.round(cropWidth * scale));
   const height = Math.max(1, Math.round(cropHeight * scale));
   const canvas = document.createElement("canvas");

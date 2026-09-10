@@ -285,8 +285,13 @@ function ScanPage() {
         ) : null}
 
         {state === "confirm" && detected ? (
-          <section className="mt-3 border-y border-border py-5 text-center" aria-labelledby="detected-reference">
-            <p className="text-[0.9375rem] text-muted-foreground">We found something that looks like:</p>
+          <section
+            className="mt-3 border-y border-border py-5 text-center"
+            aria-labelledby="detected-reference"
+          >
+            <p className="text-[0.9375rem] text-muted-foreground">
+              We found something that looks like:
+            </p>
             <h2 id="detected-reference" className="mt-2 font-serif text-2xl font-semibold">
               {referenceLabel(detected)}
             </h2>
@@ -327,7 +332,6 @@ function ScanPage() {
               Capture
             </Button>
           ) : null}
-
 
           {state === "confirm" && detected ? (
             <>

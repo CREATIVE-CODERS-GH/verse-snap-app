@@ -190,9 +190,10 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === 2) break;
     const retryAfter = Number(response.headers.get("Retry-After"));
-    const wait = Number.isFinite(retryAfter) && retryAfter > 0
-      ? retryAfter * 1000
-      : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
+    const wait =
+      Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
     await response.body?.cancel();
     await delay(wait);
   }
@@ -310,7 +311,8 @@ function score(query: string, verse: Verse, order: number): number {
     const hits = words.filter((word) => {
       const queryWord = stem(word);
       return textWords.some(
-        (textWord) => textWord === queryWord || (queryWord.length >= 5 && withinOneEdit(queryWord, textWord)),
+        (textWord) =>
+          textWord === queryWord || (queryWord.length >= 5 && withinOneEdit(queryWord, textWord)),
       );
     }).length;
     value += Math.round((hits / words.length) * 40);
@@ -327,7 +329,10 @@ async function runSearch(query: string, translation: string): Promise<ScriptureS
     return {
       results: [],
       failed: true,
-      errorMessage: error instanceof SearchGatewayError ? error.message : "Scripture search is unavailable right now.",
+      errorMessage:
+        error instanceof SearchGatewayError
+          ? error.message
+          : "Scripture search is unavailable right now.",
     };
   }
 
@@ -398,9 +403,7 @@ export const searchScripture = createServerFn({ method: "POST" })
     if (cached) return cached;
 
     const caller =
-      getRequestHeader("cf-connecting-ip") ??
-      getRequestIP({ xForwardedFor: true }) ??
-      "unknown";
+      getRequestHeader("cf-connecting-ip") ?? getRequestIP({ xForwardedFor: true }) ?? "unknown";
     if (!withinRateLimit(caller)) {
       return {
         results: [],

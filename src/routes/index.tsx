@@ -53,12 +53,14 @@ function HomePage() {
   }
 
   if (showOnboarding) {
-    return <Onboarding
+    return (
+      <Onboarding
         onComplete={() => {
           trackEvent("onboarding_completed");
           setShowOnboarding(false);
         }}
-      />;
+      />
+    );
   }
 
   return (

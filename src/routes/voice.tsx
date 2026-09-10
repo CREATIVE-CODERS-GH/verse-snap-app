@@ -277,7 +277,7 @@ function VoicePage() {
       ? "Starting…"
       : state === "listening"
         ? "Listening…"
-          : state === "processing"
+        : state === "processing"
           ? "Finding verse…"
           : state === "ambiguous"
             ? "Did you mean?"
