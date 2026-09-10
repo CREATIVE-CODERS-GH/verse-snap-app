@@ -8,7 +8,7 @@
 - [x] Validate app flows and preserve existing design
 
 ## Phase 3 — Voice reference lookup
-- [ ] Add spoken-reference normalization and ambiguity handling
-- [ ] Add voice input route and browser recognition lifecycle
-- [ ] Connect Home Say a Verse action
+- [x] Add spoken-reference normalization and ambiguity handling
+- [x] Add voice input route and browser recognition lifecycle
+- [x] Connect Home Say a Verse action
 - [ ] Validate parser, voice states, navigation, and metadata

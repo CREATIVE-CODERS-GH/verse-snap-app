@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as ChapterTranslationBookChapterRouteImport } from './routes/chapter.$translation.$book.$chapter'
 import { Route as VerseTranslationBookChapterVerseRouteImport } from './routes/verse.$translation.$book.$chapter.$verse'
 
@@ -54,6 +55,11 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VoiceRoute = VoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChapterTranslationBookChapterRoute =
   ChapterTranslationBookChapterRouteImport.update({
     id: '/chapter/$translation/$book/$chapter',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/saved': typeof SavedRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
+  '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/voice'
     | '/chapter/$translation/$book/$chapter'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesByTo: FileRoutesByTo
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/voice'
     | '/chapter/$translation/$book/$chapter'
     | '/verse/$translation/$book/$chapter/$verse'
   id:
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/saved'
     | '/search'
     | '/settings'
+    | '/voice'
     | '/chapter/$translation/$book/$chapter'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesById: FileRoutesById
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   SavedRoute: typeof SavedRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
+  VoiceRoute: typeof VoiceRoute
   ChapterTranslationBookChapterRoute: typeof ChapterTranslationBookChapterRoute
   VerseTranslationBookChapterVerseRoute: typeof VerseTranslationBookChapterVerseRoute
 }
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/voice': {
+      id: '/voice'
+      path: '/voice'
+      fullPath: '/voice'
+      preLoaderRoute: typeof VoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chapter/$translation/$book/$chapter': {
       id: '/chapter/$translation/$book/$chapter'
       path: '/chapter/$translation/$book/$chapter'
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   SavedRoute: SavedRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
+  VoiceRoute: VoiceRoute,
   ChapterTranslationBookChapterRoute: ChapterTranslationBookChapterRoute,
   VerseTranslationBookChapterVerseRoute: VerseTranslationBookChapterVerseRoute,
 }

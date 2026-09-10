@@ -147,8 +147,13 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
     return makeReference(book, chapter, verse);
   }
 
-  const whole = parseSpokenNumber(words);
-  if (whole !== null && whole <= book.chapters) return makeReference(book, whole);
+  const isSingleCompoundNumber = words.length === 1
+    || (words.length === 2 && TENS[words[0] ?? ""] !== undefined && SMALL_NUMBERS[words[1] ?? ""] !== undefined)
+    || words.includes("hundred");
+  if (isSingleCompoundNumber) {
+    const whole = parseSpokenNumber(words);
+    if (whole !== null && whole <= book.chapters) return makeReference(book, whole);
+  }
 
   for (let split = 1; split < words.length; split += 1) {
     const chapter = parseSpokenNumber(words.slice(0, split));
@@ -156,6 +161,9 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
     const reference = makeReference(book, chapter, verse);
     if (reference) return reference;
   }
+
+  const whole = parseSpokenNumber(words);
+  if (whole !== null && whole <= book.chapters) return makeReference(book, whole);
 
   return null;
 }
