@@ -155,7 +155,9 @@ function parseNumberPortion(book: BibleBook, words: string[]): ParsedReference |
     if (whole !== null && whole <= book.chapters) return makeReference(book, whole);
   }
 
-  for (let split = 1; split < words.length; split += 1) {
+  // Prefer the longest valid chapter phrase so "Psalm twenty three one"
+  // becomes Psalm 23:1 rather than Psalm 20:4.
+  for (let split = words.length - 1; split >= 1; split -= 1) {
     const chapter = parseSpokenNumber(words.slice(0, split));
     const verse = parseSpokenNumber(words.slice(split));
     const reference = makeReference(book, chapter, verse);

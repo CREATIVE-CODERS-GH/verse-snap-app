@@ -11,4 +11,4 @@
 - [x] Add spoken-reference normalization and ambiguity handling
 - [x] Add voice input route and browser recognition lifecycle
 - [x] Connect Home Say a Verse action
-- [ ] Validate parser, voice states, navigation, and metadata
+- [x] Validate parser, voice states, navigation, and metadata
