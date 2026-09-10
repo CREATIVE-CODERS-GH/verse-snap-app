@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const [dialog, setDialog] = useState<null | "voice" | "camera">(null);
+  const [dialog, setDialog] = useState<null | "camera">(null);
   const { user } = useAuth();
 
   const { data: recent } = useQuery({
@@ -49,9 +49,11 @@ function HomePage() {
       </header>
 
       <div className="mt-8 space-y-3">
-        <Button className="h-14 w-full justify-center gap-2.5 text-base" onClick={() => setDialog("voice")}>
-          <Mic className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-          Say a Verse
+        <Button asChild className="h-14 w-full justify-center gap-2.5 text-base">
+          <Link to="/voice">
+            <Mic className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+            Say a Verse
+          </Link>
         </Button>
         <Button
           variant="outline"
@@ -98,12 +100,6 @@ function HomePage() {
         ) : null}
       </section>
 
-      <ComingSoonDialog
-        open={dialog === "voice"}
-        onOpenChange={(open) => setDialog(open ? "voice" : null)}
-        title="Voice search is coming soon"
-        description="Saying a reference out loud will be the fastest way to open a verse. For now you can search the Bible by typing a reference."
-      />
       <ComingSoonDialog
         open={dialog === "camera"}
         onOpenChange={(open) => setDialog(open ? "camera" : null)}
