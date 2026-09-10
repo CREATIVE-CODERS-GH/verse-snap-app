@@ -104,6 +104,7 @@ function SearchPage() {
     <AppShell title="Search the Bible">
       <form
         className="relative"
+        action="."
         onSubmit={(event) => {
           event.preventDefault();
           if (!trimmed) return;
