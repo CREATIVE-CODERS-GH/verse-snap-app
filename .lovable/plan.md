@@ -1,6 +1,6 @@
 # Verse Snap — first build
 
-A calm, mobile-first Bible lookup app. Six screens, bottom navigation, sample Bible text, and a swappable Bible data layer ready for the real API and accounts later.
+A calm, mobile-first Bible lookup app with real accounts. Six screens plus sign-in, bottom navigation, sample Bible text, and a swappable Bible data layer ready for the real API.
 
 ## Screens
 
@@ -16,25 +16,31 @@ A calm, mobile-first Bible lookup app. Six screens, bottom navigation, sample Bi
 
 **Settings** — plain grouped rows, no cards: Bible (Translation, Text Size), Appearance (Theme), Audio (Playback Speed), About (About Verse Snap, Privacy Policy, Terms of Service). Text Size and Theme actually work; the rest are labelled placeholders.
 
+**Sign in** — a quiet sign-in / create-account screen matching the rest of the app: email and password, plus "Continue with Google". Password reset by email, with its own set-new-password screen. Settings gains an Account section showing the signed-in email and a Sign out action.
+
 **Navigation** — fixed bottom bar: Home, Saved, History, Settings. On tablet and desktop the content stays in a narrow reading column, centred, so verses stay comfortable to read.
 
 ## Look and feel
 
 Warm off-white paper background, near-black warm ink text, one restrained accent (a deep muted blue-teal) used for the primary button, active nav item, and links. A serif for verse text and headings, a clean sans for interface labels. Hairline borders and one very light shadow reserved for the bottom bar. No gradients, glows, glass, badges, or decorative graphics. Full dark mode using the same warm palette.
 
+## Accounts and storage
+
+Real accounts are switched on using the built-in backend (email + password and Google sign-in). Saved verses and history belong to the signed-in person and sync across their devices.
+
+- Reading the Bible, searching, and opening verses stay open to everyone — no sign-in wall on the reading experience.
+- Saving a verse or seeing your Saved and History lists requires an account; tapping Save while signed out opens the sign-in screen and completes the save afterwards.
+- Tables: a profile row per person (display name, preferred translation, text size, theme), saved verses, and history entries — each tied to the account, with access rules so a person can only ever read or change their own rows. A translations table holds the available versions. A profile is created automatically on signup.
+
 ## Data and services
 
 - `bibleService` is the only thing the screens talk to for scripture: get a verse, get neighbouring verses, list translations, parse a reference. It is backed by a sample KJV dataset now (a few dozen well-known verses plus surrounding context), with a documented adapter stub for the Free Use Bible API at bible.helloao.org — no invented endpoints.
 - A separate reference parser handles the input variations above.
-- Saved verses and history go through a small storage layer with the shape accounts will need (user, verse reference, translation, timestamp). It writes to the device for now; switching it to Lovable Cloud later means changing that one layer, not the screens.
+- Saved verses and history go through one storage layer that talks to the backend, so the screens never touch the database directly.
 
 ## Technical notes
 
-- Routes: `/` (home), `/search`, `/verse/$translation/$book/$chapter/$verse`, `/saved`, `/history`, `/settings`. Each gets its own page title and description.
+- Routes: `/` (home), `/search`, `/verse/$translation/$book/$chapter/$verse`, `/auth`, `/reset-password`, and account-gated `/saved`, `/history`, `/settings`. Each gets its own page title and description.
 - Design tokens (colours, fonts, radii) defined once in `src/styles.css`; components use semantic classes only.
-- Structure: `src/components/` (nav, layout, verse row, action button, settings row), `src/lib/bible/` (service, parser, sample data, API adapter stub), `src/lib/storage/` (saved + history).
-- No backend is enabled in this step. Voice, camera, audio playback, and the live Bible API stay as clearly marked placeholders for the next phase.
-
-## Open question
-
-Accounts and sync (Lovable Cloud) are not switched on in this build — saved verses and history live on the device. Say the word and I'll add real accounts and cloud sync in the next step.
+- Structure: `src/components/` (nav, layout, verse row, action button, settings row), `src/lib/bible/` (service, parser, sample data, API adapter stub), `src/lib/storage/` (saved + history against the database).
+- Voice, camera, audio playback, and the live Bible API stay as clearly marked placeholders for the next phase.
