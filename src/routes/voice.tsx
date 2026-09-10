@@ -92,6 +92,7 @@ function VoicePage() {
   const { translation } = usePreferences();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const startingRef = useRef(false);
+  const startTimerRef = useRef<number | null>(null);
   const mountedRef = useRef(true);
   const [state, setState] = useState<VoiceState>("idle");
   const [heard, setHeard] = useState("");
@@ -128,6 +129,10 @@ function VoicePage() {
   );
 
   const stopRecognition = useCallback((abort = false) => {
+    if (startTimerRef.current !== null) {
+      window.clearTimeout(startTimerRef.current);
+      startTimerRef.current = null;
+    }
     const recognition = recognitionRef.current;
     if (!recognition) return;
     recognition.onstart = null;
@@ -165,6 +170,10 @@ function VoicePage() {
     recognition.maxAlternatives = 3;
 
     recognition.onstart = () => {
+      if (startTimerRef.current !== null) {
+        window.clearTimeout(startTimerRef.current);
+        startTimerRef.current = null;
+      }
       startingRef.current = false;
       trackEvent("voice_search_started");
       if (mountedRef.current) setState("listening");
@@ -254,6 +263,19 @@ function VoicePage() {
     try {
       setState("idle");
       recognition.start();
+      // Some browsers advertise speech recognition but never start a session;
+      // don't leave the person watching "Starting…" forever.
+      startTimerRef.current = window.setTimeout(() => {
+        startTimerRef.current = null;
+        if (!mountedRef.current) return;
+        setState((current) => {
+          if (current !== "idle") return current;
+          stopRecognition(true);
+          trackEvent("voice_search_failed", { reason: "no_start" });
+          setMessage("Voice search isn't available on this device.");
+          return "unsupported";
+        });
+      }, 7000);
     } catch {
       recognitionRef.current = null;
       startingRef.current = false;
