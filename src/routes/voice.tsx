@@ -86,6 +86,7 @@ function VoicePage() {
   const navigate = useNavigate();
   const { translation } = usePreferences();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const startingRef = useRef(false);
   const mountedRef = useRef(true);
   const [state, setState] = useState<VoiceState>("idle");
   const [heard, setHeard] = useState("");
