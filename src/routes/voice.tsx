@@ -143,6 +143,7 @@ function VoicePage() {
 
     const Recognition = getRecognitionConstructor();
     if (!Recognition) {
+      startingRef.current = false;
       setState("unsupported");
       setMessage("Voice search isn't available on this device.");
       return;
@@ -156,6 +157,7 @@ function VoicePage() {
     recognition.maxAlternatives = 3;
 
     recognition.onstart = () => {
+      startingRef.current = false;
       if (mountedRef.current) setState("listening");
     };
 
