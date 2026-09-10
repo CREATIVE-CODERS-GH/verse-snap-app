@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { parseReference } from "./parse-reference";
 import { bibleService, DEFAULT_TRANSLATION } from "./service";
@@ -390,15 +391,15 @@ export async function runScriptureSearch(
  */
 export const searchScripture = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
-  .handler(async ({ data, request }): Promise<ScriptureSearchResponse> => {
+  .handler(async ({ data }): Promise<ScriptureSearchResponse> => {
     const translation = data.translation ?? DEFAULT_TRANSLATION;
     const key = cacheKey(data.query, translation);
     const cached = cache.get(key);
     if (cached) return cached;
 
     const caller =
-      request?.headers.get("cf-connecting-ip") ??
-      request?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      getRequestHeader("cf-connecting-ip") ??
+      getRequestIP({ xForwardedFor: true }) ??
       "unknown";
     if (!withinRateLimit(caller)) {
       return {
