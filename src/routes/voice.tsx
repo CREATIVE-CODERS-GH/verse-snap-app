@@ -184,7 +184,7 @@ function VoicePage() {
       const best = valid[0];
       if (!best) {
         setState("error");
-        setMessage("I couldn't identify that Bible reference.");
+        setMessage("Couldn't identify a Bible reference.");
         return;
       }
       if (valid.length === 1 && best.confidence >= 0.65) {

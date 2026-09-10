@@ -173,9 +173,11 @@ function VersePage() {
 
       <article className="mt-8">
         <h1 className="font-serif text-xl font-semibold tracking-tight">{ref.bookName} {ref.chapter}:{ref.verse}</h1>
-        <p className="mt-1 text-[0.8125rem] text-muted-foreground">KJAV · King James (Authorized) Version</p>
+        <p className="mt-1 text-[0.8125rem] text-muted-foreground">
+          {verse?.translation ?? params.translation} · King James (Authorized) Version
+        </p>
         {verseQuery.isLoading ? (
-          <p className="mt-5 text-[0.9375rem] text-muted-foreground">Retrieving verse…</p>
+          <p className="mt-5 text-[0.9375rem] text-muted-foreground">Finding verse…</p>
         ) : verse ? (
           <p className="scripture mt-5">{verse.text}</p>
         ) : (
