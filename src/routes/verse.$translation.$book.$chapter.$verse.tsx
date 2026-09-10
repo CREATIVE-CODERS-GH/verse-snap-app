@@ -27,6 +27,7 @@ import { bibleService } from "@/lib/bible/service";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/verse/$translation/$book/$chapter/$verse")({
   head: ({ params }) => {
@@ -132,6 +133,7 @@ function VersePage() {
       else await library.save(verse, user?.id);
     },
     onSuccess: () => {
+      if (!saved) trackEvent("verse_saved");
       queryClient.invalidateQueries({ queryKey: ["saved"] });
       toast(saved ? "Removed from saved" : "Saved");
     },
@@ -142,6 +144,7 @@ function VersePage() {
     const key = `${params.translation}/${params.book}/${params.chapter}/${params.verse}/${user?.id ?? "guest"}`;
     if (!verse || authLoading || recorded.current === key) return;
     recorded.current = key;
+    trackEvent("verse_opened");
     library
       .recordView(verse, user?.id)
       .then(() => queryClient.invalidateQueries({ queryKey: ["history"] }))
@@ -165,6 +168,7 @@ function VersePage() {
     if (!verse) return;
     try {
       await copyText(shareText);
+      trackEvent("verse_copied");
       toast("Copied");
     } catch {
       toast("Could not copy this verse");
@@ -173,6 +177,7 @@ function VersePage() {
 
   async function handleShare() {
     if (!verse) return;
+    trackEvent("verse_shared");
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ title: verse.reference, text: shareText });
@@ -205,6 +210,7 @@ function VersePage() {
     utterance.onerror = () => setSpeaking(false);
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
+    trackEvent("verse_listened");
     setSpeaking(true);
   }
 

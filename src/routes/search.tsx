@@ -10,6 +10,7 @@ import { classifyQuery } from "@/lib/bible/classify-query";
 import { searchScripture } from "@/lib/bible/search.functions";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences } from "@/lib/preferences";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): { q?: string } => {
@@ -72,7 +73,11 @@ function SearchPage() {
 
   const search = useQuery({
     queryKey: ["scripture-search", description, translation],
-    queryFn: () => runSearch({ data: { query: description, translation } }),
+    queryFn: () => {
+      // Only the shape of the query is recorded, never the words themselves.
+      trackEvent("semantic_search", { length: description.length });
+      return runSearch({ data: { query: description, translation } });
+    },
     enabled: description.length > 0,
     staleTime: 60 * 60 * 1000,
     retry: false,
@@ -108,6 +113,7 @@ function SearchPage() {
           event.preventDefault();
           if (!trimmed) return;
           const intent = classifyQuery(trimmed);
+          trackEvent("manual_search", { kind: intent?.kind ?? "unknown" });
           if (intent?.kind === "reference") {
             openReference(intent.reference);
             return;
@@ -186,9 +192,7 @@ function SearchPage() {
             ) : results.length === 0 ? (
               <div>
                 <p className="text-[0.9375rem]">Try describing the verse differently.</p>
-                <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-                  For example:
-                </p>
+                <p className="mt-1 text-[0.9375rem] text-muted-foreground">For example:</p>
                 <ul className="mt-2 text-[0.875rem] text-muted-foreground">
                   {FALLBACK_EXAMPLES.map((example) => (
                     <li key={example}>“{example}”</li>

@@ -51,3 +51,11 @@
 - [x] Accept unrestricted natural-language descriptions within safe length limits
 - [x] Improve candidate ranking, fallback guidance, and Gateway error handling
 - [x] Validate requested camera/reference and semantic-search cases
+
+## V1 production readiness audit
+- [x] Tighten database privileges (signed-out visitors can only read translations)
+- [x] Add abuse throttling to the semantic search endpoint
+- [x] Add request timeouts and de-duplication to Bible lookups
+- [x] Add anonymous product analytics events
+- [x] Add a voice startup fallback for devices that never begin listening
+- [x] Verify production build, types, lint, and key mobile flows

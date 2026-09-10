@@ -1,8 +1,7 @@
 import { parseReference, type ParsedReference } from "./parse-reference";
 
 export type QueryIntent =
-  | { kind: "reference"; reference: ParsedReference }
-  | { kind: "description"; query: string };
+  { kind: "reference"; reference: ParsedReference } | { kind: "description"; query: string };
 
 /** Spoken or typed lead-ins that wrap a description, e.g. "find the verse that says …". */
 const LEAD_INS = [
@@ -17,7 +16,10 @@ const LEAD_INS = [
 
 /** Removes conversational framing so the remaining words describe the scripture. */
 export function stripLeadIn(input: string): string {
-  let text = input.trim().replace(/\s+/g, " ").replace(/[?!.]+$/, "");
+  let text = input
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[?!.]+$/, "");
   let changed = true;
   while (changed) {
     changed = false;

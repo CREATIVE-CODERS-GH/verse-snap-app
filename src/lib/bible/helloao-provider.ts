@@ -44,10 +44,15 @@ function translationId(value: string): string {
   throw new BibleServiceError("translation", "That translation is not available.");
 }
 
-async function requestJson(url: string): Promise<unknown | null> {
+const REQUEST_TIMEOUT_MS = 12_000;
+
+/** In-flight requests are shared so the same passage is never fetched twice at once. */
+const inFlight = new Map<string, Promise<unknown | null>>();
+
+async function fetchJson(url: string): Promise<unknown | null> {
   let response: Response;
   try {
-    response = await fetch(url);
+    response = await fetch(url, { signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
   } catch {
     throw new BibleServiceError("network", "Verse Snap couldn't reach the Bible right now.");
   }
@@ -59,6 +64,14 @@ async function requestJson(url: string): Promise<unknown | null> {
   } catch {
     throw new BibleServiceError("provider", "Verse Snap received an unreadable response.");
   }
+}
+
+function requestJson(url: string): Promise<unknown | null> {
+  const existing = inFlight.get(url);
+  if (existing) return existing;
+  const pending = fetchJson(url).finally(() => inFlight.delete(url));
+  inFlight.set(url, pending);
+  return pending;
 }
 
 async function getBooks(): Promise<ApiBook[]> {

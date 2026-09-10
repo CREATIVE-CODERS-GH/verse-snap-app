@@ -1,0 +1,13 @@
+REVOKE ALL ON public.profiles FROM anon;
+REVOKE ALL ON public.saved_verses FROM anon;
+REVOKE ALL ON public.history FROM anon;
+REVOKE ALL ON public.translations FROM anon;
+GRANT SELECT ON public.translations TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.saved_verses TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.history TO authenticated;
+GRANT SELECT ON public.translations TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
+GRANT ALL ON public.saved_verses TO service_role;
+GRANT ALL ON public.history TO service_role;
+GRANT ALL ON public.translations TO service_role;

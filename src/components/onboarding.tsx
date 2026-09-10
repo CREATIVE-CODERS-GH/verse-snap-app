@@ -123,10 +123,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             {[0, 1, 2].map((item) => (
               <span
                 key={item}
-                className={cn(
-                  "h-1.5 w-6 rounded-full",
-                  item === step ? "bg-primary" : "bg-muted",
-                )}
+                className={cn("h-1.5 w-6 rounded-full", item === step ? "bg-primary" : "bg-muted")}
                 aria-hidden
               />
             ))}

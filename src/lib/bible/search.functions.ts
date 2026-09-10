@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { parseReference } from "./parse-reference";
 import { bibleService, DEFAULT_TRANSLATION } from "./service";
@@ -31,6 +32,24 @@ const Input = z.object({
 });
 
 const cache = new Map<string, ScriptureSearchResponse>();
+
+const RATE_LIMIT = 20;
+const RATE_WINDOW_MS = 60_000;
+const requestLog = new Map<string, number[]>();
+
+/** Cheap per-caller throttle so the semantic endpoint cannot be hammered. */
+function withinRateLimit(caller: string): boolean {
+  const now = Date.now();
+  const recent = (requestLog.get(caller) ?? []).filter((at) => now - at < RATE_WINDOW_MS);
+  recent.push(now);
+  requestLog.set(caller, recent);
+  if (requestLog.size > 500) {
+    for (const [key, times] of requestLog) {
+      if (times.every((at) => now - at >= RATE_WINDOW_MS)) requestLog.delete(key);
+    }
+  }
+  return recent.length <= RATE_LIMIT;
+}
 
 function cacheKey(query: string, translation: string): string {
   return `${translation}::${query.toLowerCase().replace(/\s+/g, " ").trim()}`;
@@ -171,9 +190,10 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     const retryable = response.status === 429 || response.status >= 500;
     if (!retryable || attempt === 2) break;
     const retryAfter = Number(response.headers.get("Retry-After"));
-    const wait = Number.isFinite(retryAfter) && retryAfter > 0
-      ? retryAfter * 1000
-      : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
+    const wait =
+      Number.isFinite(retryAfter) && retryAfter > 0
+        ? retryAfter * 1000
+        : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
     await response.body?.cancel();
     await delay(wait);
   }
@@ -189,7 +209,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     } catch {
       if (body.trim() && body.length < 240) message = body.trim();
     }
-    console.error("Scripture search upstream failed", status, message);
+    console.error("Scripture search upstream failed", status);
     throw new SearchGatewayError(status, message);
   }
 
@@ -291,7 +311,8 @@ function score(query: string, verse: Verse, order: number): number {
     const hits = words.filter((word) => {
       const queryWord = stem(word);
       return textWords.some(
-        (textWord) => textWord === queryWord || (queryWord.length >= 5 && withinOneEdit(queryWord, textWord)),
+        (textWord) =>
+          textWord === queryWord || (queryWord.length >= 5 && withinOneEdit(queryWord, textWord)),
       );
     }).length;
     value += Math.round((hits / words.length) * 40);
@@ -308,7 +329,10 @@ async function runSearch(query: string, translation: string): Promise<ScriptureS
     return {
       results: [],
       failed: true,
-      errorMessage: error instanceof SearchGatewayError ? error.message : "Scripture search is unavailable right now.",
+      errorMessage:
+        error instanceof SearchGatewayError
+          ? error.message
+          : "Scripture search is unavailable right now.",
     };
   }
 
@@ -377,6 +401,16 @@ export const searchScripture = createServerFn({ method: "POST" })
     const key = cacheKey(data.query, translation);
     const cached = cache.get(key);
     if (cached) return cached;
+
+    const caller =
+      getRequestHeader("cf-connecting-ip") ?? getRequestIP({ xForwardedFor: true }) ?? "unknown";
+    if (!withinRateLimit(caller)) {
+      return {
+        results: [],
+        failed: true,
+        errorMessage: "Too many searches just now. Wait a moment and try again.",
+      };
+    }
 
     const response = await runSearch(data.query, translation);
     if (!response.failed) {
