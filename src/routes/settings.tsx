@@ -60,7 +60,7 @@ function Row({
 
 function SettingsPage() {
   const prefs = usePreferences();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
