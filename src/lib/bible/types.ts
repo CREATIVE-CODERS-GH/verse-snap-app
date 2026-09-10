@@ -12,6 +12,15 @@ export interface Verse extends VerseRef {
   reference: string;
 }
 
+export interface Chapter {
+  translation: string;
+  bookId: string;
+  bookName: string;
+  chapter: number;
+  reference: string;
+  verses: Verse[];
+}
+
 export interface Translation {
   code: string;
   name: string;
@@ -24,9 +33,20 @@ export interface Translation {
  */
 export interface BibleProvider {
   listTranslations(): Promise<Translation[]>;
+  getChapter(ref: Omit<VerseRef, "verse">, translation: string): Promise<Chapter | null>;
   getVerse(ref: VerseRef, translation: string): Promise<Verse | null>;
   /** Returns the neighbouring verse, or null at the edges of available data. */
   getNeighbour(ref: VerseRef, direction: -1 | 1, translation: string): Promise<Verse | null>;
+}
+
+export class BibleServiceError extends Error {
+  constructor(
+    public readonly kind: "network" | "translation" | "reference" | "provider",
+    message: string,
+  ) {
+    super(message);
+    this.name = "BibleServiceError";
+  }
 }
 
 export function formatReference(ref: VerseRef): string {

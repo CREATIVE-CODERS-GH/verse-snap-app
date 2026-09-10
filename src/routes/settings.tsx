@@ -22,6 +22,8 @@ export const Route = createFileRoute("/settings")({
       { name: "description", content: "Choose your translation, text size, theme and account options." },
       { property: "og:title", content: "Settings — Verse Snap" },
       { property: "og:description", content: "Translation, text size, theme and account options." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SettingsPage,
@@ -89,7 +91,7 @@ function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(translations ?? [{ code: "KJV", name: "King James Version", language: "English" }]).map(
+                {(translations ?? [{ code: "KJAV", name: "King James (Authorized) Version", language: "English" }]).map(
                   (item) => (
                     <SelectItem key={item.code} value={item.code}>
                       {item.code}
@@ -142,7 +144,7 @@ function SettingsPage() {
       <Section title="Audio">
         <Row
           label="Playback Speed"
-          note="Used once listening is available"
+          note="Used when listening to a verse"
           control={
             <Select value={prefs.playbackSpeed} onValueChange={prefs.setPlaybackSpeed}>
               <SelectTrigger className={selectClass} aria-label="Playback speed">

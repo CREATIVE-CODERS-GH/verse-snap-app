@@ -2,7 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { SignInPrompt } from "@/components/sign-in-prompt";
 import { VerseRow } from "@/components/verse-row";
 import {
   AlertDialog,
@@ -25,6 +24,8 @@ export const Route = createFileRoute("/history")({
       { name: "description", content: "Bible verses you have opened recently, grouped by day." },
       { property: "og:title", content: "History — Verse Snap" },
       { property: "og:description", content: "Bible verses you have opened recently." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HistoryPage,
@@ -58,12 +59,12 @@ function HistoryPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["history", user?.id],
-    queryFn: () => library.listHistory(),
-    enabled: Boolean(user),
+    queryFn: () => library.listHistory(100, user?.id),
+    enabled: !loading,
   });
 
   const clear = useMutation({
-    mutationFn: () => library.clearHistory(user!.id),
+    mutationFn: () => library.clearHistory(user?.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["history"] });
       toast("History cleared");
@@ -77,7 +78,7 @@ function HistoryPage() {
     <AppShell
       title="History"
       action={
-        user && data && data.length > 0 ? (
+        data && data.length > 0 ? (
           <AlertDialog>
             <AlertDialogTrigger className="text-[0.8125rem] text-muted-foreground hover:text-foreground">
               Clear
@@ -98,9 +99,7 @@ function HistoryPage() {
         ) : null
       }
     >
-      {loading ? null : !user ? (
-        <SignInPrompt message="Sign in to keep a history of the verses you open." />
-      ) : isLoading ? (
+      {loading || isLoading ? (
         <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
       ) : groups.length === 0 ? (
         <div className="border-t border-border pt-8">

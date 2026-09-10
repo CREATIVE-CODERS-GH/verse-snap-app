@@ -23,17 +23,12 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Open any Bible verse in seconds. Search, read, save.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HomePage,
 });
-
-const DEMO_RECENT = [
-  { bookId: "hebrews", bookName: "Hebrews", chapter: 2, verse: 5 },
-  { bookId: "john", bookName: "John", chapter: 3, verse: 16 },
-  { bookId: "romans", bookName: "Romans", chapter: 8, verse: 28 },
-  { bookId: "psalms", bookName: "Psalms", chapter: 23, verse: 1 },
-];
 
 function HomePage() {
   const [dialog, setDialog] = useState<null | "voice" | "camera">(null);
@@ -41,11 +36,10 @@ function HomePage() {
 
   const { data: recent } = useQuery({
     queryKey: ["history", "recent", user?.id],
-    queryFn: () => library.listHistory(4),
-    enabled: Boolean(user),
+    queryFn: () => library.listHistory(4, user?.id),
   });
 
-  const items = user && recent && recent.length > 0 ? recent : DEMO_RECENT;
+  const items = recent ?? [];
 
   return (
     <AppShell>
@@ -89,7 +83,7 @@ function HomePage() {
           {items.map((item) => (
             <VerseRow
               key={`${item.bookId}-${item.chapter}-${item.verse}`}
-              translation="KJV"
+              translation={item.translation}
               bookId={item.bookId}
               bookName={item.bookName}
               chapter={item.chapter}
@@ -97,13 +91,9 @@ function HomePage() {
             />
           ))}
         </div>
-        {!user ? (
+        {items.length === 0 ? (
           <p className="pt-3 text-[0.8125rem] text-muted-foreground">
-            Sample verses.{" "}
-            <Link to="/auth" className="text-primary hover:underline">
-              Sign in
-            </Link>{" "}
-            to keep your own history.
+            Verses you open will appear here.
           </p>
         ) : null}
       </section>

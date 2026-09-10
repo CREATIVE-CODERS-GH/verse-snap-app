@@ -20,7 +20,7 @@ interface PreferencesValue extends Preferences {
 const DEFAULTS: Preferences = {
   textSize: "medium",
   theme: "system",
-  translation: "KJV",
+  translation: "KJAV",
   playbackSpeed: "1x",
 };
 
@@ -40,7 +40,10 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored) setPrefs({ ...DEFAULTS, ...(JSON.parse(stored) as Partial<Preferences>) });
+      if (stored) {
+        const parsed = JSON.parse(stored) as Partial<Preferences>;
+        setPrefs({ ...DEFAULTS, ...parsed, translation: parsed.translation === "KJV" ? "KJAV" : (parsed.translation ?? DEFAULTS.translation) });
+      }
     } catch {
       /* ignore unreadable storage */
     }

@@ -14,6 +14,8 @@ export const Route = createFileRoute("/reset-password")({
       { name: "description", content: "Choose a new password for your Verse Snap account." },
       { property: "og:title", content: "Set a new password — Verse Snap" },
       { property: "og:description", content: "Choose a new password for your Verse Snap account." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ResetPasswordPage,

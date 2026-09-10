@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
@@ -19,6 +19,8 @@ export const Route = createFileRoute("/search")({
         property: "og:description",
         content: "Type a Bible reference such as John 3:16 and open the verse straight away.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SearchPage,
@@ -29,12 +31,30 @@ const EXAMPLES = ["John 3:16", "Romans 8:28", "Hebrews 2:5", "Psalm 23:1", "1 Co
 function SearchPage() {
   const [query, setQuery] = useState("");
   const { translation } = usePreferences();
+  const navigate = useNavigate();
   const result = useMemo(() => bibleService.parseReference(query), [query]);
   const trimmed = query.trim();
 
   return (
     <AppShell title="Search the Bible">
-      <div className="relative">
+      <form
+        className="relative"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!result) return;
+          if (result.verse === undefined) {
+            navigate({
+              to: "/chapter/$translation/$book/$chapter",
+              params: { translation, book: result.bookId, chapter: String(result.chapter) },
+            });
+          } else {
+            navigate({
+              to: "/verse/$translation/$book/$chapter/$verse",
+              params: { translation, book: result.bookId, chapter: String(result.chapter), verse: String(result.verse) },
+            });
+          }
+        }}
+      >
         <Search
           className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
           aria-hidden
@@ -47,23 +67,20 @@ function SearchPage() {
           autoComplete="off"
           className="h-12 rounded-md pl-9 text-base"
         />
-      </div>
+      </form>
 
       <div className="mt-6">
         {result ? (
           <Link
-            to="/verse/$translation/$book/$chapter/$verse"
-            params={{
-              translation,
-              book: result.bookId,
-              chapter: String(result.chapter),
-              verse: String(result.verse),
-            }}
+            to={result.verse === undefined ? "/chapter/$translation/$book/$chapter" : "/verse/$translation/$book/$chapter/$verse"}
+            params={result.verse === undefined
+              ? { translation, book: result.bookId, chapter: String(result.chapter) }
+              : { translation, book: result.bookId, chapter: String(result.chapter), verse: String(result.verse) }}
             className="flex items-center justify-between border-y border-border py-4"
           >
             <span>
               <span className="block text-[0.9375rem] font-medium">
-                {result.bookName} {result.chapter}:{result.verse}
+                {result.bookName} {result.chapter}{result.verse === undefined ? "" : `:${result.verse}`}
               </span>
               <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
                 {translation}
@@ -73,7 +90,7 @@ function SearchPage() {
           </Link>
         ) : trimmed.length > 2 ? (
           <p className="text-[0.9375rem] text-muted-foreground">
-            No reference found in “{trimmed}”. Try a book, chapter and verse — for example John 3:16.
+            That Bible reference doesn't look right. Try John 3:16 or Psalm 23.
           </p>
         ) : (
           <div>
