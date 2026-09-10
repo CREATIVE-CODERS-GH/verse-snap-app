@@ -1,9 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Camera, Mic, Search } from "lucide-react";
-import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
-import { ComingSoonDialog } from "@/components/coming-soon-dialog";
 import { VerseRow } from "@/components/verse-row";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -31,7 +29,6 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
-  const [dialog, setDialog] = useState<null | "camera">(null);
   const { user } = useAuth();
 
   const { data: recent } = useQuery({
@@ -102,12 +99,6 @@ function HomePage() {
         ) : null}
       </section>
 
-      <ComingSoonDialog
-        open={dialog === "camera"}
-        onOpenChange={(open) => setDialog(open ? "camera" : null)}
-        title="Camera scanning is coming soon"
-        description="Pointing your camera at a printed or on-screen reference will open the verse. For now you can search the Bible by typing a reference."
-      />
     </AppShell>
   );
 }
