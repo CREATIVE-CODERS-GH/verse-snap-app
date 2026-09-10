@@ -29,3 +29,10 @@
 - [x] Remove unused sample data and placeholder dialog code
 - [x] Fix formatting/lint issues across the app
 - [x] Validate search, save, history dedupe, offline fallback and reference parsing
+
+## Phase 6 — Natural scripture search
+- [x] Classify typed and spoken input as reference or description
+- [x] Add server-side candidate lookup, verified against the Bible source
+- [x] Rank and show matching verses in the existing search screen
+- [x] Route natural-language speech from voice into search
+- [x] Validate reference routing, phrase matches and topical queries

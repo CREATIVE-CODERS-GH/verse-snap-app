@@ -1,23 +1,32 @@
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronRight, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { classifyQuery } from "@/lib/bible/classify-query";
+import { searchScripture } from "@/lib/bible/search.functions";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences } from "@/lib/preferences";
 
 export const Route = createFileRoute("/search")({
+  validateSearch: (search: Record<string, unknown>): { q?: string } => {
+    const value = search["q"];
+    return typeof value === "string" && value.trim() ? { q: value } : {};
+  },
   head: () => ({
     meta: [
       { title: "Search the Bible — Verse Snap" },
       {
         name: "description",
-        content: "Type a Bible reference such as John 3:16 and open the verse straight away.",
+        content: "Enter a reference such as John 3:16, or describe the verse you remember.",
       },
       { property: "og:title", content: "Search the Bible — Verse Snap" },
       {
         property: "og:description",
-        content: "Type a Bible reference such as John 3:16 and open the verse straight away.",
+        content: "Enter a reference such as John 3:16, or describe the verse you remember.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -26,14 +35,64 @@ export const Route = createFileRoute("/search")({
   component: SearchPage,
 });
 
-const EXAMPLES = ["John 3:16", "Romans 8:28", "Hebrews 2:5", "Psalm 23:1", "1 Corinthians 13:4"];
+const EXAMPLES = [
+  "John 3:16",
+  "Romans 8:28",
+  "I can do all things through Christ",
+  "the verse about renewing your mind",
+  "Psalm 23:1",
+];
 
 function SearchPage() {
-  const [query, setQuery] = useState("");
+  const { q } = Route.useSearch();
+  const [query, setQuery] = useState(q ?? "");
+  const [submitted, setSubmitted] = useState(q ?? "");
   const { translation } = usePreferences();
   const navigate = useNavigate();
+  const runSearch = useServerFn(searchScripture);
   const result = useMemo(() => bibleService.parseReference(query), [query]);
   const trimmed = query.trim();
+
+  useEffect(() => {
+    if (q) {
+      setQuery(q);
+      setSubmitted(q);
+    }
+  }, [q]);
+
+  const description = useMemo(() => {
+    const intent = submitted ? classifyQuery(submitted) : null;
+    return intent?.kind === "description" ? intent.query : "";
+  }, [submitted]);
+
+  const search = useQuery({
+    queryKey: ["scripture-search", description, translation],
+    queryFn: () => runSearch({ data: { query: description, translation } }),
+    enabled: description.length > 0,
+    staleTime: 60 * 60 * 1000,
+  });
+
+  const openReference = (reference: NonNullable<typeof result>) => {
+    if (reference.verse === undefined) {
+      navigate({
+        to: "/chapter/$translation/$book/$chapter",
+        params: { translation, book: reference.bookId, chapter: String(reference.chapter) },
+      });
+      return;
+    }
+    navigate({
+      to: "/verse/$translation/$book/$chapter/$verse",
+      params: {
+        translation,
+        book: reference.bookId,
+        chapter: String(reference.chapter),
+        verse: String(reference.verse),
+      },
+    });
+  };
+
+  const results = search.data?.results ?? [];
+  const failed = search.isError || search.data?.failed === true;
 
   return (
     <AppShell title="Search the Bible">
@@ -41,23 +100,14 @@ function SearchPage() {
         className="relative"
         onSubmit={(event) => {
           event.preventDefault();
-          if (!result) return;
-          if (result.verse === undefined) {
-            navigate({
-              to: "/chapter/$translation/$book/$chapter",
-              params: { translation, book: result.bookId, chapter: String(result.chapter) },
-            });
-          } else {
-            navigate({
-              to: "/verse/$translation/$book/$chapter/$verse",
-              params: {
-                translation,
-                book: result.bookId,
-                chapter: String(result.chapter),
-                verse: String(result.verse),
-              },
-            });
+          if (!trimmed) return;
+          const intent = classifyQuery(trimmed);
+          if (intent?.kind === "reference") {
+            openReference(intent.reference);
+            return;
           }
+          setSubmitted(trimmed);
+          navigate({ to: "/search", search: { q: trimmed }, replace: true });
         }}
       >
         <Search
@@ -67,8 +117,8 @@ function SearchPage() {
         <Input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Enter a reference, e.g. John 3:16"
-          aria-label="Bible reference"
+          placeholder="Enter a reference or describe a verse..."
+          aria-label="Bible reference or description"
           autoComplete="off"
           className="h-12 rounded-md pl-9 text-base"
         />
@@ -105,9 +155,86 @@ function SearchPage() {
             </span>
             <ChevronRight className="h-4 w-4 text-muted-foreground" aria-hidden />
           </Link>
+        ) : description ? (
+          <section aria-live="polite">
+            {search.isPending ? (
+              <p className="text-[0.9375rem] text-muted-foreground">Finding verses…</p>
+            ) : failed ? (
+              <div>
+                <p className="text-[0.9375rem]">Couldn't complete that search.</p>
+                <p className="mt-1 text-[0.9375rem] text-muted-foreground">
+                  Try again, or search by reference.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => void search.refetch()}
+                >
+                  Search again
+                </Button>
+              </div>
+            ) : results.length === 0 ? (
+              <div>
+                <p className="text-[0.9375rem]">No matching verses found.</p>
+                <p className="mt-1 text-[0.9375rem] text-muted-foreground">
+                  Try a different description or search by reference.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => void search.refetch()}
+                >
+                  Search again
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-xs font-semibold uppercase tracking-[0.09em] text-muted-foreground">
+                  Relevant verses
+                </h2>
+                <ul className="mt-1">
+                  {results.map((item) => (
+                    <li
+                      key={`${item.bookId}-${item.chapter}-${item.verse}`}
+                      className="border-b border-border last:border-b-0"
+                    >
+                      <Link
+                        to="/verse/$translation/$book/$chapter/$verse"
+                        params={{
+                          translation,
+                          book: item.bookId,
+                          chapter: String(item.chapter),
+                          verse: String(item.verse),
+                        }}
+                        className="flex items-center gap-2 py-3.5"
+                      >
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[0.9375rem] font-medium">
+                            {item.reference}
+                          </span>
+                          <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
+                            {item.translation}
+                          </span>
+                          <span className="mt-1 block truncate font-serif text-sm text-muted-foreground">
+                            {item.text}
+                          </span>
+                        </span>
+                        <ChevronRight
+                          className="h-4 w-4 shrink-0 text-muted-foreground"
+                          aria-hidden
+                        />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
         ) : trimmed.length > 2 ? (
           <p className="text-[0.9375rem] text-muted-foreground">
-            That doesn't look like a valid Bible reference. Try John 3:16 or Psalm 23.
+            Press enter to search for a verse like this, or enter a reference such as John 3:16.
           </p>
         ) : (
           <div>

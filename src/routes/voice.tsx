@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { bibleService, type VerseRef } from "@/lib/bible/service";
+import { classifyQuery } from "@/lib/bible/classify-query";
 import type { ParsedReference } from "@/lib/bible/parse-reference";
 import { usePreferences } from "@/lib/preferences";
 
@@ -196,6 +197,13 @@ function VoicePage() {
       if (!mountedRef.current) return;
       const best = valid[0];
       if (!best) {
+        // Not a reference — treat it as a description of the verse.
+        const spoken = first?.transcript ?? "";
+        const intent = spoken ? classifyQuery(spoken) : null;
+        if (intent?.kind === "description") {
+          navigate({ to: "/search", search: { q: intent.query } });
+          return;
+        }
         setState("error");
         setMessage("Couldn't identify a Bible reference.");
         return;
@@ -244,7 +252,7 @@ function VoicePage() {
       setState("error");
       setMessage("Voice search couldn't start. Try again.");
     }
-  }, [openReference, stopRecognition]);
+  }, [navigate, openReference, stopRecognition]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -272,7 +280,7 @@ function VoicePage() {
       <main className="flex min-h-[28rem] flex-col items-center pt-12 text-center">
         <h2 className="font-serif text-2xl font-semibold">What verse are you looking for?</h2>
         <p className="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-          Say a reference such as “Hebrews chapter two verse five.”
+          Say a reference such as “Hebrews chapter two verse five,” or describe the verse.
         </p>
 
         <Button
