@@ -19,3 +19,13 @@
 - [x] Add camera screen with capture, guide frame, permission and fallback states
 - [x] Handle multiple, missing, and unclear references
 - [x] Validate end-to-end scan to Verse View
+
+## Phase 5 — Polish and production hardening
+- [x] Cache recent chapters locally and fall back when the service is unreachable
+- [x] Tune query caching defaults for instant repeat lookups
+- [x] Refine loading, error, and empty-state wording
+- [x] Show the real translation label on verse and chapter screens
+- [x] Guard duplicate microphone sessions and OCR reads; hold the captured frame while reading
+- [x] Remove unused sample data and placeholder dialog code
+- [x] Fix formatting/lint issues across the app
+- [x] Validate search, save, history dedupe, offline fallback and reference parsing
