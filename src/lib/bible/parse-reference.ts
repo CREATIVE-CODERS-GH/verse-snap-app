@@ -58,16 +58,18 @@ export function parseReference(input: string): VerseRef | null {
 
   // Leading ordinal words: "first john 1 9" -> "1 john 1 9"
   const words = text.split(" ");
-  if (words.length && NUMBER_WORDS[words[0]]) {
-    words[0] = NUMBER_WORDS[words[0]];
+  const firstWord = words[0];
+  if (firstWord && NUMBER_WORDS[firstWord]) {
+    words[0] = NUMBER_WORDS[firstWord] as string;
     text = words.join(" ");
   }
 
   const match = text.match(/^([0-9]?\s?[a-z][a-z\s]*?)\s+(\d{1,3})(?:\s+(\d{1,3}))?$/);
-  if (!match) return null;
+  if (!match || !match[1] || !match[2]) return null;
 
   const book = matchBook(match[1].trim());
   if (!book) return null;
+
 
   const chapter = Number(match[2]);
   const verse = match[3] ? Number(match[3]) : 1;
