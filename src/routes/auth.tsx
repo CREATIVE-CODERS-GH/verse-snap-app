@@ -11,6 +11,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in to save verses and keep your reading history in sync." },
       { property: "og:title", content: "Sign in — Verse Snap" },
       { property: "og:description", content: "Save verses and keep your reading history in sync." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AuthPage,

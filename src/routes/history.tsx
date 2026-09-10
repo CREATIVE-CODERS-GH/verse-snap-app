@@ -24,6 +24,8 @@ export const Route = createFileRoute("/history")({
       { name: "description", content: "Bible verses you have opened recently, grouped by day." },
       { property: "og:title", content: "History — Verse Snap" },
       { property: "og:description", content: "Bible verses you have opened recently." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HistoryPage,

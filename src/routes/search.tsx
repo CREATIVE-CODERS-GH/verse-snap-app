@@ -19,6 +19,8 @@ export const Route = createFileRoute("/search")({
         property: "og:description",
         content: "Type a Bible reference such as John 3:16 and open the verse straight away.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SearchPage,

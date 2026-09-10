@@ -14,6 +14,8 @@ export const Route = createFileRoute("/saved")({
       { name: "description", content: "The Bible verses you have saved to come back to." },
       { property: "og:title", content: "Saved Verses — Verse Snap" },
       { property: "og:description", content: "The Bible verses you have saved to come back to." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SavedPage,

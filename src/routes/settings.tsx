@@ -22,6 +22,8 @@ export const Route = createFileRoute("/settings")({
       { name: "description", content: "Choose your translation, text size, theme and account options." },
       { property: "og:title", content: "Settings — Verse Snap" },
       { property: "og:description", content: "Translation, text size, theme and account options." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SettingsPage,
