@@ -30,7 +30,7 @@ export function VerseRow({
           chapter: String(chapter),
           verse: String(verse),
         }}
-        className="flex min-w-0 items-center gap-2 py-3.5 pr-1"
+        className="flex min-h-12 min-w-0 items-center gap-2 py-3.5 pr-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[0.9375rem] font-medium">

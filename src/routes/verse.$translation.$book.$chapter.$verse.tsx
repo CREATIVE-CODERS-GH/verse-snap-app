@@ -209,14 +209,17 @@ function VersePage() {
   }
 
   const providerError = verseQuery.error instanceof BibleServiceError ? verseQuery.error : null;
+  const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const errorMessage =
     providerError?.kind === "network"
-      ? "Verse Snap couldn't reach the Bible right now. Check your connection and try again."
+      ? offline
+        ? "You’re offline. Connect to the internet to find this verse."
+        : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
       : providerError?.kind === "translation"
         ? "That translation isn't available."
         : "That Bible reference doesn't look right.";
   const actionClass =
-    "flex flex-1 flex-col items-center gap-1.5 py-2 text-[0.75rem] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50";
+    "flex min-h-14 flex-1 flex-col items-center justify-center gap-1.5 py-2 text-[0.75rem] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
 
   return (
     <AppShell>
@@ -256,8 +259,8 @@ function VersePage() {
         </Select>
       </div>
 
-      <article className="mt-8">
-        <h1 className="font-serif text-xl font-semibold tracking-tight">
+      <article className="mt-10">
+        <h1 className="font-serif text-2xl font-semibold">
           {ref.bookName} {ref.chapter}:{ref.verse}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
@@ -266,7 +269,7 @@ function VersePage() {
         {verseQuery.isLoading ? (
           <p className="mt-5 text-[0.9375rem] text-muted-foreground">Finding verse…</p>
         ) : verse ? (
-          <p className="scripture mt-5">{verse.text}</p>
+          <p className="scripture mt-7">{verse.text}</p>
         ) : (
           <div className="mt-5">
             <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">{errorMessage}</p>
@@ -280,17 +283,24 @@ function VersePage() {
       </article>
 
       <div className="mt-8 flex border-y border-border">
-        <button type="button" className={actionClass} onClick={handleListen} disabled={!verse}>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleListen}
+          disabled={!verse}
+        >
           {speaking ? (
             <Square className="h-[1.125rem] w-[1.125rem]" aria-hidden />
           ) : (
             <Volume2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           )}
           {speaking ? "Stop" : "Listen"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className={actionClass}
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
           onClick={() => toggleSave.mutate()}
           disabled={!verse || toggleSave.isPending}
         >
@@ -304,15 +314,27 @@ function VersePage() {
             <Bookmark className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           )}
           {saved ? "Saved" : "Save"}
-        </button>
-        <button type="button" className={actionClass} onClick={handleCopy} disabled={!verse}>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleCopy}
+          disabled={!verse}
+        >
           <Copy className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           Copy
-        </button>
-        <button type="button" className={actionClass} onClick={handleShare} disabled={!verse}>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleShare}
+          disabled={!verse}
+        >
           <Share2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           Share
-        </button>
+        </Button>
       </div>
 
       <nav className="mt-6 flex items-center justify-between text-[0.875rem]">

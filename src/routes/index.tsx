@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Camera, Mic, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
+import { BrandMark } from "@/components/brand-mark";
+import { hasCompletedOnboarding, Onboarding } from "@/components/onboarding";
 import { VerseRow } from "@/components/verse-row";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -30,6 +33,11 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const { user } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setShowOnboarding(!hasCompletedOnboarding());
+  }, []);
 
   const { data: recent } = useQuery({
     queryKey: ["history", "recent", user?.id],
@@ -38,11 +46,26 @@ function HomePage() {
 
   const items = recent ?? [];
 
+  if (showOnboarding === null) {
+    return <div className="min-h-dvh bg-background" aria-hidden />;
+  }
+
+  if (showOnboarding) {
+    return <Onboarding onComplete={() => setShowOnboarding(false)} />;
+  }
+
   return (
     <AppShell>
       <header className="pt-10">
-        <h1 className="font-serif text-[1.75rem] font-semibold tracking-tight">Verse Snap</h1>
-        <p className="mt-1 text-[0.9375rem] text-muted-foreground">Find your verse. Instantly.</p>
+        <div className="flex items-center gap-3">
+          <BrandMark />
+          <div>
+            <h1 className="font-serif text-[1.75rem] font-semibold">Verse Snap</h1>
+            <p className="mt-0.5 text-[0.9375rem] text-muted-foreground">
+              Find your verse. Instantly.
+            </p>
+          </div>
+        </div>
       </header>
 
       <div className="mt-8 space-y-3">

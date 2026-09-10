@@ -204,13 +204,13 @@ function ScanPage() {
         </p>
 
         {showCamera ? (
-          <div className="relative mt-5 overflow-hidden rounded-md border border-border bg-muted">
+          <div className="relative mt-5 aspect-[4/3] overflow-hidden rounded-md border border-border bg-muted">
             <video
               ref={videoRef}
               playsInline
               muted
               autoPlay
-              className="block h-auto w-full"
+              className="block h-full w-full object-cover"
               aria-label="Camera preview"
             />
             <div
@@ -264,7 +264,7 @@ function ScanPage() {
           ) : null}
 
           {state === "unsupported" || state === "denied" || state === "error" ? (
-            <label className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border border-border text-[0.9375rem]">
+            <label className="flex h-12 w-full cursor-pointer items-center justify-center rounded-md border border-border text-[0.9375rem] focus-within:ring-2 focus-within:ring-ring">
               Upload a photo
               <input
                 type="file"

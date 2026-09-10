@@ -36,9 +36,12 @@ function ChapterPage() {
     enabled: Boolean(book && Number.isInteger(chapterNumber) && chapterNumber > 0),
   });
 
+  const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const message =
     query.error instanceof BibleServiceError && query.error.kind === "network"
-      ? "Verse Snap couldn't reach the Bible right now. Check your connection and try again."
+      ? offline
+        ? "You’re offline. Connect to the internet to find this chapter."
+        : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
       : "That Bible reference doesn't look right.";
 
   return (
@@ -52,7 +55,7 @@ function ChapterPage() {
         </Link>
       </div>
       <article className="mt-8">
-        <h1 className="font-serif text-xl font-semibold tracking-tight">
+        <h1 className="font-serif text-2xl font-semibold">
           {ref.bookName} {chapterNumber}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
