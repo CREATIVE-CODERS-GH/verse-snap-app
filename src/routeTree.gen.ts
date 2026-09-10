@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as VoiceRouteImport } from './routes/voice'
@@ -43,6 +44,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const SavedRoute = SavedRouteImport.update({
   id: '/saved',
   path: '/saved',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScanRoute = ScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
+  '/scan': typeof ScanRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
+  '/scan': typeof ScanRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
+  '/scan': typeof ScanRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/reset-password'
     | '/saved'
+    | '/scan'
     | '/search'
     | '/settings'
     | '/voice'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/reset-password'
     | '/saved'
+    | '/scan'
     | '/search'
     | '/settings'
     | '/voice'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/history'
     | '/reset-password'
     | '/saved'
+    | '/scan'
     | '/search'
     | '/settings'
     | '/voice'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
+  ScanRoute: typeof ScanRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   VoiceRoute: typeof VoiceRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/saved'
       fullPath: '/saved'
       preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scan': {
+      id: '/scan'
+      path: '/scan'
+      fullPath: '/scan'
+      preLoaderRoute: typeof ScanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
+  ScanRoute: ScanRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   VoiceRoute: VoiceRoute,
