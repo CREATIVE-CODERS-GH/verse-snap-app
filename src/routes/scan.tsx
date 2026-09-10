@@ -8,6 +8,7 @@ import { parseReference } from "@/lib/bible/parse-reference";
 import { captureFrame, prepareImageFile } from "@/lib/ocr/capture";
 import { ocrService } from "@/lib/ocr/service";
 import { usePreferences } from "@/lib/preferences";
+import { trackEvent } from "@/lib/analytics";
 
 type ScanState =
   | "starting"
@@ -118,6 +119,7 @@ function ScanPage() {
         await videoRef.current.play().catch(() => undefined);
       }
       setState("ready");
+      trackEvent("camera_opened");
     } catch (error) {
       if (!mountedRef.current) return;
       const name = error instanceof DOMException ? error.name : "";
@@ -134,6 +136,9 @@ function ScanPage() {
   const handleText = useCallback(
     (text: string, confidence: number) => {
       const references = findReferences(text, 5);
+      trackEvent(references.length === 0 ? "camera_ocr_failed" : "camera_ocr_success", {
+        matches: references.length,
+      });
       if (references.length === 0) {
         setState("error");
         setMessage(
@@ -186,6 +191,7 @@ function ScanPage() {
         handleText(result.text, result.confidence);
       } catch {
         if (!mountedRef.current) return;
+        trackEvent("camera_ocr_failed", { reason: "engine_error" });
         setState("error");
         setMessage("Couldn't read the reference clearly.");
       } finally {

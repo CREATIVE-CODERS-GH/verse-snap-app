@@ -9,6 +9,7 @@ import { VerseRow } from "@/components/verse-row";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,6 +38,7 @@ function HomePage() {
 
   useEffect(() => {
     setShowOnboarding(!hasCompletedOnboarding());
+    trackEvent("app_open");
   }, []);
 
   const { data: recent } = useQuery({
@@ -51,7 +53,12 @@ function HomePage() {
   }
 
   if (showOnboarding) {
-    return <Onboarding onComplete={() => setShowOnboarding(false)} />;
+    return <Onboarding
+        onComplete={() => {
+          trackEvent("onboarding_completed");
+          setShowOnboarding(false);
+        }}
+      />;
   }
 
   return (

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { VerseRow } from "@/components/verse-row";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/auth";
 import { library, type LibraryEntry } from "@/lib/library";
+import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -54,6 +56,9 @@ function groupByDay(entries: LibraryEntry[]) {
 }
 
 function HistoryPage() {
+  useEffect(() => {
+    trackEvent("history_opened");
+  }, []);
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
 
