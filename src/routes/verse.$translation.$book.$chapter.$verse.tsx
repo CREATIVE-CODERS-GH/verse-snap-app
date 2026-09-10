@@ -283,17 +283,24 @@ function VersePage() {
       </article>
 
       <div className="mt-8 flex border-y border-border">
-        <button type="button" className={actionClass} onClick={handleListen} disabled={!verse}>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleListen}
+          disabled={!verse}
+        >
           {speaking ? (
             <Square className="h-[1.125rem] w-[1.125rem]" aria-hidden />
           ) : (
             <Volume2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           )}
           {speaking ? "Stop" : "Listen"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className={actionClass}
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
           onClick={() => toggleSave.mutate()}
           disabled={!verse || toggleSave.isPending}
         >
@@ -307,15 +314,27 @@ function VersePage() {
             <Bookmark className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           )}
           {saved ? "Saved" : "Save"}
-        </button>
-        <button type="button" className={actionClass} onClick={handleCopy} disabled={!verse}>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleCopy}
+          disabled={!verse}
+        >
           <Copy className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           Copy
-        </button>
-        <button type="button" className={actionClass} onClick={handleShare} disabled={!verse}>
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className={`${actionClass} h-auto rounded-none`}
+          onClick={handleShare}
+          disabled={!verse}
+        >
           <Share2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
           Share
-        </button>
+        </Button>
       </div>
 
       <nav className="mt-6 flex items-center justify-between text-[0.875rem]">
