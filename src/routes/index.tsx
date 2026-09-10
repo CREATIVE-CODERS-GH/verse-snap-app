@@ -50,9 +50,11 @@ function HomePage() {
     return <div className="min-h-dvh bg-background" aria-hidden />;
   }
 
+  if (showOnboarding) {
+    return <Onboarding onComplete={() => setShowOnboarding(false)} />;
+  }
+
   return (
-    <>
-      {showOnboarding ? <Onboarding onComplete={() => setShowOnboarding(false)} /> : null}
     <AppShell>
       <header className="pt-10">
         <div className="flex items-center gap-3">
@@ -120,6 +122,5 @@ function HomePage() {
         ) : null}
       </section>
     </AppShell>
-    </>
   );
 }
