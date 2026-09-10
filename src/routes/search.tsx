@@ -90,7 +90,7 @@ function SearchPage() {
           </Link>
         ) : trimmed.length > 2 ? (
           <p className="text-[0.9375rem] text-muted-foreground">
-            That Bible reference doesn't look right. Try John 3:16 or Psalm 23.
+            That doesn't look like a valid Bible reference. Try John 3:16 or Psalm 23.
           </p>
         ) : (
           <div>

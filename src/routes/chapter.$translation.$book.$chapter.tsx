@@ -47,9 +47,11 @@ function ChapterPage() {
       </div>
       <article className="mt-8">
         <h1 className="font-serif text-xl font-semibold tracking-tight">{ref.bookName} {chapterNumber}</h1>
-        <p className="mt-1 text-[0.8125rem] text-muted-foreground">KJAV · King James (Authorized) Version</p>
+        <p className="mt-1 text-[0.8125rem] text-muted-foreground">
+          {query.data?.translation ?? params.translation} · King James (Authorized) Version
+        </p>
         {query.isLoading ? (
-          <p className="mt-6 text-[0.9375rem] text-muted-foreground">Retrieving chapter…</p>
+          <p className="mt-6 text-[0.9375rem] text-muted-foreground">Finding chapter…</p>
         ) : query.data ? (
           <div className="mt-6 space-y-4">
             {query.data.verses.map((verse) => (

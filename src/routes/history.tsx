@@ -103,7 +103,7 @@ function HistoryPage() {
         <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
       ) : groups.length === 0 ? (
         <div className="border-t border-border pt-8">
-          <p className="text-[0.9375rem] font-medium">Nothing here yet.</p>
+          <p className="text-[0.9375rem] font-medium">No recent verses.</p>
           <p className="mt-1 text-[0.9375rem] text-muted-foreground">
             Verses you open will appear here.
           </p>
