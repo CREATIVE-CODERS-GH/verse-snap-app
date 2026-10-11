@@ -3,6 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "./types";
 import { brokeredPreviewStorage } from "./previewAuthStorage";
 
+type SupabaseClient = ReturnType<typeof createClient<Database>>;
+
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
@@ -30,9 +32,7 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
+function buildClient(): SupabaseClient | null {
   const SUPABASE_URL = import.meta.env["VITE_SUPABASE_URL"] || process.env["SUPABASE_URL"];
   const SUPABASE_PUBLISHABLE_KEY =
     import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
@@ -42,9 +42,8 @@ function createSupabaseClient() {
       ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
       ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
+    console.warn(`[Supabase] Missing env var(s): ${missing.join(", ")}. Running in guest-only mode.`);
+    return null;
   }
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -59,13 +58,50 @@ function createSupabaseClient() {
   });
 }
 
-let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
+let _client: SupabaseClient | null | undefined;
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
-export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
+function getClient(): SupabaseClient | null {
+  if (_client === undefined) _client = buildClient();
+  return _client;
+}
+
+/**
+ * Returns the Supabase client, or null when env vars are not configured.
+ * Always null-check before calling auth/database methods.
+ *
+ * Import the supabase client like this:
+ *   import { supabase } from "@/integrations/supabase/client";
+ */
+export const supabase = new Proxy({} as SupabaseClient, {
   get(_, prop, receiver) {
-    if (!_supabase) _supabase = createSupabaseClient();
-    return Reflect.get(_supabase, prop, receiver);
+    const client = getClient();
+    if (!client) {
+      // Return a safe no-op for auth so callers that don't guard still won't throw
+      if (prop === "auth") {
+        return {
+          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+          getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+          signOut: () => Promise.resolve({ error: null }),
+        };
+      }
+      // For table queries return a chainable stub that resolves to empty data
+      return () => ({
+        select: () => Promise.resolve({ data: [], error: null }),
+        insert: () => Promise.resolve({ data: null, error: null }),
+        upsert: () => Promise.resolve({ data: null, error: null }),
+        delete: () => Promise.resolve({ data: null, error: null }),
+        eq: function () { return this; },
+        order: function () { return this; },
+        limit: function () { return this; },
+        maybeSingle: () => Promise.resolve({ data: null, error: null }),
+        single: () => Promise.resolve({ data: null, error: null }),
+      });
+    }
+    return Reflect.get(client, prop, receiver);
   },
 });
+
+/** True when Supabase credentials are available */
+export function isSupabaseConfigured(): boolean {
+  return getClient() !== null;
+}
