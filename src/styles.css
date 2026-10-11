@@ -36,7 +36,23 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
+  --color-action-green: var(--action-green-bg);
+  --color-action-green-deep: var(--action-green-bg-deep);
+  --color-action-green-icon: var(--action-green-icon);
+  --color-action-green-heading: var(--action-green-heading);
+  --color-action-green-text: var(--action-green-text);
+  --color-action-peach: var(--action-peach-bg);
+  --color-action-peach-deep: var(--action-peach-bg-deep);
+  --color-action-peach-icon: var(--action-peach-icon);
+  --color-action-peach-icon-deep: var(--action-peach-icon-deep);
+  --color-action-peach-heading: var(--action-peach-heading);
+  --color-action-peach-text: var(--action-peach-text);
+  --color-action-blue: var(--action-blue-bg);
+  --color-action-blue-deep: var(--action-blue-bg-deep);
+  --color-action-blue-icon: var(--action-blue-icon);
+  --color-action-blue-icon-deep: var(--action-blue-icon-deep);
+  --color-action-blue-heading: var(--action-blue-heading);
+  --color-action-blue-text: var(--action-blue-text);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -68,6 +84,24 @@
   --border: oklch(0.9 0.009 80);
   --input: oklch(0.9 0.009 80);
   --ring: oklch(0.46 0.055 215);
+  /* Home action cards (light) */
+  --action-green-bg: oklch(0.965 0.022 155);
+  --action-green-bg-deep: oklch(0.945 0.03 155);
+  --action-green-icon: oklch(0.42 0.085 158);
+  --action-green-heading: oklch(0.28 0.045 158);
+  --action-green-text: oklch(0.46 0.04 158);
+  --action-peach-bg: oklch(0.975 0.017 70);
+  --action-peach-bg-deep: oklch(0.955 0.028 68);
+  --action-peach-icon: oklch(0.68 0.095 62);
+  --action-peach-icon-deep: oklch(0.61 0.095 60);
+  --action-peach-heading: oklch(0.32 0.055 58);
+  --action-peach-text: oklch(0.5 0.05 62);
+  --action-blue-bg: oklch(0.965 0.018 252);
+  --action-blue-bg-deep: oklch(0.945 0.028 252);
+  --action-blue-icon: oklch(0.55 0.17 258);
+  --action-blue-icon-deep: oklch(0.48 0.16 258);
+  --action-blue-heading: oklch(0.28 0.065 258);
+  --action-blue-text: oklch(0.45 0.06 258);
   --sidebar: oklch(0.985 0.006 85);
   --sidebar-foreground: oklch(0.24 0.014 60);
   --sidebar-primary: oklch(0.46 0.055 215);
@@ -100,6 +134,24 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 16%);
   --ring: oklch(0.74 0.06 210);
+  /* Home action cards (dark) */
+  --action-green-bg: oklch(0.27 0.028 158);
+  --action-green-bg-deep: oklch(0.24 0.03 158);
+  --action-green-icon: oklch(0.74 0.09 158);
+  --action-green-heading: oklch(0.88 0.03 158);
+  --action-green-text: oklch(0.72 0.03 158);
+  --action-peach-bg: oklch(0.27 0.025 62);
+  --action-peach-bg-deep: oklch(0.24 0.028 62);
+  --action-peach-icon: oklch(0.72 0.09 62);
+  --action-peach-icon-deep: oklch(0.64 0.09 62);
+  --action-peach-heading: oklch(0.9 0.025 68);
+  --action-peach-text: oklch(0.75 0.03 66);
+  --action-blue-bg: oklch(0.27 0.035 258);
+  --action-blue-bg-deep: oklch(0.24 0.038 258);
+  --action-blue-icon: oklch(0.7 0.14 258);
+  --action-blue-icon-deep: oklch(0.6 0.14 258);
+  --action-blue-heading: oklch(0.9 0.02 258);
+  --action-blue-text: oklch(0.73 0.04 258);
   --sidebar: oklch(0.19 0.008 70);
   --sidebar-foreground: oklch(0.94 0.005 85);
   --sidebar-primary: oklch(0.74 0.06 210);
@@ -128,6 +180,31 @@
   font-size: var(--verse-size);
   line-height: 1.75;
   letter-spacing: 0.003em;
+}
+
+@utility action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.25rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklch, var(--color-foreground) 6%, transparent);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.action-card:active {
+  transform: scale(0.985);
+}
+
+@media (hover: hover) {
+  .action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px color-mix(in oklch, var(--color-foreground) 8%, transparent);
+  }
 }
 
 @layer base {
