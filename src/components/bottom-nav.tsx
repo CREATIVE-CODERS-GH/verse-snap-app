@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getLastRead } from "@/lib/last-read";
 
 const TAB_CLASS =
-  "relative flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:font-medium data-[status=active]:text-primary after:absolute after:top-0 after:h-0.5 after:w-8 after:bg-transparent data-[status=active]:after:bg-primary";
+  "relative flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:font-medium data-[status=active]:text-primary after:absolute after:top-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-8 after:bg-transparent data-[status=active]:after:bg-primary";
 
 const ITEMS = [
   { to: "/", label: "Home", icon: Home, exact: true },
