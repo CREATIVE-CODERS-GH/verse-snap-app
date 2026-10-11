@@ -1,8 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
+import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
+import { setLastRead } from "@/lib/last-read";
 import { findBook } from "@/lib/bible/books";
 import { BibleServiceError } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
@@ -35,6 +37,12 @@ function ChapterPage() {
     queryFn: () => bibleService.getChapter(ref, params.translation),
     enabled: Boolean(book && Number.isInteger(chapterNumber) && chapterNumber > 0),
   });
+
+  useEffect(() => {
+    if (query.data) {
+      setLastRead({ translation: params.translation, bookId: params.book, chapter: chapterNumber });
+    }
+  }, [query.data, params.translation, params.book, chapterNumber]);
 
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const message =
