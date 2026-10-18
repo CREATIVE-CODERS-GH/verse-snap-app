@@ -65,6 +65,9 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     const dark = prefs.theme === "dark" || (prefs.theme === "system" && prefersDark);
     root.classList.toggle("dark", dark);
+    // Keep the installed-app / browser chrome colour in sync with the app theme.
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.setAttribute("content", dark ? "#161310" : "#fcfaf6");
   }, [prefs]);
 
   const value = useMemo<PreferencesValue>(
