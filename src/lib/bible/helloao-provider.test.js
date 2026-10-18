@@ -22,6 +22,13 @@ describe("Bible edition lookup", () => {
     expect(resolveTranslation("KJV").code).toBe("KJAV");
     expect(resolveTranslation("KJV").apiId).toBe("eng_kjv");
   });
+  it("keeps words separated around footnotes in modern editions", async () => {
+    globalThis.fetch = mock(async () => Response.json({ chapter: { content: [
+      { type: "verse", number: 16, content: ["His one and only", { noteId: 17 }, "Son"] },
+    ] } }));
+    const verse = await helloAoProvider.getVerse({ bookId: "john", bookName: "John", chapter: 3, verse: 16 }, "BSB");
+    expect(verse.text).toBe("His one and only Son");
+  });
   it("does not silently substitute an unsupported edition", () => {
     expect(() => resolveTranslation("NIV")).toThrow("That translation is not available.");
   });

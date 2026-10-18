@@ -32,6 +32,8 @@ function readableText(value: unknown): string {
   if (Array.isArray(value)) return value.map(readableText).join("");
   if (!value || typeof value !== "object") return "";
   const item = value as Record<string, unknown>;
+  // Footnotes can separate words without whitespace in the API content.
+  if ("noteId" in item) return " ";
   if (typeof item["text"] === "string") return item["text"];
   if (Array.isArray(item["content"])) return readableText(item["content"]);
   return "";
