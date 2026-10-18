@@ -95,7 +95,7 @@ function SettingsPage() {
           control={
             <Select value={prefs.translation} onValueChange={prefs.setTranslation}>
               <SelectTrigger className={selectClass} aria-label="Translation">
-                <SelectValue />
+                <SelectValue>{prefs.translation}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {(translations ?? BIBLE_TRANSLATIONS).map((item) => (

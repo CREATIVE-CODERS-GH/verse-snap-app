@@ -250,7 +250,7 @@ function VersePage() {
             className="h-8 w-auto gap-1.5 border-border text-[0.8125rem]"
             aria-label="Translation"
           >
-            <SelectValue />
+            <SelectValue>{params.translation}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             {(translations ?? BIBLE_TRANSLATIONS).map((item) => (
