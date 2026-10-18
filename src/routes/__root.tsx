@@ -86,6 +86,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "description",
         content: "A quiet, fast way to open and read any Bible verse.",
       },
+      { name: "theme-color", content: "#f8f6f0", media: "(prefers-color-scheme: light)" },
+      { name: "theme-color", content: "#302a24", media: "(prefers-color-scheme: dark)" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "Verse Snap" },
       { property: "og:title", content: "Verse Snap — Find your verse. Instantly." },
       {
         property: "og:description",
