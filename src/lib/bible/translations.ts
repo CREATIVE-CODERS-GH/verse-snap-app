@@ -14,7 +14,8 @@ export function resolveTranslation(value: string) {
   const translation = BIBLE_TRANSLATIONS.find(
     (item) => item.code === normalized || item.apiId === normalized,
   );
-  if (!translation) throw new BibleServiceError("translation", "That translation is not available.");
+  if (!translation)
+    throw new BibleServiceError("translation", "That translation is not available.");
   return translation;
 }
 

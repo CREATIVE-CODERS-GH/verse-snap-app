@@ -98,9 +98,7 @@ function SettingsPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {(
-                  translations ?? BIBLE_TRANSLATIONS
-                ).map((item) => (
+                {(translations ?? BIBLE_TRANSLATIONS).map((item) => (
                   <SelectItem key={item.code} value={item.code}>
                     {item.code} · {item.name}
                   </SelectItem>

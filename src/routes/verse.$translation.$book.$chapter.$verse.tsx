@@ -253,9 +253,7 @@ function VersePage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {(
-              translations ?? BIBLE_TRANSLATIONS
-            ).map((item) => (
+            {(translations ?? BIBLE_TRANSLATIONS).map((item) => (
               <SelectItem key={item.code} value={item.code}>
                 {item.code} · {item.name}
               </SelectItem>
@@ -269,7 +267,8 @@ function VersePage() {
           {ref.bookName} {ref.chapter}:{ref.verse}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-          {verse?.translation ?? params.translation} · {translationName(verse?.translation ?? params.translation)}
+          {verse?.translation ?? params.translation} ·{" "}
+          {translationName(verse?.translation ?? params.translation)}
         </p>
         {verseQuery.isLoading ? (
           <p className="mt-5 text-[0.9375rem] text-muted-foreground">Finding verse…</p>

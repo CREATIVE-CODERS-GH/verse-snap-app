@@ -71,18 +71,20 @@ async function getBooks(translation: string): Promise<ApiBook[]> {
   const apiId = resolveTranslation(translation).apiId;
   const existing = booksPromises.get(apiId);
   if (existing) return existing;
-  const pending = requestJson(`${BASE_URL}/${apiId}/books.json`).then((data) => {
-    const books =
-      data && typeof data === "object" ? (data as { books?: unknown }).books : undefined;
-    if (!Array.isArray(books))
-      throw new BibleServiceError("provider", "The Bible book list is unavailable.");
-    return books.filter((book): book is ApiBook =>
-      Boolean(book && typeof book === "object" && "id" in book),
-    );
-  }).catch((error: unknown) => {
-    booksPromises.delete(apiId);
-    throw error;
-  });
+  const pending = requestJson(`${BASE_URL}/${apiId}/books.json`)
+    .then((data) => {
+      const books =
+        data && typeof data === "object" ? (data as { books?: unknown }).books : undefined;
+      if (!Array.isArray(books))
+        throw new BibleServiceError("provider", "The Bible book list is unavailable.");
+      return books.filter((book): book is ApiBook =>
+        Boolean(book && typeof book === "object" && "id" in book),
+      );
+    })
+    .catch((error: unknown) => {
+      booksPromises.delete(apiId);
+      throw error;
+    });
   booksPromises.set(apiId, pending);
   return pending;
 }

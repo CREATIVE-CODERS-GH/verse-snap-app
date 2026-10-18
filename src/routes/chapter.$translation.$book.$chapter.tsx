@@ -68,7 +68,8 @@ function ChapterPage() {
           {ref.bookName} {chapterNumber}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-          {query.data?.translation ?? params.translation} · {translationName(query.data?.translation ?? params.translation)}
+          {query.data?.translation ?? params.translation} ·{" "}
+          {translationName(query.data?.translation ?? params.translation)}
         </p>
         {query.isLoading ? (
           <p className="mt-6 text-[0.9375rem] text-muted-foreground">Finding chapter…</p>
