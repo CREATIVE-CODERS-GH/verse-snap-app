@@ -49,7 +49,7 @@ function ChapterPage() {
   const message =
     query.error instanceof BibleServiceError && query.error.kind === "network"
       ? offline
-        ? "You’re offline. Connect to the internet to find this chapter."
+        ? "You’re offline, and this chapter isn’t saved on this device yet. Chapters you’ve opened recently are available offline — reconnect to read this one."
         : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
       : "That Bible reference doesn't look right.";
 
