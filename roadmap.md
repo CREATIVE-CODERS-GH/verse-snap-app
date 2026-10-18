@@ -59,3 +59,8 @@
 - [x] Add anonymous product analytics events
 - [x] Add a voice startup fallback for devices that never begin listening
 - [x] Verify production build, types, lint, and key mobile flows
+
+## Installable app (home screen)
+- [x] Add web app manifest with standalone display, app icons, and maskable icon
+- [x] Wire apple-touch-icon, theme colour, and iOS web-app metadata
+- [x] Keep theme colour in sync with the app's light/dark setting
