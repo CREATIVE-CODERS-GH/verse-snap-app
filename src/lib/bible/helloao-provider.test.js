@@ -14,6 +14,7 @@ describe("Bible edition lookup", () => {
     ["WEB", "ENGWEBP"],
     ["ASV", "eng_asv"],
     ["BBE", "eng_bbe"],
+    ["FBV", "eng_fbv"],
   ]) {
     it(`loads and labels ${code} from its own edition`, async () => {
       const request = mock(async () =>

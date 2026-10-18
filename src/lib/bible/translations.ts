@@ -7,6 +7,7 @@ export const BIBLE_TRANSLATIONS: (Translation & { apiId: string })[] = [
   { code: "WEB", apiId: "ENGWEBP", name: "World English Bible", language: "English" },
   { code: "ASV", apiId: "eng_asv", name: "American Standard Version (1901)", language: "English" },
   { code: "BBE", apiId: "eng_bbe", name: "Bible in Basic English", language: "English" },
+  { code: "FBV", apiId: "eng_fbv", name: "Free Bible Version", language: "English" },
 ];
 
 export function resolveTranslation(value: string) {
