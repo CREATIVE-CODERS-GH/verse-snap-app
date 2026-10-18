@@ -2,6 +2,7 @@
 
 ## Additional Bible versions
 - [x] Enable complete public-domain English BSB, WEB, ASV, and BBE editions alongside KJAV
+- [x] Add the Free Bible Version (FBV) — modern NLT-style wording; NLT itself is copyrighted and unavailable
 - [x] Use selected-edition text and accurate names throughout reading and search
 - [x] Verify switching, guest saved/history isolation, navigation, and version-specific lookup
 
