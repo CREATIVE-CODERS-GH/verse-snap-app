@@ -4,14 +4,12 @@ import {
   formatReference,
   type BibleProvider,
   type Chapter,
-  type Translation,
   type Verse,
   type VerseRef,
 } from "./types";
+import { BIBLE_TRANSLATIONS, resolveTranslation } from "./translations";
 
 const BASE_URL = "https://bible.helloao.org/api";
-const API_TRANSLATION = "eng_kjv";
-const DISPLAY_CODE = "KJAV";
 
 interface ApiBook {
   id: string;
@@ -27,7 +25,7 @@ interface ApiChapter {
   chapter?: { number?: number; content?: unknown[] };
 }
 
-let booksPromise: Promise<ApiBook[]> | undefined;
+const booksPromises = new Map<string, Promise<ApiBook[]>>();
 
 function readableText(value: unknown): string {
   if (typeof value === "string") return value;
@@ -37,11 +35,6 @@ function readableText(value: unknown): string {
   if (typeof item["text"] === "string") return item["text"];
   if (Array.isArray(item["content"])) return readableText(item["content"]);
   return "";
-}
-
-function translationId(value: string): string {
-  if ([DISPLAY_CODE, "KJV", API_TRANSLATION].includes(value)) return API_TRANSLATION;
-  throw new BibleServiceError("translation", "That translation is not available.");
 }
 
 const REQUEST_TIMEOUT_MS = 12_000;
@@ -74,8 +67,11 @@ function requestJson(url: string): Promise<unknown | null> {
   return pending;
 }
 
-async function getBooks(): Promise<ApiBook[]> {
-  booksPromise ??= requestJson(`${BASE_URL}/${API_TRANSLATION}/books.json`).then((data) => {
+async function getBooks(translation: string): Promise<ApiBook[]> {
+  const apiId = resolveTranslation(translation).apiId;
+  const existing = booksPromises.get(apiId);
+  if (existing) return existing;
+  const pending = requestJson(`${BASE_URL}/${apiId}/books.json`).then((data) => {
     const books =
       data && typeof data === "object" ? (data as { books?: unknown }).books : undefined;
     if (!Array.isArray(books))
@@ -83,15 +79,20 @@ async function getBooks(): Promise<ApiBook[]> {
     return books.filter((book): book is ApiBook =>
       Boolean(book && typeof book === "object" && "id" in book),
     );
+  }).catch((error: unknown) => {
+    booksPromises.delete(apiId);
+    throw error;
   });
-  return booksPromise;
+  booksPromises.set(apiId, pending);
+  return pending;
 }
 
 async function fetchChapter(
   ref: Omit<VerseRef, "verse">,
   translation: string,
 ): Promise<Chapter | null> {
-  const apiTranslation = translationId(translation);
+  const edition = resolveTranslation(translation);
+  const apiTranslation = edition.apiId;
   const apiBookId = toApiBookId(ref.bookId);
   const localBook = findBook(ref.bookId);
   if (!apiBookId || !localBook || !Number.isInteger(ref.chapter) || ref.chapter < 1) return null;
@@ -110,12 +111,12 @@ async function fetchChapter(
     const verseRef: VerseRef = { ...ref, bookName: localBook.name, verse: item.number };
     const text = readableText(item.content).replace(/\s+/g, " ").trim();
     return text
-      ? [{ ...verseRef, translation: DISPLAY_CODE, text, reference: formatReference(verseRef) }]
+      ? [{ ...verseRef, translation: edition.code, text, reference: formatReference(verseRef) }]
       : [];
   });
 
   return {
-    translation: DISPLAY_CODE,
+    translation: edition.code,
     bookId: localBook.id,
     bookName: localBook.name,
     chapter: ref.chapter,
@@ -126,10 +127,7 @@ async function fetchChapter(
 
 export const helloAoProvider: BibleProvider = {
   async listTranslations() {
-    // The English Authorized Version is the one verified and enabled for this release.
-    return [
-      { code: DISPLAY_CODE, name: "King James (Authorized) Version", language: "English" },
-    ] satisfies Translation[];
+    return BIBLE_TRANSLATIONS.map(({ code, name, language }) => ({ code, name, language }));
   },
   async getChapter(ref, translation) {
     return fetchChapter(ref, translation);
@@ -146,7 +144,7 @@ export const helloAoProvider: BibleProvider = {
     const neighbour = chapter.verses[index + direction];
     if (neighbour) return neighbour;
 
-    const books = await getBooks();
+    const books = await getBooks(translation);
     const apiBookId = toApiBookId(ref.bookId);
     const apiBookIndex = books.findIndex((book) => book.id.toUpperCase() === apiBookId);
     const apiBook = books[apiBookIndex];

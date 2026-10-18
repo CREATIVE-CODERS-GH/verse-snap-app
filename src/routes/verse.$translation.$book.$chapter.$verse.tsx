@@ -24,6 +24,7 @@ import {
 import { findBook } from "@/lib/bible/books";
 import { BibleServiceError } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
+import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
@@ -253,12 +254,10 @@ function VersePage() {
           </SelectTrigger>
           <SelectContent>
             {(
-              translations ?? [
-                { code: "KJAV", name: "King James (Authorized) Version", language: "English" },
-              ]
+              translations ?? BIBLE_TRANSLATIONS
             ).map((item) => (
               <SelectItem key={item.code} value={item.code}>
-                {item.code}
+                {item.code} · {item.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -270,7 +269,7 @@ function VersePage() {
           {ref.bookName} {ref.chapter}:{ref.verse}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-          {verse?.translation ?? params.translation} · King James (Authorized) Version
+          {verse?.translation ?? params.translation} · {translationName(verse?.translation ?? params.translation)}
         </p>
         {verseQuery.isLoading ? (
           <p className="mt-5 text-[0.9375rem] text-muted-foreground">Finding verse…</p>
