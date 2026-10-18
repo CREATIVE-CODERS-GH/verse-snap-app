@@ -1,5 +1,10 @@
 # Roadmap
 
+## Additional Bible versions
+- [x] Enable complete public-domain English BSB, WEB, ASV, and BBE editions alongside KJAV
+- [x] Use selected-edition text and accurate names throughout reading and search
+- [x] Verify switching, guest saved/history isolation, navigation, and version-specific lookup
+
 - [x] Verify AO Lab API contract and licensing
 - [x] Implement real verse and chapter lookup
 - [x] Add direct search loading and error states

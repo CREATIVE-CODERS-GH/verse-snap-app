@@ -8,6 +8,7 @@ import { setLastRead } from "@/lib/last-read";
 import { findBook } from "@/lib/bible/books";
 import { BibleServiceError } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
+import { translationName } from "@/lib/bible/translations";
 
 export const Route = createFileRoute("/chapter/$translation/$book/$chapter")({
   head: ({ params }) => {
@@ -67,7 +68,8 @@ function ChapterPage() {
           {ref.bookName} {chapterNumber}
         </h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-          {query.data?.translation ?? params.translation} · King James (Authorized) Version
+          {query.data?.translation ?? params.translation} ·{" "}
+          {translationName(query.data?.translation ?? params.translation)}
         </p>
         {query.isLoading ? (
           <p className="mt-6 text-[0.9375rem] text-muted-foreground">Finding chapter…</p>

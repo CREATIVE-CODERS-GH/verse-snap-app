@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { bibleService } from "@/lib/bible/service";
+import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
 import { useAuth } from "@/lib/auth";
 import { usePreferences, type TextSize, type Theme } from "@/lib/preferences";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,19 +91,16 @@ function SettingsPage() {
       <Section title="Bible">
         <Row
           label="Translation"
+          note={translationName(prefs.translation)}
           control={
             <Select value={prefs.translation} onValueChange={prefs.setTranslation}>
               <SelectTrigger className={selectClass} aria-label="Translation">
-                <SelectValue />
+                <SelectValue>{prefs.translation}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {(
-                  translations ?? [
-                    { code: "KJAV", name: "King James (Authorized) Version", language: "English" },
-                  ]
-                ).map((item) => (
+                {(translations ?? BIBLE_TRANSLATIONS).map((item) => (
                   <SelectItem key={item.code} value={item.code}>
-                    {item.code}
+                    {item.code} · {item.name}
                   </SelectItem>
                 ))}
               </SelectContent>
