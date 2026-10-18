@@ -220,7 +220,7 @@ function VersePage() {
   const errorMessage =
     providerError?.kind === "network"
       ? offline
-        ? "You’re offline. Connect to the internet to find this verse."
+        ? "You’re offline, and this verse isn’t saved on this device yet. Verses you’ve opened recently are available offline — reconnect to read this one."
         : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
       : providerError?.kind === "translation"
         ? "That translation isn't available."

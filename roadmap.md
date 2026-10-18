@@ -70,3 +70,8 @@
 - [x] Add web app manifest with standalone display, app icons, and maskable icon
 - [x] Wire apple-touch-icon, theme colour, and iOS web-app metadata
 - [x] Keep theme colour in sync with the app's light/dark setting
+
+## Offline support (done)
+- Generated service worker (/sw.js) via vite-plugin-pwa; registered only in production, never in dev/preview; ?sw=off kill switch.
+- App shell + pages: NetworkFirst; Bible API text cached up to 30 days; OAuth callbacks excluded.
+- Offline copy on verse/chapter screens explains only recently opened passages are available offline.
