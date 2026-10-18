@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { lazy, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -75,6 +75,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset?: () => void }) 
     </div>
   );
 }
+
+// Route error components are lazy-typed in TanStack Router v1.
+const LazyErrorComponent = lazy(async () => ({ default: ErrorComponent }));
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
