@@ -38,7 +38,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: Error; reset?: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -86,8 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "description",
         content: "A quiet, fast way to open and read any Bible verse.",
       },
-      { name: "theme-color", content: "#fcfaf6", media: "(prefers-color-scheme: light)" },
-      { name: "theme-color", content: "#161310", media: "(prefers-color-scheme: dark)" },
+      { name: "theme-color", content: "#fcfaf6" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Verse Snap" },
