@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
+import { createVerseImageBlob, verseImageFileName } from "@/lib/share-verse-image";
 
 export const Route = createFileRoute("/verse/$translation/$book/$chapter/$verse")({
   head: ({ params }) => {
@@ -179,6 +180,27 @@ function VersePage() {
   async function handleShare() {
     if (!verse) return;
     trackEvent("verse_shared");
+    // Preferred: a rendered image card, shared through the system sheet or
+    // downloaded where file sharing isn't supported.
+    try {
+      const blob = await createVerseImageBlob(verse);
+      const file = new File([blob], verseImageFileName(verse), { type: "image/png" });
+      if (typeof navigator.canShare === "function" && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: verse.reference, text: shareText });
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = file.name;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast("Image downloaded");
+      return;
+    } catch (error) {
+      if ((error as Error).name === "AbortError") return;
+      // Fall through to text sharing below.
+    }
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ title: verse.reference, text: shareText });
