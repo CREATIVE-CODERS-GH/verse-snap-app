@@ -1,5 +1,10 @@
 # Roadmap
 
+## Smarter Bible search
+- [ ] Build a full-text lookup index from the enabled AO Lab editions
+- [ ] Combine typo-tolerant phrase matching with verified semantic candidates
+- [ ] Test remembered wording, misspellings, topical searches, and direct references
+
 ## Additional Bible versions
 - [x] Enable complete public-domain English BSB, WEB, ASV, and BBE editions alongside KJAV
 - [x] Add the Free Bible Version (FBV) — modern NLT-style wording; NLT itself is copyrighted and unavailable
