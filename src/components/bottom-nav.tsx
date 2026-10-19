@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Bookmark, BookOpenText, Clock, Home, Settings } from "lucide-react";
 import { useState } from "react";
 import { getLastRead } from "@/lib/last-read";
@@ -39,8 +39,9 @@ function ReadTab() {
 }
 
 export function BottomNav() {
+  const isHome = useLocation({ select: (location) => location.pathname === "/" });
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur-[2px]">
+    <nav className={`fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur-[2px] ${isHome ? "home-bottom-nav" : ""}`}>
       <ul className="mx-auto grid max-w-[30rem] grid-cols-5">
         <li>
           <Link to="/" activeOptions={{ exact: true }} className={TAB_CLASS}>
