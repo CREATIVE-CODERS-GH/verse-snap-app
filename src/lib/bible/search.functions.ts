@@ -169,6 +169,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
+      signal: AbortSignal.timeout(25_000),
       headers: {
         "Content-Type": "application/json",
         "Lovable-API-Key": apiKey,
@@ -199,7 +200,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     const retryAfter = Number(response.headers.get("Retry-After"));
     const wait =
       Number.isFinite(retryAfter) && retryAfter > 0
-        ? retryAfter * 1000
+        ? Math.min(retryAfter * 1000, 3000)
         : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
     await response.body?.cancel();
     await delay(wait);

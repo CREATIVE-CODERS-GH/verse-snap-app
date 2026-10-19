@@ -30,4 +30,9 @@ describe("Cross-translation Bible search", () => {
     expect(oneTypo("patient", "paitent")).toBe(true);
     expect(oneTypo("patient", "patience")).toBe(false);
   });
+  it("ranks an adjacent remembered phrase above scattered matching words", () => {
+    const phrases = { editions: {}, refs: ["1TI:3:3", "1CO:13:4"],
+      terms: { love: [0, 1], patient: [0, 1], "is patient": [1] } };
+    expect(searchIndex(phrases, "love is patient")[0].bookId).toBe("1corinthians");
+  });
 });
