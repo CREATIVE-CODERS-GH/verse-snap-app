@@ -47,21 +47,23 @@ function ChapterPage() {
 
   // Chapter-level neighbours, crossing book boundaries at the edges.
   const bookIndex = BIBLE_BOOKS.findIndex((item) => item.id === book?.id);
+  const previousBook = bookIndex > 0 ? BIBLE_BOOKS[bookIndex - 1] : undefined;
+  const nextBook = bookIndex >= 0 ? BIBLE_BOOKS[bookIndex + 1] : undefined;
   const previous =
     book && chapterNumber > 1
       ? { bookId: book.id, chapter: chapterNumber - 1, label: `${book.name} ${chapterNumber - 1}` }
-      : bookIndex > 0
+      : previousBook
         ? {
-            bookId: BIBLE_BOOKS[bookIndex - 1].id,
-            chapter: BIBLE_BOOKS[bookIndex - 1].chapters,
-            label: `${BIBLE_BOOKS[bookIndex - 1].name} ${BIBLE_BOOKS[bookIndex - 1].chapters}`,
+            bookId: previousBook.id,
+            chapter: previousBook.chapters,
+            label: `${previousBook.name} ${previousBook.chapters}`,
           }
         : null;
   const next =
     book && chapterNumber < book.chapters
       ? { bookId: book.id, chapter: chapterNumber + 1, label: `${book.name} ${chapterNumber + 1}` }
-      : bookIndex >= 0 && bookIndex < BIBLE_BOOKS.length - 1
-        ? { bookId: BIBLE_BOOKS[bookIndex + 1].id, chapter: 1, label: `${BIBLE_BOOKS[bookIndex + 1].name} 1` }
+      : nextBook
+        ? { bookId: nextBook.id, chapter: 1, label: `${nextBook.name} 1` }
         : null;
 
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
