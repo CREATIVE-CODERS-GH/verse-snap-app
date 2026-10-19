@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { BookOpen, Camera, Mic, Search, Settings } from "lucide-react";
+import { BookOpen, Camera, ChevronRight, Mic, Search, Settings } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { AppShell } from "@/components/app-shell";
 import { hasCompletedOnboarding, Onboarding } from "@/components/onboarding";
 import { VerseRow } from "@/components/verse-row";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
+import { findBook } from "@/lib/bible/books";
+import { getStoredLastRead, type LastRead } from "@/lib/last-read";
 import { trackEvent } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
@@ -80,9 +82,11 @@ function ActionCard({
 function HomePage() {
   const { user } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
+  const [continueReading, setContinueReading] = useState<LastRead | null>(null);
 
   useEffect(() => {
     setShowOnboarding(!hasCompletedOnboarding());
+    setContinueReading(getStoredLastRead());
     trackEvent("app_open");
   }, []);
 
@@ -164,6 +168,31 @@ function HomePage() {
           text="text-action-blue-text"
         />
       </section>
+
+      {continueReading ? (
+        <section className="mt-8" aria-label="Continue reading">
+          <Link
+            to="/chapter/$translation/$book/$chapter"
+            params={{
+              translation: continueReading.translation,
+              book: continueReading.bookId,
+              chapter: String(continueReading.chapter),
+            }}
+            className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3.5 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span className="min-w-0">
+              <span className="block text-xs font-semibold uppercase tracking-[0.09em] text-muted-foreground">
+                Continue reading
+              </span>
+              <span className="mt-1 block truncate font-serif text-base font-semibold">
+                {findBook(continueReading.bookId)?.name ?? continueReading.bookId}{" "}
+                {continueReading.chapter} · {continueReading.translation}
+              </span>
+            </span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+          </Link>
+        </section>
+      ) : null}
 
       <section className="mt-10 pb-2">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border pb-2">

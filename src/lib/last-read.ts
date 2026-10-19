@@ -29,6 +29,16 @@ export function getLastRead(): LastRead {
   }
 }
 
+/** The stored reading position, or null when the reader hasn't opened a chapter yet. */
+export function getStoredLastRead(): LastRead | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) ? getLastRead() : null;
+  } catch {
+    return null;
+  }
+}
+
 export function setLastRead(location: LastRead): void {
   if (typeof window === "undefined") return;
   try {
