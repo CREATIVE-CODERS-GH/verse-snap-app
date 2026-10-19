@@ -1,11 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { setLastRead } from "@/lib/last-read";
-import { findBook } from "@/lib/bible/books";
+import { BIBLE_BOOKS, findBook } from "@/lib/bible/books";
 import { BibleServiceError } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
 import { translationName } from "@/lib/bible/translations";
@@ -44,6 +44,27 @@ function ChapterPage() {
       setLastRead({ translation: params.translation, bookId: params.book, chapter: chapterNumber });
     }
   }, [query.data, params.translation, params.book, chapterNumber]);
+
+  // Chapter-level neighbours, crossing book boundaries at the edges.
+  const bookIndex = BIBLE_BOOKS.findIndex((item) => item.id === book?.id);
+  const previousBook = bookIndex > 0 ? BIBLE_BOOKS[bookIndex - 1] : undefined;
+  const nextBook = bookIndex >= 0 ? BIBLE_BOOKS[bookIndex + 1] : undefined;
+  const previous =
+    book && chapterNumber > 1
+      ? { bookId: book.id, chapter: chapterNumber - 1, label: `${book.name} ${chapterNumber - 1}` }
+      : previousBook
+        ? {
+            bookId: previousBook.id,
+            chapter: previousBook.chapters,
+            label: `${previousBook.name} ${previousBook.chapters}`,
+          }
+        : null;
+  const next =
+    book && chapterNumber < book.chapters
+      ? { bookId: book.id, chapter: chapterNumber + 1, label: `${book.name} ${chapterNumber + 1}` }
+      : nextBook
+        ? { bookId: nextBook.id, chapter: 1, label: `${nextBook.name} 1` }
+        : null;
 
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
   const message =
@@ -99,6 +120,41 @@ function ChapterPage() {
           </div>
         )}
       </article>
+
+      <nav className="mt-10 flex items-center justify-between gap-3 border-t border-border pt-4 text-[0.875rem]">
+        {previous ? (
+          <Link
+            to="/chapter/$translation/$book/$chapter"
+            params={{
+              translation: params.translation,
+              book: previous.bookId,
+              chapter: String(previous.chapter),
+            }}
+            className="flex min-w-0 items-center gap-1 text-primary"
+          >
+            <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="truncate">{previous.label}</span>
+          </Link>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <Link
+            to="/chapter/$translation/$book/$chapter"
+            params={{
+              translation: params.translation,
+              book: next.bookId,
+              chapter: String(next.chapter),
+            }}
+            className="flex min-w-0 items-center gap-1 text-primary"
+          >
+            <span className="truncate">{next.label}</span>
+            <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
+          </Link>
+        ) : (
+          <span />
+        )}
+      </nav>
     </AppShell>
   );
 }

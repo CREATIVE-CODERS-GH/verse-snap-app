@@ -78,3 +78,7 @@
 
 ## Share verse as image (done)
 - Share button on Verse View renders a branded PNG card on-device (canvas, works offline); system share sheet when supported, download fallback, then text share/copy.
+
+## Reading continuity (done)
+- Home shows a "Continue reading" card (last opened chapter + translation) once the reader has opened a chapter.
+- Chapter pages have previous/next chapter navigation that crosses book boundaries (e.g. John 21 → Acts 1).
