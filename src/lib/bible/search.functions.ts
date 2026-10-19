@@ -31,11 +31,18 @@ export interface ScriptureSearchResponse {
 const Input = z.object({
   query: z.string().trim().min(1).max(500),
   translation: z.string().min(2).max(12).optional(),
-  indexed: z.array(z.object({
-    bookId: z.string().max(30), bookName: z.string().max(40),
-    chapter: z.number().int().min(1).max(150), verse: z.number().int().min(1).max(176),
-    confidence: z.number().min(0).max(1),
-  })).max(12).optional(),
+  indexed: z
+    .array(
+      z.object({
+        bookId: z.string().max(30),
+        bookName: z.string().max(40),
+        chapter: z.number().int().min(1).max(150),
+        verse: z.number().int().min(1).max(176),
+        confidence: z.number().min(0).max(1),
+      }),
+    )
+    .max(12)
+    .optional(),
 });
 
 const cache = new Map<string, ScriptureSearchResponse>();
@@ -329,7 +336,11 @@ function score(query: string, verse: Verse, order: number): number {
   return value;
 }
 
-async function runSearch(query: string, translation: string, indexed: z.infer<typeof Input>["indexed"] = []): Promise<ScriptureSearchResponse> {
+async function runSearch(
+  query: string,
+  translation: string,
+  indexed: z.infer<typeof Input>["indexed"] = [],
+): Promise<ScriptureSearchResponse> {
   // Indexed citations are untrusted hints, never text or an authority to cache.
   const lexical = (indexed ?? []).flatMap((hit): Candidate[] => {
     const book = findBook(hit.bookId);
@@ -341,14 +352,15 @@ async function runSearch(query: string, translation: string, indexed: z.infer<ty
     semantic = await askForCandidates(query);
   } catch (error) {
     gatewayError = error;
-    if (!lexical.length) return {
-      results: [],
-      failed: true,
-      errorMessage:
-        error instanceof SearchGatewayError
-          ? error.message
-          : "Scripture search is unavailable right now.",
-    };
+    if (!lexical.length)
+      return {
+        results: [],
+        failed: true,
+        errorMessage:
+          error instanceof SearchGatewayError
+            ? error.message
+            : "Scripture search is unavailable right now.",
+      };
   }
 
   // Interleave sources so either can recover candidates the other missed.
@@ -401,9 +413,13 @@ async function runSearch(query: string, translation: string, indexed: z.infer<ty
       text: verse.text,
     }));
 
-  return { results, failed: results.length === 0 && (Boolean(gatewayError) || candidates.length > 0),
+  return {
+    results,
+    failed: results.length === 0 && (Boolean(gatewayError) || candidates.length > 0),
     ...(results.length === 0 && (gatewayError || candidates.length > 0)
-      ? { errorMessage: "Couldn't retrieve matching verses right now. Try again." } : {}) };
+      ? { errorMessage: "Couldn't retrieve matching verses right now. Try again." }
+      : {}),
+  };
 }
 
 /** Internal entry point kept separate so reliability checks can exercise the full server pipeline. */

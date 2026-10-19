@@ -23,7 +23,7 @@ async function json(url: string): Promise<any> {
       return await response.json();
     } catch (error) {
       if (attempt === 3) throw error;
-      await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 300 * (attempt + 1)));
     }
   }
 }
@@ -34,32 +34,54 @@ for (const edition of BIBLE_TRANSLATIONS) {
   );
   let next = 0;
   counts[edition.code] = 0;
-  await Promise.all(Array.from({ length: 32 }, async () => {
-    while (next < tasks.length) {
-      const task = tasks[next++];
-      const data = await json(`${base}/${edition.apiId}/${task.book}/${task.chapter}.json`);
-      for (const block of data.chapter.content) {
-        if (block.type !== "verse") continue;
-        const words = text(block.content).toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g, " ").trim().split(/\s+/).filter(Boolean);
-        if (!words.length) continue;
-        const ref = `${task.book}:${task.chapter}:${block.number}`;
-        let id = refIds.get(ref);
-        if (id === undefined) { id = refs.length; refs.push(ref); refIds.set(ref, id); }
-        counts[edition.code] = (counts[edition.code] ?? 0) + 1;
-        const terms = new Set(words.filter(word => word.length > 1));
-        words.slice(1).forEach((word, i) => terms.add(`${words[i]} ${word}`));
-        for (const term of terms) {
-          const existing = postings.get(term) ?? new Set<number>();
-          existing.add(id); postings.set(term, existing);
+  await Promise.all(
+    Array.from({ length: 32 }, async () => {
+      while (next < tasks.length) {
+        const task = tasks[next++];
+        const data = await json(`${base}/${edition.apiId}/${task.book}/${task.chapter}.json`);
+        for (const block of data.chapter.content) {
+          if (block.type !== "verse") continue;
+          const words = text(block.content)
+            .toLowerCase()
+            .normalize("NFKD")
+            .replace(/[^a-z0-9\s]/g, " ")
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+          if (!words.length) continue;
+          const ref = `${task.book}:${task.chapter}:${block.number}`;
+          let id = refIds.get(ref);
+          if (id === undefined) {
+            id = refs.length;
+            refs.push(ref);
+            refIds.set(ref, id);
+          }
+          counts[edition.code] = (counts[edition.code] ?? 0) + 1;
+          const terms = new Set(words.filter((word) => word.length > 1));
+          words.slice(1).forEach((word, i) => terms.add(`${words[i]} ${word}`));
+          for (const term of terms) {
+            const existing = postings.get(term) ?? new Set<number>();
+            existing.add(id);
+            postings.set(term, existing);
+          }
         }
       }
-    }
-  }));
+    }),
+  );
   console.log(edition.code, counts[edition.code], "verses indexed");
 }
 // Upload this temporary output with lovable-assets; never commit the raw corpus.
-await writeFile("/tmp/scripture-words.json", JSON.stringify({
-  source: base, editions: counts, refs,
-  terms: Object.fromEntries([...postings].filter(([term, ids]) => !term.includes(" ") || (ids.size >= 2 && ids.size <= 15)).map(([term, ids]) => [term, [...ids].sort((a,b) => a-b)])),
-}));
+await writeFile(
+  "/tmp/scripture-words.json",
+  JSON.stringify({
+    source: base,
+    editions: counts,
+    refs,
+    terms: Object.fromEntries(
+      [...postings]
+        .filter(([term, ids]) => !term.includes(" ") || (ids.size >= 2 && ids.size <= 15))
+        .map(([term, ids]) => [term, [...ids].sort((a, b) => a - b)]),
+    ),
+  }),
+);
 console.log("Complete", refs.length, "references", postings.size, "terms");

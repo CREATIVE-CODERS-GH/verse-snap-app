@@ -5,7 +5,17 @@ import { classifyQuery } from "./classify-query";
 const index = {
   editions: { KJAV: 3, WEB: 3 },
   refs: ["1CO:13:4", "ROM:12:2", "PHP:4:6"],
-  terms: { love: [0], patient: [0], charity: [0], suffereth: [0], long: [0], renewing: [1], mind: [1], anxious: [2], nothing: [2] },
+  terms: {
+    love: [0],
+    patient: [0],
+    charity: [0],
+    suffereth: [0],
+    long: [0],
+    renewing: [1],
+    mind: [1],
+    anxious: [2],
+    nothing: [2],
+  },
 };
 describe("Cross-translation Bible search", () => {
   it("finds modern wording and King James wording at the same reference", () => {
@@ -31,8 +41,11 @@ describe("Cross-translation Bible search", () => {
     expect(oneTypo("patient", "patience")).toBe(false);
   });
   it("ranks an adjacent remembered phrase above scattered matching words", () => {
-    const phrases = { editions: {}, refs: ["1TI:3:3", "1CO:13:4"],
-      terms: { love: [0, 1], patient: [0, 1], "is patient": [1] } };
+    const phrases = {
+      editions: {},
+      refs: ["1TI:3:3", "1CO:13:4"],
+      terms: { love: [0, 1], patient: [0, 1], "is patient": [1] },
+    };
     expect(searchIndex(phrases, "love is patient")[0].bookId).toBe("1corinthians");
   });
 });

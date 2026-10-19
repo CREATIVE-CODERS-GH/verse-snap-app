@@ -9,19 +9,35 @@ export interface ScriptureIndex {
 export interface LexicalHit extends VerseRef {
   confidence: number;
 }
-const STOP_WORDS = new Set("a an the is are be to of and in for with that this it i me my you your verse bible about says say find show please".split(" "));
+const STOP_WORDS = new Set(
+  "a an the is are be to of and in for with that this it i me my you your verse bible about says say find show please".split(
+    " ",
+  ),
+);
 export function searchWords(value: string): string[] {
-  return value.toLowerCase().normalize("NFKD").replace(/[^a-z0-9\s]/g, " ").trim().split(/\s+/).filter(Boolean);
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
 }
 // Includes transposed letters as well as one insertion, deletion or substitution.
 export function oneTypo(left: string, right: string): boolean {
   if (left === right) return true;
   if (Math.abs(left.length - right.length) > 1) return false;
   if (left.length === right.length) {
-    const differing = [...left].flatMap((c, i) => c === right[i] ? [] : [i]);
+    const differing = [...left].flatMap((c, i) => (c === right[i] ? [] : [i]));
     if (differing.length === 1) return true;
     const [a, b] = differing;
-    return differing.length === 2 && a !== undefined && b === a + 1 && left[a] === right[b] && left[b] === right[a];
+    return (
+      differing.length === 2 &&
+      a !== undefined &&
+      b === a + 1 &&
+      left[a] === right[b] &&
+      left[b] === right[a]
+    );
   }
   const shorter = left.length < right.length ? left : right;
   const longer = left.length < right.length ? right : left;
@@ -33,16 +49,23 @@ function root(word: string): string {
   return word.length > 5 ? word.replace(/(ing|eth|ed|es|s)$/, "") : word;
 }
 export function searchIndex(index: ScriptureIndex, query: string): LexicalHit[] {
-  const words = [...new Set(searchWords(query).filter(word => !STOP_WORDS.has(word)))].slice(0, 32);
+  const words = [...new Set(searchWords(query).filter((word) => !STOP_WORDS.has(word)))].slice(
+    0,
+    32,
+  );
   if (!words.length) return [];
-  const vocabulary = Object.keys(index.terms).filter(term => !term.includes(" "));
+  const vocabulary = Object.keys(index.terms).filter((term) => !term.includes(" "));
   const scores = new Map<number, { weight: number; hits: number }>();
   for (const word of words) {
     const alternatives = new Map<number, number>();
     const terms = [word];
     // Preserve exact matches, but also recover inflections and common typos.
     if (word.length >= 4) {
-      terms.push(...vocabulary.filter(term => term !== word && (root(term) === root(word) || oneTypo(word, term))));
+      terms.push(
+        ...vocabulary.filter(
+          (term) => term !== word && (root(term) === root(word) || oneTypo(word, term)),
+        ),
+      );
     }
     for (const term of terms) {
       const ids = index.terms[term];
@@ -62,14 +85,31 @@ export function searchIndex(index: ScriptureIndex, query: string): LexicalHit[] 
     const ids = index.terms[`${fullWords[i]} ${word}`] ?? [];
     for (const id of ids) phraseWeights.set(id, (phraseWeights.get(id) ?? 0) + 20);
   });
-  return [...scores].filter(([, value]) => value.hits >= Math.max(1, Math.ceil(words.length * 0.6)))
-    .sort((a, b) => b[1].hits - a[1].hits || (b[1].weight + (phraseWeights.get(b[0]) ?? 0)) - (a[1].weight + (phraseWeights.get(a[0]) ?? 0)) || a[0] - b[0])
-    .slice(0, 12).flatMap(([id, value]): LexicalHit[] => {
+  return [...scores]
+    .filter(([, value]) => value.hits >= Math.max(1, Math.ceil(words.length * 0.6)))
+    .sort(
+      (a, b) =>
+        b[1].hits - a[1].hits ||
+        b[1].weight +
+          (phraseWeights.get(b[0]) ?? 0) -
+          (a[1].weight + (phraseWeights.get(a[0]) ?? 0)) ||
+        a[0] - b[0],
+    )
+    .slice(0, 12)
+    .flatMap(([id, value]): LexicalHit[] => {
       const ref = index.refs[id];
       if (!ref) return [];
       const [bookId, chapter, verse] = ref.split(":");
       const book = fromApiBookId(bookId ?? "");
       if (!book) return [];
-      return [{ bookId: book.id, bookName: book.name, chapter: Number(chapter), verse: Number(verse), confidence: value.hits / words.length }];
+      return [
+        {
+          bookId: book.id,
+          bookName: book.name,
+          chapter: Number(chapter),
+          verse: Number(verse),
+          confidence: value.hits / words.length,
+        },
+      ];
     });
 }
