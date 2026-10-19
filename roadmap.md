@@ -75,3 +75,6 @@
 - Generated service worker (/sw.js) via vite-plugin-pwa; registered only in production, never in dev/preview; ?sw=off kill switch.
 - App shell + pages: NetworkFirst; Bible API text cached up to 30 days; OAuth callbacks excluded.
 - Offline copy on verse/chapter screens explains only recently opened passages are available offline.
+
+## Share verse as image (done)
+- Share button on Verse View renders a branded PNG card on-device (canvas, works offline); system share sheet when supported, download fallback, then text share/copy.
