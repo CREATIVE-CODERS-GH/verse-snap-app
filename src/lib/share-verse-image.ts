@@ -87,7 +87,13 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
     if (blockHeight <= HEIGHT - PADDING * 2 - 260) break;
   }
 
-  const textTop = PADDING + 120;
+  // Vertically center the verse between the brand mark and the footer.
+  const blockHeight = lines.length * lineHeight;
+  const footerReserve = 260;
+  const textTop = Math.max(
+    PADDING + 120,
+    Math.round((HEIGHT - footerReserve - blockHeight) / 2) + Math.round(lineHeight * 0.75),
+  );
   context.fillStyle = COLORS.text;
   lines.forEach((line, index) => {
     context.fillText(line, PADDING, textTop + index * lineHeight);
