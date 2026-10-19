@@ -11,6 +11,7 @@ import { searchScripture } from "@/lib/bible/search.functions";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
+import { findIndexedReferences } from "@/lib/bible/search-index-client";
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): { q?: string } => {
@@ -73,10 +74,12 @@ function SearchPage() {
 
   const search = useQuery({
     queryKey: ["scripture-search", description, translation],
-    queryFn: () => {
+    queryFn: async () => {
       // Only the shape of the query is recorded, never the words themselves.
       trackEvent("semantic_search", { length: description.length });
-      return runSearch({ data: { query: description, translation } });
+      // A missing index must never prevent the existing semantic fallback.
+      const indexed = await findIndexedReferences(description).catch(() => []);
+      return runSearch({ data: { query: description, translation, indexed } });
     },
     enabled: description.length > 0,
     staleTime: 60 * 60 * 1000,
