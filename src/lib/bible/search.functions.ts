@@ -317,7 +317,7 @@ function score(query: string, verse: Verse, order: number): number {
   const cleaned = normalise(query);
   // The upstream ordering carries the meaning of the query, so it leads;
   // wording overlap only nudges close calls.
-  let value = Math.max(0, MAX_CANDIDATES - order) * 10;
+  let value = Math.max(0, MAX_CANDIDATES * 2 - order) * 50;
   if (cleaned && text.includes(cleaned)) value += 1000;
 
   const words = cleaned.split(" ").filter((word) => word.length > 2 && !STOP_WORDS.has(word));
@@ -368,8 +368,8 @@ async function runSearch(
   for (let i = 0; i < MAX_CANDIDATES; i++) {
     const local = lexical[i];
     const suggested = semantic[i];
-    if (local) candidates.push(local);
     if (suggested) candidates.push(suggested);
+    if (local) candidates.push(local);
   }
 
   const seen = new Set<string>();
