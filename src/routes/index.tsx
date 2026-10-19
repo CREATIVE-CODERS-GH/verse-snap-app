@@ -58,20 +58,20 @@ function ActionCard({
     <Link
       to={to}
       className={cn(
-        "action-card min-h-44 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "action-card h-[190px] w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         bg,
       )}
     >
       <span
         className={cn(
-          "mb-3 flex h-14 w-14 items-center justify-center rounded-full text-white shadow-md ring-4 ring-white/70 dark:ring-white/10",
+          "home-action-icon mb-2 flex h-14 w-14 items-center justify-center rounded-full text-action-icon-foreground ring-4 ring-action-icon-ring",
           iconBg,
         )}
         aria-hidden
       >
         {icon}
       </span>
-      <span className={cn("font-serif text-lg font-semibold tracking-tight", heading)}>
+      <span className={cn("font-serif text-lg font-semibold", heading)}>
         {title}
       </span>
       <span className={cn("mt-1 text-xs leading-5", text)}>{description}</span>
@@ -114,10 +114,11 @@ function HomePage() {
 
   return (
     <AppShell>
-      <header className="flex items-center justify-between pt-8">
-        <div className="flex items-center gap-2">
+      <div className="home-page mx-auto max-w-[340px]">
+      <header className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 pt-3">
+        <div className="flex min-w-0 items-center gap-2">
           <BookOpen className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-          <h1 className="text-base font-semibold tracking-tight">Verse Snap</h1>
+          <h1 className="truncate text-base font-semibold">Verse Snap</h1>
         </div>
         <Link
           to="/settings"
@@ -128,22 +129,22 @@ function HomePage() {
         </Link>
       </header>
 
-      <section className="pb-1 pt-6 text-center">
-        <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.2] tracking-tight">
+      <section className="pt-4 text-center">
+        <h2 className="font-serif text-[1.75rem] font-semibold leading-[1.2]">
           Find your verse.
           <br />
           Instantly.
         </h2>
       </section>
 
-      <section className="mt-4 space-y-3.5" aria-label="Ways to find a verse">
+      <section className="mt-5 space-y-4" aria-label="Ways to find a verse">
         <ActionCard
           to="/voice"
           icon={<Mic className="h-7 w-7" strokeWidth={1.9} />}
           title="Say a Verse"
           description="Speak a Bible reference."
-          bg="bg-gradient-to-b from-action-green to-action-green-deep"
-          iconBg="bg-gradient-to-br from-action-green-icon to-action-green-icon"
+          bg="home-action-green"
+          iconBg="bg-action-green-icon"
           heading="text-action-green-heading"
           text="text-action-green-text"
         />
@@ -152,7 +153,7 @@ function HomePage() {
           icon={<Camera className="h-7 w-7" strokeWidth={1.9} />}
           title="Snap a Verse"
           description="Point your camera at a Bible reference."
-          bg="bg-gradient-to-b from-action-peach to-action-peach-deep"
+          bg="home-action-peach"
           iconBg="bg-gradient-to-br from-action-peach-icon to-action-peach-icon-deep"
           heading="text-action-peach-heading"
           text="text-action-peach-text"
@@ -162,7 +163,7 @@ function HomePage() {
           icon={<Search className="h-7 w-7" strokeWidth={2.1} />}
           title="Search the Bible"
           description="Enter a reference or describe a verse."
-          bg="bg-gradient-to-b from-action-blue to-action-blue-deep"
+          bg="home-action-blue"
           iconBg="bg-gradient-to-br from-action-blue-icon to-action-blue-icon-deep"
           heading="text-action-blue-heading"
           text="text-action-blue-text"
@@ -194,7 +195,7 @@ function HomePage() {
         </section>
       ) : null}
 
-      <section className="mt-10 pb-2">
+      <section className="mt-12 pb-2">
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border pb-2">
           <h2 className="truncate text-xs font-semibold uppercase tracking-[0.09em] text-muted-foreground">
             Recent
@@ -221,6 +222,7 @@ function HomePage() {
           </p>
         ) : null}
       </section>
+      </div>
     </AppShell>
   );
 }

@@ -53,6 +53,8 @@
   --color-action-blue-icon-deep: var(--action-blue-icon-deep);
   --color-action-blue-heading: var(--action-blue-heading);
   --color-action-blue-text: var(--action-blue-text);
+  --color-action-icon-foreground: var(--action-icon-foreground);
+  --color-action-icon-ring: var(--action-icon-ring);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -102,6 +104,14 @@
   --action-blue-icon-deep: oklch(0.48 0.16 258);
   --action-blue-heading: oklch(0.28 0.065 258);
   --action-blue-text: oklch(0.45 0.06 258);
+  --action-icon-foreground: oklch(0.99 0.004 85);
+  --action-icon-ring: oklch(1 0 0 / 85%);
+  --home-green-highlight: oklch(0.93 0.047 168);
+  --home-peach-highlight: oklch(0.96 0.064 88);
+  --home-blue-highlight: oklch(0.92 0.043 250);
+  --home-nav-active: oklch(0.42 0.075 164);
+  --home-nav-background: oklch(1 0 0);
+  --home-card-shadow: 0 2px 3px oklch(0.24 0.014 60 / 4%);
   --sidebar: oklch(0.985 0.006 85);
   --sidebar-foreground: oklch(0.24 0.014 60);
   --sidebar-primary: oklch(0.46 0.055 215);
@@ -152,6 +162,14 @@
   --action-blue-icon-deep: oklch(0.6 0.14 258);
   --action-blue-heading: oklch(0.9 0.02 258);
   --action-blue-text: oklch(0.73 0.04 258);
+  --action-icon-foreground: oklch(0.19 0.008 70);
+  --action-icon-ring: oklch(1 0 0 / 14%);
+  --home-green-highlight: oklch(0.31 0.04 168);
+  --home-peach-highlight: oklch(0.31 0.045 88);
+  --home-blue-highlight: oklch(0.31 0.05 250);
+  --home-nav-active: oklch(0.74 0.09 158);
+  --home-nav-background: var(--background);
+  --home-card-shadow: none;
   --sidebar: oklch(0.19 0.008 70);
   --sidebar-foreground: oklch(0.94 0.005 85);
   --sidebar-primary: oklch(0.74 0.06 210);
@@ -198,6 +216,50 @@
 
 .action-card:active {
   transform: scale(0.985);
+}
+
+.home-page .action-card {
+  border-color: var(--action-icon-ring);
+  box-shadow: var(--home-card-shadow);
+}
+
+.home-action-green {
+  background: radial-gradient(ellipse at top right, var(--home-green-highlight), transparent 45%), linear-gradient(var(--action-green-bg), var(--action-green-bg-deep));
+}
+
+.home-action-peach {
+  background: radial-gradient(ellipse at top right, var(--home-peach-highlight), transparent 45%), linear-gradient(var(--action-peach-bg), var(--action-peach-bg-deep));
+}
+
+.home-action-blue {
+  background: radial-gradient(ellipse at top right, var(--home-blue-highlight), transparent 45%), linear-gradient(var(--action-blue-bg), var(--action-blue-bg-deep));
+}
+
+.home-bottom-nav {
+  background: var(--home-nav-background);
+  backdrop-filter: none;
+}
+
+.home-bottom-nav ul {
+  max-width: 390px;
+}
+
+.home-bottom-nav a[data-status="active"] {
+  color: var(--home-nav-active);
+}
+
+.home-bottom-nav a::after {
+  display: none;
+}
+
+.home-bottom-nav a[data-status="active"] svg {
+  fill: currentColor;
+}
+
+.home-bottom-nav a,
+.home-bottom-nav button {
+  width: 100%;
+  font-size: 10px;
 }
 
 @media (hover: hover) {
