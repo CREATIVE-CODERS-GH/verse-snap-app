@@ -4,6 +4,8 @@ import { z } from "zod";
 import { parseReference } from "./parse-reference";
 import { bibleService, DEFAULT_TRANSLATION } from "./service";
 import type { Verse } from "./types";
+import { findBook } from "./books";
+import { resolveTranslation } from "./translations";
 
 const MAX_RESULTS = 8;
 const MAX_CANDIDATES = 12;
@@ -29,6 +31,18 @@ export interface ScriptureSearchResponse {
 const Input = z.object({
   query: z.string().trim().min(1).max(500),
   translation: z.string().min(2).max(12).optional(),
+  indexed: z
+    .array(
+      z.object({
+        bookId: z.string().max(30),
+        bookName: z.string().max(40),
+        chapter: z.number().int().min(1).max(150),
+        verse: z.number().int().min(1).max(176),
+        confidence: z.number().min(0).max(1),
+      }),
+    )
+    .max(12)
+    .optional(),
 });
 
 const cache = new Map<string, ScriptureSearchResponse>();
@@ -162,6 +176,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     response = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
       method: "POST",
+      signal: AbortSignal.timeout(25_000),
       headers: {
         "Content-Type": "application/json",
         "Lovable-API-Key": apiKey,
@@ -192,7 +207,7 @@ async function askForCandidates(query: string): Promise<Candidate[]> {
     const retryAfter = Number(response.headers.get("Retry-After"));
     const wait =
       Number.isFinite(retryAfter) && retryAfter > 0
-        ? retryAfter * 1000
+        ? Math.min(retryAfter * 1000, 3000)
         : 500 * 2 ** attempt + Math.floor(Math.random() * 200);
     await response.body?.cancel();
     await delay(wait);
@@ -302,7 +317,7 @@ function score(query: string, verse: Verse, order: number): number {
   const cleaned = normalise(query);
   // The upstream ordering carries the meaning of the query, so it leads;
   // wording overlap only nudges close calls.
-  let value = Math.max(0, MAX_CANDIDATES - order) * 10;
+  let value = Math.max(0, MAX_CANDIDATES * 2 - order) * 50;
   if (cleaned && text.includes(cleaned)) value += 1000;
 
   const words = cleaned.split(" ").filter((word) => word.length > 2 && !STOP_WORDS.has(word));
@@ -321,26 +336,47 @@ function score(query: string, verse: Verse, order: number): number {
   return value;
 }
 
-async function runSearch(query: string, translation: string): Promise<ScriptureSearchResponse> {
-  let candidates: Candidate[];
+async function runSearch(
+  query: string,
+  translation: string,
+  indexed: z.infer<typeof Input>["indexed"] = [],
+): Promise<ScriptureSearchResponse> {
+  // Indexed citations are untrusted hints, never text or an authority to cache.
+  const lexical = (indexed ?? []).flatMap((hit): Candidate[] => {
+    const book = findBook(hit.bookId);
+    return book ? [{ book: book.name, chapter: hit.chapter, verse: hit.verse }] : [];
+  });
+  let semantic: Candidate[] = [];
+  let gatewayError: unknown;
   try {
-    candidates = await askForCandidates(query);
+    semantic = await askForCandidates(query);
   } catch (error) {
-    return {
-      results: [],
-      failed: true,
-      errorMessage:
-        error instanceof SearchGatewayError
-          ? error.message
-          : "Scripture search is unavailable right now.",
-    };
+    gatewayError = error;
+    if (!lexical.length)
+      return {
+        results: [],
+        failed: true,
+        errorMessage:
+          error instanceof SearchGatewayError
+            ? error.message
+            : "Scripture search is unavailable right now.",
+      };
+  }
+
+  // Interleave sources so either can recover candidates the other missed.
+  const candidates: Candidate[] = [];
+  for (let i = 0; i < MAX_CANDIDATES; i++) {
+    const local = lexical[i];
+    const suggested = semantic[i];
+    if (suggested) candidates.push(suggested);
+    if (local) candidates.push(local);
   }
 
   const seen = new Set<string>();
   const verses: Array<{ verse: Verse; order: number }> = [];
 
   await Promise.all(
-    candidates.slice(0, MAX_CANDIDATES).map(async (candidate, order) => {
+    candidates.map(async (candidate, order) => {
       const reference = parseReference(`${candidate.book} ${candidate.chapter}:${candidate.verse}`);
       if (!reference || reference.verse === undefined) return;
       const key = `${reference.bookId}-${reference.chapter}-${reference.verse}`;
@@ -377,7 +413,13 @@ async function runSearch(query: string, translation: string): Promise<ScriptureS
       text: verse.text,
     }));
 
-  return { results, failed: false };
+  return {
+    results,
+    failed: results.length === 0 && (Boolean(gatewayError) || candidates.length > 0),
+    ...(results.length === 0 && (gatewayError || candidates.length > 0)
+      ? { errorMessage: "Couldn't retrieve matching verses right now. Try again." }
+      : {}),
+  };
 }
 
 /** Internal entry point kept separate so reliability checks can exercise the full server pipeline. */
@@ -397,10 +439,10 @@ export async function runScriptureSearch(
 export const searchScripture = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }): Promise<ScriptureSearchResponse> => {
-    const translation = data.translation ?? DEFAULT_TRANSLATION;
+    const translation = resolveTranslation(data.translation ?? DEFAULT_TRANSLATION).code;
     const key = cacheKey(data.query, translation);
     const cached = cache.get(key);
-    if (cached) return cached;
+    if (cached && !data.indexed?.length) return cached;
 
     const caller =
       getRequestHeader("cf-connecting-ip") ?? getRequestIP({ xForwardedFor: true }) ?? "unknown";
@@ -412,8 +454,9 @@ export const searchScripture = createServerFn({ method: "POST" })
       };
     }
 
-    const response = await runSearch(data.query, translation);
-    if (!response.failed) {
+    const response = await runSearch(data.query, translation, data.indexed);
+    // Client-supplied hints cannot poison the shared query cache.
+    if (!response.failed && !data.indexed?.length) {
       if (cache.size >= CACHE_LIMIT) cache.delete(cache.keys().next().value as string);
       cache.set(key, response);
     }
