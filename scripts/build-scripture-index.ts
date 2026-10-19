@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { BIBLE_TRANSLATIONS } from "../src/lib/bible/translations";
 
 // This maintenance script runs with Bun, never in the published app.
@@ -23,7 +23,7 @@ async function json(url: string): Promise<any> {
       return await response.json();
     } catch (error) {
       if (attempt === 3) throw error;
-      await Bun.sleep(300 * (attempt + 1));
+      await new Promise(resolve => setTimeout(resolve, 300 * (attempt + 1)));
     }
   }
 }
@@ -57,9 +57,9 @@ for (const edition of BIBLE_TRANSLATIONS) {
   }));
   console.log(edition.code, counts[edition.code], "verses indexed");
 }
-await mkdir("src/lib/bible/data", { recursive: true });
-await writeFile("src/lib/bible/data/scripture-index.json", JSON.stringify({
+// Upload this temporary output with lovable-assets; never commit the raw corpus.
+await writeFile("/tmp/scripture-words.json", JSON.stringify({
   source: base, editions: counts, refs,
-  terms: Object.fromEntries([...postings].map(([term, ids]) => [term, [...ids].sort((a,b) => a-b)])),
+  terms: Object.fromEntries([...postings].filter(([term, ids]) => !term.includes(" ") || (ids.size >= 2 && ids.size <= 15)).map(([term, ids]) => [term, [...ids].sort((a,b) => a-b)])),
 }));
 console.log("Complete", refs.length, "references", postings.size, "terms");

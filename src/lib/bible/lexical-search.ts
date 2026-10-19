@@ -35,7 +35,7 @@ function root(word: string): string {
 export function searchIndex(index: ScriptureIndex, query: string): LexicalHit[] {
   const words = [...new Set(searchWords(query).filter(word => !STOP_WORDS.has(word)))].slice(0, 32);
   if (!words.length) return [];
-  const vocabulary = Object.keys(index.terms);
+  const vocabulary = Object.keys(index.terms).filter(term => !term.includes(" "));
   const scores = new Map<number, { weight: number; hits: number }>();
   for (const word of words) {
     const alternatives = new Map<number, number>();
@@ -56,8 +56,14 @@ export function searchIndex(index: ScriptureIndex, query: string): LexicalHit[] 
       scores.set(id, { weight: previous.weight + weight, hits: previous.hits + 1 });
     }
   }
+  const phraseWeights = new Map<number, number>();
+  const fullWords = searchWords(query);
+  fullWords.slice(1).forEach((word, i) => {
+    const ids = index.terms[`${fullWords[i]} ${word}`] ?? [];
+    for (const id of ids) phraseWeights.set(id, (phraseWeights.get(id) ?? 0) + 20);
+  });
   return [...scores].filter(([, value]) => value.hits >= Math.max(1, Math.ceil(words.length * 0.6)))
-    .sort((a, b) => b[1].hits - a[1].hits || b[1].weight - a[1].weight || a[0] - b[0])
+    .sort((a, b) => b[1].hits - a[1].hits || (b[1].weight + (phraseWeights.get(b[0]) ?? 0)) - (a[1].weight + (phraseWeights.get(a[0]) ?? 0)) || a[0] - b[0])
     .slice(0, 12).flatMap(([id, value]): LexicalHit[] => {
       const ref = index.refs[id];
       if (!ref) return [];
