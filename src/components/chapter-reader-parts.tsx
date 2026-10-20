@@ -216,8 +216,11 @@ interface VerseBlockProps {
   number: number;
   text: string;
   selected: boolean;
-  /** Show a large first letter (the first verse of the chapter). */
-  dropCap?: boolean;
+  /**
+   * The first verse of the chapter opens with the chapter number as a large drop cap (rendered by
+   * the page as a link to the verse), and its own small verse number is left out.
+   */
+  dropCapNode?: ReactNode;
   onSelect: () => void;
   /** The verse number, rendered as a link by the page so it keeps opening the verse view. */
   numberNode: ReactNode;
@@ -237,7 +240,7 @@ export function VerseBlock({
   number,
   text,
   selected,
-  dropCap,
+  dropCapNode,
   onSelect,
   numberNode,
   dimmed,
@@ -249,22 +252,10 @@ export function VerseBlock({
   const bar = (
     <div className="absolute bottom-0 left-0 top-0 w-1.5 rounded-l-xl bg-ch-primary" aria-hidden />
   );
-  const letters = Array.from(text);
-  const first = dropCap ? (letters[0] ?? "") : "";
-  const rest = dropCap ? letters.slice(1).join("") : text;
   const body = (
     <p className="relative">
-      {first ? (
-        <span
-          aria-hidden
-          className="float-left pr-3 pt-1 font-display text-4xl font-semibold leading-none text-ch-primary"
-        >
-          {first}
-        </span>
-      ) : null}
-      {numberNode}
-      {first ? <span className="sr-only">{first}</span> : null}
-      {rest}
+      {dropCapNode ?? numberNode}
+      {text}
     </p>
   );
 
@@ -315,6 +306,10 @@ export function VerseBlock({
     </div>
   );
 }
+
+/** The chapter number set as a drop cap at the start of the first verse. */
+export const CHAPTER_DROP_CAP_CLASS =
+  "float-left mr-3 mt-1.5 select-none rounded-md font-display text-[3.25rem] font-semibold leading-[0.85] text-ch-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary";
 
 export const VERSE_NUMBER_CLASS =
   "relative mr-1 select-none text-xs font-semibold leading-4 text-brand-text-faint font-sans after:absolute after:-inset-2 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary";

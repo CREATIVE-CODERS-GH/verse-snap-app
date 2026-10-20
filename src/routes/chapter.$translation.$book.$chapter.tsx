@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import {
+  CHAPTER_DROP_CAP_CLASS,
   ChapterControls,
   ChapterHeading,
   ChapterToast,
@@ -443,7 +444,19 @@ function ChapterPage() {
                           selected={isSelected}
                           dimmed={selectedVerse !== null && !isSelected}
                           tint={isSelected ? toneInfo(activeTone).tint : savedTint}
-                          dropCap={index === 0}
+                          dropCapNode={
+                            index === 0 ? (
+                              <Link
+                                to="/verse/$translation/$book/$chapter/$verse"
+                                params={{ ...params, verse: String(verse.verse) }}
+                                aria-label={`Chapter ${chapterNumber}, verse ${verse.verse}. Open verse ${verse.verse}`}
+                                onClick={(event) => event.stopPropagation()}
+                                className={CHAPTER_DROP_CAP_CLASS}
+                              >
+                                {chapterNumber}
+                              </Link>
+                            ) : undefined
+                          }
                           marked={!isSelected && markedVerse === verse.verse}
                           onSelect={() => tapVerse(verse.verse)}
                           toolbar={

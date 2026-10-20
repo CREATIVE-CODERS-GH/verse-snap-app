@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import * as parts from "@/components/chapter-reader-parts";
 import {
+  CHAPTER_DROP_CAP_CLASS,
   ChapterHeading,
   ChapterToast,
   SampleBadge,
@@ -149,20 +150,25 @@ describe("chapter reader pieces (server-rendered markup)", () => {
     expect(heading).not.toMatch(/Letter to|Gospel|Sample content/i);
   });
 
-  it("renders a drop cap that screen readers still read as part of the word", () => {
+  it("opens the first verse with the chapter number as a drop cap and no verse number", () => {
     const markup = html(
       createElement(VerseBlock, {
         number: 1,
         text: "Therefore, I urge you",
         selected: false,
-        dropCap: true,
+        dropCapNode: createElement("a", { className: CHAPTER_DROP_CAP_CLASS }, "12"),
         onSelect: () => undefined,
         numberNode: createElement("sup", null, "1"),
       }),
     );
-    expect(markup).toContain('aria-hidden="true"');
-    expect(markup).toContain("sr-only");
-    expect(markup).toContain("herefore, I urge you");
+    expect(markup).toContain(">12</a>");
+    expect(markup).toContain("float-left");
+    expect(markup).not.toContain("<sup>1</sup>");
+    // The verse text is complete (no letter is split off any more).
+    expect(markup).toContain("Therefore, I urge you");
+    const page = read(PAGE);
+    expect(page).toContain("dropCapNode={");
+    expect(page).toContain("{chapterNumber}");
     const plain = html(
       createElement(VerseBlock, {
         number: 2,
