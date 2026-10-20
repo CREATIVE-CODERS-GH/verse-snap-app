@@ -553,6 +553,23 @@
   animation: bounce-subtle 2.4s ease-in-out infinite;
 }
 
+/* Voice Lookup (Stitch 07): the rings around the microphone breathe while listening. */
+@keyframes voice-ripple {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@utility animate-voice-ripple {
+  animation: voice-ripple 2.2s ease-in-out infinite;
+}
+
 /* Horizontal chip rows scroll without a visible scrollbar. */
 @utility no-scrollbar {
   scrollbar-width: none;

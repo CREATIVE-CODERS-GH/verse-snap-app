@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { ActionCard } from "@/components/action-card";
 import { AppShell } from "@/components/app-shell";
 import { BrandMark } from "@/components/brand-mark";
-import { hasCompletedOnboarding, Onboarding } from "@/components/onboarding";
+import {
+  hasCompletedOnboarding,
+  Onboarding,
+  resetOnboardingFromUrl,
+} from "@/components/onboarding";
 import { CameraIcon, GearIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
 import { trackEvent } from "@/lib/analytics";
 
@@ -32,6 +36,7 @@ function HomePage() {
   const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
+    resetOnboardingFromUrl();
     setShowOnboarding(!hasCompletedOnboarding());
     trackEvent("app_open");
   }, []);

@@ -1,14 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Mic, MicOff } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AppShell } from "@/components/app-shell";
-import { Button } from "@/components/ui/button";
+import { ChevronLeftIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
 import { bibleService, type VerseRef } from "@/lib/bible/service";
 import { classifyQuery } from "@/lib/bible/classify-query";
 import { routeQuery } from "@/lib/bible/search-router";
 import type { ParsedReference } from "@/lib/bible/parse-reference";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
+import { useBackOrHome } from "@/lib/use-back-or-home";
+import { cn } from "@/lib/utils";
 
 interface SpeechAlternativeLike {
   transcript: string;
@@ -296,87 +296,160 @@ function VoicePage() {
     };
   }, [startListening, stopRecognition]);
 
+  const goBack = useBackOrHome();
+  const failed = state === "error" || state === "unsupported";
+  const showExamples = !heard && (state === "idle" || state === "listening");
+  const heading =
+    state === "processing"
+      ? "Finding verse…"
+      : state === "ambiguous"
+        ? "Did you mean?"
+        : failed
+          ? message
+          : "Speak a Bible reference";
   const status =
     state === "idle"
-      ? "Starting…"
+      ? "Starting the microphone…"
       : state === "listening"
         ? "Listening…"
         : state === "processing"
           ? "Finding verse…"
           : state === "ambiguous"
-            ? "Did you mean?"
+            ? "Choose the reference you said."
             : message;
 
   return (
-    <AppShell title="Say a Verse">
-      <main className="flex min-h-[28rem] flex-col items-center pt-12 text-center">
-        <h2 className="font-serif text-2xl font-semibold">Say the Bible reference.</h2>
-        <p className="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
-          Try “Hebrews chapter two verse five,” or describe the verse you remember.
-        </p>
-
-        <Button
+    <div className="flex min-h-dvh flex-col bg-brand-canvas font-stitch text-brand-text">
+      <nav className="relative flex shrink-0 items-center px-6 pb-2 pt-[calc(0.75rem+env(safe-area-inset-top))]">
+        <button
           type="button"
-          size="icon"
-          variant={state === "listening" ? "default" : "outline"}
-          className="mt-9 h-16 w-16 rounded-full focus-visible:ring-2"
-          onClick={startListening}
-          disabled={state === "processing"}
-          aria-label={
-            state === "listening" ? "Listening for a Bible reference" : "Start voice search"
-          }
-          aria-pressed={state === "listening"}
+          aria-label="Go back"
+          onClick={() => {
+            stopRecognition(true);
+            goBack();
+          }}
+          className="relative z-10 -ml-1 flex h-10 w-10 items-center justify-center rounded-full text-brand-text transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
         >
-          {state === "unsupported" || state === "error" ? (
-            <MicOff className="h-6 w-6" aria-hidden />
-          ) : (
-            <Mic className="h-6 w-6" aria-hidden />
-          )}
-        </Button>
+          <ChevronLeftIcon className="h-6 w-6" strokeWidth={2.2} />
+        </button>
+        <h1 className="pointer-events-none absolute inset-x-0 text-center text-[17px] font-semibold tracking-tight">
+          Say a Verse
+        </h1>
+      </nav>
 
-        <p className="mt-5 min-h-6 text-sm font-medium" role="status" aria-live="polite">
-          {status}
-        </p>
-        {heard ? <p className="mt-3 max-w-sm font-serif text-xl leading-8">“{heard}”</p> : null}
+      <main className="mx-auto flex w-full max-w-[30rem] flex-1 flex-col items-center justify-center px-8">
+        <div className="relative mb-8 flex h-72 w-72 items-center justify-center">
+          <span
+            aria-hidden
+            className={cn(
+              "absolute h-64 w-64 rounded-full bg-brand-primary-soft/60",
+              state === "listening" && "animate-voice-ripple",
+            )}
+          />
+          <span
+            aria-hidden
+            className={cn(
+              "absolute h-48 w-48 rounded-full bg-brand-primary-soft",
+              state === "listening" && "animate-voice-ripple [animation-delay:0.3s]",
+            )}
+          />
+          <span
+            aria-hidden
+            className={cn(
+              "absolute h-36 w-36 rounded-full bg-brand-primary/15",
+              state === "listening" && "animate-voice-ripple [animation-delay:0.6s]",
+            )}
+          />
+          <button
+            type="button"
+            onClick={startListening}
+            disabled={state === "processing"}
+            aria-label={
+              state === "listening" ? "Listening for a Bible reference" : "Start voice search"
+            }
+            aria-pressed={state === "listening"}
+            className={cn(
+              "relative z-10 flex h-24 w-24 items-center justify-center rounded-full shadow-lg transition-transform focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-focus/40 active:scale-95 disabled:opacity-70",
+              failed
+                ? "bg-brand-surface-strong text-brand-text-muted"
+                : "bg-brand-primary text-brand-on-primary",
+            )}
+          >
+            <MicIcon className="h-10 w-10" />
+          </button>
+        </div>
+
+        <div className="w-full max-w-xs space-y-3 text-center">
+          <h2 className="text-[19px] font-bold tracking-tight text-brand-text">{heading}</h2>
+          <p className="sr-only" role="status" aria-live="polite">
+            {status}
+          </p>
+          {heard ? (
+            <p className="font-display text-xl italic leading-8 text-brand-text">“{heard}”</p>
+          ) : null}
+          {showExamples ? (
+            <div className="flex flex-col items-center space-y-1 text-[13px] leading-relaxed">
+              <span className="text-brand-text-faint">For example:</span>
+              <span className="italic text-brand-text-muted">“John 3:16”</span>
+              <span className="italic text-brand-text-muted">“Hebrews chapter two verse five”</span>
+              <span className="italic text-brand-text-muted">
+                “the verse about renewing your mind”
+              </span>
+            </div>
+          ) : null}
+          {state === "idle" ? (
+            <p className="text-[13px] text-brand-text-muted">Starting the microphone…</p>
+          ) : null}
+        </div>
 
         {state === "ambiguous" && options.length > 0 ? (
-          <div className="mt-6 w-full border-t border-border pt-2">
+          <ul className="mt-6 w-full divide-y divide-brand-border overflow-hidden rounded-2xl border border-brand-border bg-brand-surface">
             {options.map((option) => (
-              <Button
-                key={referenceLabel(option.reference)}
-                type="button"
-                variant="ghost"
-                className="h-12 w-full justify-between border-b border-border px-1 text-[0.9375rem]"
-                onClick={() => openReference(option.reference)}
-              >
-                <span>{referenceLabel(option.reference)}</span>
-                <span className="text-xs text-muted-foreground">Open verse</span>
-              </Button>
+              <li key={referenceLabel(option.reference)}>
+                <button
+                  type="button"
+                  onClick={() => openReference(option.reference)}
+                  className="flex min-h-12 w-full items-center justify-between px-4 text-left text-[15px] font-medium transition-colors hover:bg-brand-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
+                >
+                  <span>{referenceLabel(option.reference)}</span>
+                  <span className="text-xs text-brand-text-muted">Open verse</span>
+                </button>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : null}
-
-        <div className="mt-8 flex items-center gap-5">
-          {state === "error" || state === "ambiguous" ? (
-            <Button type="button" variant="outline" onClick={startListening}>
-              Try again
-            </Button>
-          ) : null}
-          <Button asChild variant="link">
-            <Link
-              to={
-                state === "unsupported" || state === "error" || state === "ambiguous"
-                  ? "/search"
-                  : "/"
-              }
-            >
-              {state === "unsupported" || state === "error" || state === "ambiguous"
-                ? "Search manually"
-                : "Cancel"}
-            </Link>
-          </Button>
-        </div>
       </main>
-    </AppShell>
+
+      <footer className="mx-auto flex w-full max-w-[30rem] shrink-0 flex-col items-center gap-3 px-6 pb-[max(2.25rem,env(safe-area-inset-bottom))] pt-2">
+        {failed || state === "ambiguous" ? (
+          <>
+            <button
+              type="button"
+              onClick={startListening}
+              className="w-full rounded-full bg-brand-primary py-3.5 text-[15px] font-semibold text-brand-on-primary transition-colors hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas"
+            >
+              Try again
+            </button>
+            <Link
+              to="/search"
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[14px] font-medium text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+            >
+              <SearchIcon className="h-4 w-4" />
+              Search manually
+            </Link>
+          </>
+        ) : null}
+        <button
+          type="button"
+          onClick={() => {
+            stopRecognition(true);
+            goBack();
+          }}
+          className="w-full rounded-full bg-brand-surface-sunken py-3.5 text-[15px] font-semibold text-brand-text transition-colors hover:bg-brand-surface-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+        >
+          Cancel
+        </button>
+      </footer>
+    </div>
   );
 }

@@ -470,3 +470,47 @@ export function PlusIcon(props: IconProps) {
     </Outline>
   );
 }
+
+export function FlashIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M13 2.5L4.5 13.5H11l-1 8 8.5-11H12l1-8z" />
+    </Outline>
+  );
+}
+
+export function FlashOffIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M13 2.5l-2.6 3.4M8.2 8.7L4.5 13.5H11l-1 8 3.6-4.7M15.9 13.2l2.6-3.2H12l1-7.5" />
+      <path d="M3.5 3.5l17 17" />
+    </Outline>
+  );
+}
+
+export function GalleryIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <circle cx="8.5" cy="8.5" r="1.5" />
+      <path d="M21 15l-5-5L5 21" />
+    </Outline>
+  );
+}
+
+export function RefreshIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M16.023 9.348h4.992V4.356M2.985 19.644v-4.992h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+    </Outline>
+  );
+}
+
+export function FlipCameraIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M6.8 6.5l.9-1.4A2 2 0 019.4 4h5.2a2 2 0 011.7 1.1l.9 1.4H19a2 2 0 012 2V17a2 2 0 01-2 2H5a2 2 0 01-2-2V8.5a2 2 0 012-2h1.8z" />
+      <path d="M9 12.5a3 3 0 015.2-2l.8.8M15 12.5a3 3 0 01-5.2 2l-.8-.8M15 9.8v1.5h-1.5M9 15.2v-1.5h1.5" />
+    </Outline>
+  );
+}
