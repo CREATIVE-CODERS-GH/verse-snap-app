@@ -228,7 +228,7 @@ interface VerseBlockProps {
   dimmed?: boolean;
   /** Tapped once: shown with the selection bar and card, but the options sheet is not open yet. */
   marked?: boolean;
-  /** Background class for a highlighted verse (a preview highlight, not saved). */
+  /** Background class for a highlighted verse (saved, or chosen in this visit). */
   tint?: string | null;
   /** The selected verse's floating toolbar. */
   toolbar?: ReactNode;

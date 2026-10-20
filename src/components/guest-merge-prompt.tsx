@@ -10,8 +10,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/auth";
-import { mergeableCounts, mergeableHistory, runGuestMerge } from "@/lib/guest-merge";
-import { guestStore } from "@/lib/library";
+import {
+  guestDevice,
+  mergeableCounts,
+  mergeableHighlights,
+  mergeableHistory,
+  runGuestMerge,
+} from "@/lib/guest-merge";
 
 /*
  * After sign-in, if this device holds Saved verses or History from before (as a guest), asks
@@ -40,11 +45,12 @@ function dismiss(userId: string) {
   }
 }
 
-function describe(saved: number, history: number, chapters = 0): string {
+function describe(saved: number, history: number, chapters = 0, highlights = 0): string {
   const parts = [
     saved ? `${saved} saved verse${saved === 1 ? "" : "s"}` : "",
     history ? `${history} verse${history === 1 ? "" : "s"} from your history` : "",
     chapters ? `${chapters} chapter${chapters === 1 ? "" : "s"} you read` : "",
+    highlights ? `${highlights} highlight${highlights === 1 ? "" : "s"}` : "",
   ].filter(Boolean);
   return parts.length > 2
     ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
@@ -55,7 +61,13 @@ export function GuestMergePrompt() {
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [counts, setCounts] = useState({ saved: 0, history: 0, chapters: 0, total: 0 });
+  const [counts, setCounts] = useState({
+    saved: 0,
+    history: 0,
+    chapters: 0,
+    highlights: 0,
+    total: 0,
+  });
   const [busy, setBusy] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
 
@@ -75,6 +87,7 @@ export function GuestMergePrompt() {
   const refresh = () => {
     void queryClient.invalidateQueries({ queryKey: ["saved"] });
     void queryClient.invalidateQueries({ queryKey: ["history"] });
+    void queryClient.invalidateQueries({ queryKey: ["highlights"] });
   };
 
   const add = async () => {
@@ -84,7 +97,8 @@ export function GuestMergePrompt() {
     refresh();
     if (result.status === "done" || result.status === "nothing") {
       setOpen(false);
-      const added = result.savedAdded + result.historyAdded + result.chaptersAdded;
+      const added =
+        result.savedAdded + result.historyAdded + result.chaptersAdded + result.highlightsAdded;
       toast(added > 0 ? "Added to your account" : "Already in your account");
       return;
     }
@@ -98,9 +112,10 @@ export function GuestMergePrompt() {
   };
 
   const removeFromDevice = () => {
-    // Removes only what this prompt offered (chapter visits too, once accounts can hold them).
-    guestStore.removeSaved(guestStore.saved().map((entry) => entry.id));
-    guestStore.removeHistory(mergeableHistory().map((entry) => entry.id));
+    // Removes only what this prompt offered (chapter visits and highlights once accounts hold them).
+    guestDevice.removeSaved(guestDevice.saved().map((entry) => entry.id));
+    guestDevice.removeHistory(mergeableHistory().map((entry) => entry.id));
+    guestDevice.removeHighlights(mergeableHighlights().map((entry) => entry.id));
     setOpen(false);
     refresh();
     toast("Removed from this device");
@@ -115,8 +130,8 @@ export function GuestMergePrompt() {
           </AlertDialogTitle>
           <AlertDialogDescription className="text-brand-text-muted">
             {confirmRemove
-              ? `This deletes ${describe(counts.saved, counts.history, counts.chapters)} kept on this device. Your account isn’t affected.`
-              : `This device has ${describe(counts.saved, counts.history, counts.chapters)} from before you signed in. Add them to your account so they’re available on all your devices?`}
+              ? `This deletes ${describe(counts.saved, counts.history, counts.chapters, counts.highlights)} kept on this device. Your account isn’t affected.`
+              : `This device has ${describe(counts.saved, counts.history, counts.chapters, counts.highlights)} from before you signed in. Add them to your account so they’re available on all your devices?`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-col">

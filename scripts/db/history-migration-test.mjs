@@ -110,7 +110,8 @@ await q(`
   grant execute on function auth.uid() to anon, authenticated, service_role;
 `);
 for (const file of fs.readdirSync(MIGRATIONS).sort()) {
-  if (file.startsWith("20261020000000")) continue;
+  // Only the migrations that come before this one (later ones are tested separately).
+  if (file >= "20261020000000") break;
   await q(read(path.join(MIGRATIONS, file)));
 }
 check("existing migrations 1–6 apply on PostgreSQL 17", true);

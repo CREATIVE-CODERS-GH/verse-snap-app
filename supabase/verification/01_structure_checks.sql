@@ -42,8 +42,10 @@ with checks(sort, check_name, pass) as (
   from pg_policies where schemaname = 'public'
 
   union all
-  select 41, 'exactly 4 policies in public',
-         (select count(*) = 4 from pg_policies where schemaname = 'public')
+  -- 4, plus 1 once 20261021000000_verse_highlights adds public.highlights (checked in detail by 06).
+  select 41, 'exactly 4 policies in public (5 with highlights)',
+         (select count(*) = 4 + case when to_regclass('public.highlights') is null then 0 else 1 end
+            from pg_policies where schemaname = 'public')
 
   union all
   -- 5. Trigger and hardened function

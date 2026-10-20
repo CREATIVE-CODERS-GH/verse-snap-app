@@ -35,6 +35,42 @@ export type Database = {
         }
         Relationships: []
       }
+      highlights: {
+        Row: {
+          book_id: string
+          chapter: number
+          color: string
+          created_at: string
+          id: string
+          translation: string
+          updated_at: string
+          user_id: string
+          verse: number
+        }
+        Insert: {
+          book_id: string
+          chapter: number
+          color: string
+          created_at?: string
+          id?: string
+          translation: string
+          updated_at?: string
+          user_id: string
+          verse: number
+        }
+        Update: {
+          book_id?: string
+          chapter?: number
+          color?: string
+          created_at?: string
+          id?: string
+          translation?: string
+          updated_at?: string
+          user_id?: string
+          verse?: number
+        }
+        Relationships: []
+      }
       history: {
         Row: {
           book_id: string

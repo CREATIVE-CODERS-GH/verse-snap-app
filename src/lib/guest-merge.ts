@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { guestHighlights, HIGHLIGHT_KEY, type GuestHighlight } from "./highlights";
+import { ACCOUNT_HIGHLIGHTS_ENABLED } from "./highlights-schema";
 import { ACCOUNT_HISTORY_V2, HISTORY_ENTRY_KEY } from "./history-schema";
 import { guestStore, type HistoryEntry, type LibraryEntry } from "./library";
 
@@ -20,6 +22,9 @@ import { guestStore, type HistoryEntry, type LibraryEntry } from "./library";
  *    or interruption leaves the rest on the device, so the merge can simply be run again.
  *  - Chapter visits are added only once the account table can hold them (ACCOUNT_HISTORY_V2);
  *    until then they stay on the device.
+ *  - Highlights (once ACCOUNT_HIGHLIGHTS_ENABLED): insert-or-ignore on the one-per-verse key, so a
+ *    verse the account already highlighted keeps the account's colour; until enabled they stay on
+ *    the device.
  */
 
 export const MERGE_BATCH_SIZE = 50;
@@ -49,6 +54,17 @@ export interface HistoryRow {
   kind?: "verse" | "chapter";
 }
 
+export interface HighlightRow {
+  user_id: string;
+  translation: string;
+  book_id: string;
+  chapter: number;
+  verse: number;
+  color: string;
+  created_at: string;
+  updated_at: string;
+}
+
 /** The few database operations the merge needs, so the rules can be tested without a server. */
 export interface MergeBackend {
   /** The user confirmed by the auth server for the current session, or null. */
@@ -60,11 +76,15 @@ export interface MergeBackend {
   existingHistoryKeys(bookIds: string[]): Promise<Set<string>>;
   /** Adds rows; once the migration is applied, rows already in the account are left unchanged. */
   insertHistory(rows: HistoryRow[]): Promise<void>;
+  /** Adds highlights; a verse the account already highlighted is left unchanged. */
+  insertHighlights(rows: HighlightRow[]): Promise<void>;
 }
 
 export interface MergeOptions {
   /** The account table holds chapter entries (defaults to ACCOUNT_HISTORY_V2). */
   accountHistoryV2?: boolean;
+  /** The account highlights table exists (defaults to ACCOUNT_HIGHLIGHTS_ENABLED). */
+  accountHighlights?: boolean;
 }
 
 export interface GuestStoreLike {
@@ -72,7 +92,19 @@ export interface GuestStoreLike {
   history(): HistoryEntry[];
   removeSaved(ids: readonly string[]): void;
   removeHistory(ids: readonly string[]): void;
+  highlights(): GuestHighlight[];
+  removeHighlights(ids: readonly string[]): void;
 }
+
+/** This device's guest data: Saved, History and highlights. */
+export const guestDevice: GuestStoreLike = {
+  saved: () => guestStore.saved(),
+  history: () => guestStore.history(),
+  removeSaved: (ids) => guestStore.removeSaved(ids),
+  removeHistory: (ids) => guestStore.removeHistory(ids),
+  highlights: () => guestHighlights.all(),
+  removeHighlights: (ids) => guestHighlights.remove(ids),
+};
 
 export type MergeStatus = "done" | "partial" | "aborted" | "nothing";
 
@@ -82,6 +114,8 @@ export interface MergeResult {
   historyAdded: number;
   /** Chapter visits added (only when the account table holds chapter entries). */
   chaptersAdded: number;
+  /** Highlights added (only when the account highlights table exists). */
+  highlightsAdded: number;
   /** Guest items still on the device afterwards (failed batches, and chapter visits if kept). */
   remaining: number;
   error?: string;
@@ -92,7 +126,7 @@ type ChapterHistory = Extract<HistoryEntry, { kind: "chapter" }>;
 
 /** The guest History entries that can be added to an account (chapters only after the migration). */
 export function mergeableHistory(
-  store: GuestStoreLike = guestStore,
+  store: GuestStoreLike = guestDevice,
   accountHistoryV2 = ACCOUNT_HISTORY_V2,
 ): HistoryEntry[] {
   return store
@@ -100,16 +134,26 @@ export function mergeableHistory(
     .filter((entry) => entry.kind === "verse" || (accountHistoryV2 && entry.kind === "chapter"));
 }
 
-/** What could be added to an account: saved verses, verse history and (when supported) chapters. */
+/** The guest highlights that can be added to an account (none until the table exists). */
+export function mergeableHighlights(
+  store: GuestStoreLike = guestDevice,
+  accountHighlights = ACCOUNT_HIGHLIGHTS_ENABLED,
+): GuestHighlight[] {
+  return accountHighlights ? store.highlights() : [];
+}
+
+/** What could be added to an account: saved verses, history and (when supported) highlights. */
 export function mergeableCounts(
-  store: GuestStoreLike = guestStore,
+  store: GuestStoreLike = guestDevice,
   accountHistoryV2 = ACCOUNT_HISTORY_V2,
+  accountHighlights = ACCOUNT_HIGHLIGHTS_ENABLED,
 ) {
   const saved = store.saved().length;
   const entries = mergeableHistory(store, accountHistoryV2);
   const history = entries.filter((entry) => entry.kind === "verse").length;
   const chapters = entries.length - history;
-  return { saved, history, chapters, total: saved + history + chapters };
+  const highlights = mergeableHighlights(store, accountHighlights).length;
+  return { saved, history, chapters, highlights, total: saved + history + chapters + highlights };
 }
 
 const keyOf = (item: { translation: string; bookId: string; chapter: number; verse: number }) =>
@@ -133,12 +177,15 @@ function message(error: unknown): string {
 export async function mergeGuestLibrary(
   expectedUserId: string,
   backend: MergeBackend,
-  store: GuestStoreLike = guestStore,
-  { accountHistoryV2 = ACCOUNT_HISTORY_V2 }: MergeOptions = {},
+  store: GuestStoreLike = guestDevice,
+  {
+    accountHistoryV2 = ACCOUNT_HISTORY_V2,
+    accountHighlights = ACCOUNT_HIGHLIGHTS_ENABLED,
+  }: MergeOptions = {},
 ): Promise<MergeResult> {
-  const counts = mergeableCounts(store, accountHistoryV2);
-  const leftover = () => store.saved().length + store.history().length;
-  const none = { savedAdded: 0, historyAdded: 0, chaptersAdded: 0 };
+  const counts = mergeableCounts(store, accountHistoryV2, accountHighlights);
+  const leftover = () => store.saved().length + store.history().length + store.highlights().length;
+  const none = { savedAdded: 0, historyAdded: 0, chaptersAdded: 0, highlightsAdded: 0 };
   if (counts.total === 0) return { status: "nothing", ...none, remaining: leftover() };
 
   // 1. Confirm who is signed in with the server before writing anything.
@@ -166,6 +213,7 @@ export async function mergeGuestLibrary(
   let savedAdded = 0;
   let historyAdded = 0;
   let chaptersAdded = 0;
+  let highlightsAdded = 0;
   // Before the migration the table has no `kind` column, so it isn't sent.
   const kind = <K extends "verse" | "chapter">(value: K) =>
     accountHistoryV2 ? { kind: value } : {};
@@ -249,18 +297,46 @@ export async function mergeGuestLibrary(
         chaptersAdded += batch.length;
       }
     }
+
+    // 5. Highlights, once the account table exists: insert-or-ignore on the one-per-verse key, so
+    //    the account's own colour wins and retries add nothing.
+    for (const batch of chunks(mergeableHighlights(store, accountHighlights), MERGE_BATCH_SIZE)) {
+      if (!(await stillSameUser())) throw new Error("account changed");
+      await backend.insertHighlights(
+        batch.map((entry) => ({
+          user_id: expectedUserId,
+          translation: entry.translation,
+          book_id: entry.bookId,
+          chapter: entry.chapter,
+          verse: entry.verse,
+          color: entry.color,
+          created_at: entry.at,
+          updated_at: entry.at,
+        })),
+      );
+      store.removeHighlights(batch.map((entry) => entry.id));
+      highlightsAdded += batch.length;
+    }
   } catch (error) {
     return {
       status: "partial",
       savedAdded,
       historyAdded,
       chaptersAdded,
+      highlightsAdded,
       remaining: leftover(),
       error: message(error),
     };
   }
 
-  return { status: "done", savedAdded, historyAdded, chaptersAdded, remaining: leftover() };
+  return {
+    status: "done",
+    savedAdded,
+    historyAdded,
+    chaptersAdded,
+    highlightsAdded,
+    remaining: leftover(),
+  };
 }
 
 /** The real backend: the signed-in person's own Supabase session (RLS applies to every call). */
@@ -298,6 +374,12 @@ export const supabaseMergeBackend: MergeBackend = {
           .from("history")
           .upsert(rows, { onConflict: HISTORY_ENTRY_KEY, ignoreDuplicates: true })
       : await supabase.from("history").insert(rows);
+    if (error) throw error;
+  },
+  async insertHighlights(rows) {
+    const { error } = await supabase
+      .from("highlights")
+      .upsert(rows, { onConflict: HIGHLIGHT_KEY, ignoreDuplicates: true });
     if (error) throw error;
   },
 };

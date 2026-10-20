@@ -24,7 +24,7 @@ const USER_B = "00000000-0000-4000-8000-00000000000b";
 const server = {
   authUser: USER_A, // who /auth/v1/user says is signed in
   failSavedWrites: 0, // how many upcoming saved_verses writes fail with a 500
-  tables: { saved_verses: [], history: [] },
+  tables: { saved_verses: [], history: [], highlights: [] },
   writes: [], // every write request: { table, method, prefer, rows }
   blocked: [],
 };
@@ -209,8 +209,20 @@ const GUEST_HISTORY = [
   },
 ];
 
+const GUEST_HIGHLIGHTS = [
+  {
+    id: "KJAV/john/3/16",
+    translation: "KJAV",
+    bookId: "john",
+    chapter: 3,
+    verse: 16,
+    color: "sage",
+    at: "2026-02-07T10:00:00.000Z",
+  },
+];
 const seedGuest = () =>
-  ev(`localStorage.setItem('versesnap.library.saved.v1', ${JSON.stringify(JSON.stringify(GUEST_SAVED))});
+  ev(`localStorage.setItem('versesnap.highlights.v1', ${JSON.stringify(JSON.stringify(GUEST_HIGHLIGHTS))});
+      localStorage.setItem('versesnap.library.saved.v1', ${JSON.stringify(JSON.stringify(GUEST_SAVED))});
       localStorage.setItem('versesnap.library.history.v1', ${JSON.stringify(JSON.stringify(GUEST_HISTORY))}); true`);
 const signIn = (id) =>
   ev(
@@ -247,7 +259,8 @@ const opened = await waitFor(promptOpen, 10000);
 const text = await dialogText();
 check(
   "signed in with guest data: asks before adding anything",
-  opened && /3 saved verses, 2 verses from your history and 1 chapter you read/.test(text),
+  opened &&
+    /3 saved verses, 2 verses from your history, 1 chapter you read and 1 highlight/.test(text),
   text,
 );
 check(
@@ -325,6 +338,16 @@ check(
   "after success every merged item leaves the device",
   local.saved.length === 0 && local.history.length === 0,
   JSON.stringify(local),
+);
+const highlightWrites = server.writes.filter((w) => w.table === "highlights");
+check(
+  "the device's highlight was added with consent (insert-or-ignore, this user) and left the device",
+  server.tables.highlights.length === 1 &&
+    server.tables.highlights[0].color === "sage" &&
+    server.tables.highlights[0].user_id === USER_A &&
+    highlightWrites.every((w) => w.prefer.includes("resolution=ignore-duplicates")) &&
+    (await ev("JSON.parse(localStorage.getItem('versesnap.highlights.v1') ?? '[]').length")) === 0,
+  JSON.stringify(server.tables.highlights),
 );
 await go("/saved", "document.body.innerText.includes('Romans 8:28')");
 check(

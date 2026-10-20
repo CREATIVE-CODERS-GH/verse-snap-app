@@ -48,6 +48,7 @@ import { getSampleCrossReferences } from "@/lib/bible/verse-annotation-sample";
 import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
 import { copyText } from "@/lib/copy-text";
+import { highlights } from "@/lib/highlights";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
 import { verseShareText } from "@/lib/share-verse-card";
@@ -177,7 +178,7 @@ function ChapterPage() {
       : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
     : "That Bible reference doesn't look right.";
 
-  // --- interface state (previews are kept in memory only; nothing here is saved) ----------------
+  // --- interface state (kept in memory; highlights are saved separately, see pickTone) ---------
   const [translationsOpen, setTranslationsOpen] = useState(false);
   const [textSizeOpen, setTextSizeOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
@@ -195,8 +196,11 @@ function ChapterPage() {
   const [sheetExpanded, setSheetExpanded] = useState(false);
   // A single tap only marks a verse; the options open on the second tap.
   const [markedVerse, setMarkedVerse] = useState<number | null>(null);
-  // Highlight colours chosen in this visit, per verse. Preview only: never stored.
+  // Highlight colours chosen in this visit, per verse ("clear" = removed). They are saved as they
+  // are chosen (see pickTone) and take precedence over the stored highlights loaded below.
   const [tones, setTones] = useState<Record<number, Tone>>({});
+  // Highlight writes run one after another, so the last colour chosen is the one kept.
+  const highlightWrites = useRef<Promise<unknown>>(Promise.resolve());
   const [toast, setToast] = useState<{ message: string; action?: ReactNode } | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimer = useRef<number | null>(null);
@@ -231,6 +235,47 @@ function ChapterPage() {
     stopSpeech();
     window.scrollTo?.(0, 0);
   }, [params.book, params.chapter, params.translation, stopSpeech]);
+
+  // Signing in or out shows that person's highlights only.
+  useEffect(() => {
+    setTones({});
+  }, [user?.id]);
+
+  // Stored highlights for this chapter, translation and person (refetched on return to the tab,
+  // so changes made on another device appear).
+  const { data: storedHighlights } = useQuery({
+    queryKey: ["highlights", user?.id ?? "guest", params.translation, params.book, chapterNumber],
+    queryFn: () => highlights.forChapter(params.translation, params.book, chapterNumber, user?.id),
+    enabled: !authLoading,
+  });
+  const toneOf = (verse: number): Tone | undefined => tones[verse] ?? storedHighlights?.[verse];
+
+  const pickTone = (verse: number, tone: Tone) => {
+    const previous = tones[verse];
+    setTones((current) => ({ ...current, [verse]: tone }));
+    if (!highlights.persists(user?.id)) return;
+    const ref = {
+      translation: params.translation,
+      bookId: params.book,
+      chapter: chapterNumber,
+      verse,
+    };
+    const userId = user?.id;
+    highlightWrites.current = highlightWrites.current
+      .then(() =>
+        tone === "clear" ? highlights.remove(ref, userId) : highlights.set(ref, tone, userId),
+      )
+      .then(() => queryClient.invalidateQueries({ queryKey: ["highlights"] }))
+      .catch(() => {
+        setTones((current) => {
+          const next = { ...current };
+          if (previous === undefined) delete next[verse];
+          else next[verse] = previous;
+          return next;
+        });
+        showToast("Couldn’t save the highlight. Try again.");
+      });
+  };
 
   // Reading progress follows the scroll position.
   useEffect(() => {
@@ -391,7 +436,7 @@ function ChapterPage() {
     }
   };
 
-  const chosenTone = selectedVerse !== null ? tones[selectedVerse] : undefined;
+  const chosenTone = selectedVerse !== null ? toneOf(selectedVerse) : undefined;
   const activeTone: Tone = chosenTone ?? "amber";
   const crossRefs = selected
     ? getSampleCrossReferences(params.book, chapterNumber, selected.verse)
@@ -472,7 +517,7 @@ function ChapterPage() {
                 >
                   {verses.map((verse, index) => {
                     const isSelected = selectedVerse === verse.verse;
-                    const verseTone = tones[verse.verse];
+                    const verseTone = toneOf(verse.verse);
                     const savedTint =
                       verseTone && verseTone !== "clear" ? toneInfo(verseTone).tint : null;
                     return (
@@ -588,7 +633,7 @@ function ChapterPage() {
             peek={
               <HighlightPicker
                 active={activeTone}
-                onChange={(tone) => setTones((current) => ({ ...current, [selected.verse]: tone }))}
+                onChange={(tone) => pickTone(selected.verse, tone)}
               />
             }
             collapsedExtra={

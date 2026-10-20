@@ -178,6 +178,7 @@ function AuthSync() {
         // Account data is never kept on the device; also drop it from memory on sign-out.
         queryClient.removeQueries({ queryKey: ["saved"] });
         queryClient.removeQueries({ queryKey: ["history"] });
+        queryClient.removeQueries({ queryKey: ["highlights"] });
       }
     });
     return () => data.subscription.unsubscribe();

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import type { GuestHighlight } from "./highlights";
 import type { HistoryEntry, LibraryEntry } from "./library";
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
@@ -7,6 +8,7 @@ const { MERGE_BATCH_SIZE, mergeGuestLibrary, mergeableCounts } = await import(".
 type Backend = import("./guest-merge").MergeBackend;
 type SavedRow = import("./guest-merge").SavedRow;
 type HistoryRow = import("./guest-merge").HistoryRow;
+type HighlightRow = import("./guest-merge").HighlightRow;
 
 const USER = "user-a";
 
@@ -32,11 +34,32 @@ function chapterVisit(chapter: number): HistoryEntry {
   return { ...rest, id: `chapter:BSB/GEN/${chapter}`, kind: "chapter", verse: null };
 }
 
+function highlight(verse: number, color: GuestHighlight["color"] = "amber", translation = "BSB") {
+  return {
+    id: `${translation}/GEN/1/${verse}`,
+    translation,
+    bookId: "GEN",
+    chapter: 1,
+    verse,
+    color,
+    at: `2026-02-0${(verse % 9) + 1}T00:00:00.000Z`,
+  } satisfies GuestHighlight;
+}
+
 /** The device's guest lists, with the same remove-by-id behaviour as the real store. */
-function fakeStore(initial: { saved?: LibraryEntry[]; history?: HistoryEntry[] }) {
+function fakeStore(initial: {
+  saved?: LibraryEntry[];
+  history?: HistoryEntry[];
+  highlights?: GuestHighlight[];
+}) {
   let savedList = [...(initial.saved ?? [])];
   let historyList = [...(initial.history ?? [])];
+  let highlightList = [...(initial.highlights ?? [])];
   return {
+    highlights: () => [...highlightList],
+    removeHighlights(ids: readonly string[]) {
+      highlightList = highlightList.filter((entry) => !ids.includes(entry.id));
+    },
     saved: () => [...savedList],
     history: () => [...historyList],
     removeSaved(ids: readonly string[]) {
@@ -49,8 +72,16 @@ function fakeStore(initial: { saved?: LibraryEntry[]; history?: HistoryEntry[] }
 }
 
 /** An account on a fake server, enforcing the saved_verses unique key like the real table. */
-function fakeServer(options: { user?: string | null; existingHistory?: string[] } = {}) {
+function fakeServer(
+  options: { user?: string | null; existingHistory?: string[]; highlights?: HighlightRow[] } = {},
+) {
   const savedRows = new Map<string, SavedRow>();
+  const highlightRows = new Map<string, HighlightRow>();
+  const highlightKey = (row: HighlightRow) =>
+    `${row.user_id}/${row.translation}/${row.book_id}/${row.chapter}/${row.verse}`;
+  for (const row of options.highlights ?? []) highlightRows.set(highlightKey(row), row);
+  let failHighlightsOnCall: number | null = null;
+  let highlightCalls = 0;
   const historyRows: HistoryRow[] = [];
   const existing = new Set(options.existingHistory ?? []);
   let sessionUser: string | null = options.user === undefined ? USER : options.user;
@@ -82,12 +113,24 @@ function fakeServer(options: { user?: string | null; existingHistory?: string[] 
         existing.add(key);
       }
     }),
+    insertHighlights: vi.fn(async (rows: HighlightRow[]) => {
+      highlightCalls += 1;
+      if (highlightCalls === failHighlightsOnCall) throw new Error("highlights down");
+      // Insert-or-ignore on the one-per-verse key: the account's colour wins.
+      for (const row of rows)
+        if (!highlightRows.has(highlightKey(row))) highlightRows.set(highlightKey(row), row);
+    }),
   };
 
   return {
     backend,
     savedRows,
     historyRows,
+    highlightRows,
+    failHighlights(call: number | null) {
+      failHighlightsOnCall = call;
+      highlightCalls = 0;
+    },
     switchUser(next: string | null) {
       sessionUser = next;
     },
@@ -239,7 +282,13 @@ describe("mergeGuestLibrary", () => {
     const store = fakeStore({ history: [chapterVisit(2), viewed(5), chapterVisit(3)] });
     const server = fakeServer();
 
-    expect(mergeableCounts(store, false)).toEqual({ saved: 0, history: 1, chapters: 0, total: 1 });
+    expect(mergeableCounts(store, false)).toEqual({
+      saved: 0,
+      history: 1,
+      chapters: 0,
+      highlights: 0,
+      total: 1,
+    });
     const result = await mergeGuestLibrary(USER, server.backend, store, {
       accountHistoryV2: false,
     });
@@ -266,7 +315,13 @@ describe("mergeGuestLibrary once account History holds chapters", () => {
     const store = fakeStore({ history: [chapterVisit(2), viewed(5), chapterVisit(3)] });
     const server = fakeServer();
 
-    expect(mergeableCounts(store, true)).toEqual({ saved: 0, history: 1, chapters: 2, total: 3 });
+    expect(mergeableCounts(store, true)).toEqual({
+      saved: 0,
+      history: 1,
+      chapters: 2,
+      highlights: 0,
+      total: 3,
+    });
     const result = await mergeGuestLibrary(USER, server.backend, store, V2);
 
     expect(result).toMatchObject({
@@ -327,5 +382,106 @@ describe("mergeGuestLibrary once account History holds chapters", () => {
     });
     expect(server.historyRows).toHaveLength(1);
     expect(server.historyRows[0]).not.toHaveProperty("kind");
+  });
+});
+
+describe("mergeGuestLibrary with highlights", () => {
+  const ON = { accountHighlights: true };
+
+  it("adds the device's highlights to the signed-in account, then clears them", async () => {
+    const store = fakeStore({ highlights: [highlight(1, "sage"), highlight(2, "rose", "KJAV")] });
+    const server = fakeServer();
+
+    expect(mergeableCounts(store, true, true)).toMatchObject({ highlights: 2, total: 2 });
+    const result = await mergeGuestLibrary(USER, server.backend, store, ON);
+
+    expect(result).toMatchObject({ status: "done", highlightsAdded: 2, remaining: 0 });
+    const rows = [...server.highlightRows.values()];
+    expect(rows.map((row) => [row.user_id, row.translation, row.verse, row.color])).toEqual([
+      [USER, "BSB", 1, "sage"],
+      [USER, "KJAV", 2, "rose"],
+    ]);
+    expect(rows[0]?.created_at).toBe(highlight(1).at);
+    expect(store.highlights()).toEqual([]);
+  });
+
+  it("keeps the account's colour where the verse is already highlighted (no duplicates)", async () => {
+    const accountRow: HighlightRow = {
+      user_id: USER,
+      translation: "BSB",
+      book_id: "GEN",
+      chapter: 1,
+      verse: 1,
+      color: "lilac",
+      created_at: "2025-01-01T00:00:00.000Z",
+      updated_at: "2025-01-01T00:00:00.000Z",
+    };
+    const server = fakeServer({ highlights: [accountRow] });
+    const store = fakeStore({ highlights: [highlight(1, "amber")] });
+
+    const result = await mergeGuestLibrary(USER, server.backend, store, ON);
+
+    expect(result.status).toBe("done");
+    expect(server.highlightRows.size).toBe(1);
+    expect([...server.highlightRows.values()][0]).toEqual(accountRow);
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "nothing",
+    });
+  });
+
+  it("keeps highlights on the device when their batch fails, and a retry finishes", async () => {
+    const store = fakeStore({ highlights: [highlight(1), highlight(2)] });
+    const server = fakeServer();
+    server.failHighlights(1);
+
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "partial",
+      highlightsAdded: 0,
+      error: "highlights down",
+    });
+    expect(store.highlights()).toHaveLength(2);
+
+    server.failHighlights(null);
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "done",
+      highlightsAdded: 2,
+    });
+    expect(server.highlightRows.size).toBe(2);
+  });
+
+  it("aborts before writing highlights to a different account", async () => {
+    const store = fakeStore({ highlights: [highlight(1)] });
+    const server = fakeServer({ user: "user-b" });
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "aborted",
+    });
+    expect(server.backend.insertHighlights).not.toHaveBeenCalled();
+    expect(store.highlights()).toHaveLength(1);
+  });
+
+  it("stops before highlights if the account changed mid-way", async () => {
+    const store = fakeStore({ saved: [saved(1)], highlights: [highlight(1)] });
+    const server = fakeServer();
+    vi.mocked(server.backend.upsertSaved).mockImplementationOnce(async () => {
+      server.switchUser("user-b");
+    });
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "partial",
+      error: "account changed",
+    });
+    expect(server.backend.insertHighlights).not.toHaveBeenCalled();
+    expect(store.highlights()).toHaveLength(1);
+  });
+
+  it("before the highlights table exists: doesn't offer or send highlights", async () => {
+    const store = fakeStore({ highlights: [highlight(1)] });
+    const server = fakeServer();
+    expect(mergeableCounts(store, true, false)).toMatchObject({ highlights: 0, total: 0 });
+    const result = await mergeGuestLibrary(USER, server.backend, store, {
+      accountHighlights: false,
+    });
+    expect(result.status).toBe("nothing");
+    expect(server.backend.insertHighlights).not.toHaveBeenCalled();
+    expect(store.highlights()).toHaveLength(1);
   });
 });

@@ -22,7 +22,7 @@ const noop = () => undefined;
 const read = (file: string) => readFileSync(join(process.cwd(), file), "utf8");
 
 describe("verse annotation pieces (server-rendered markup)", () => {
-  it("offers the six approved highlight tones and says they are preview only", () => {
+  it("offers the six approved highlight tones, with no preview-only note", () => {
     expect(TONES.map((tone) => tone.label)).toEqual([
       "Amber",
       "Sage",
