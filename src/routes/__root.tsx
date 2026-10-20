@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
 import {
   Outlet,
   Link,
@@ -174,6 +175,15 @@ function AuthSync() {
   return null;
 }
 
+// Vercel Web Analytics: anonymous page views. Query strings are dropped before sending, because
+// search URLs carry the text people typed (see src/lib/analytics.ts: raw search text is never sent).
+function withoutQuery<T extends { url: string }>(event: T): T {
+  const url = new URL(event.url);
+  url.search = "";
+  url.hash = "";
+  return { ...event, url: url.toString() };
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -190,6 +200,7 @@ function RootComponent() {
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
           <Toaster position="top-center" />
+          <Analytics beforeSend={withoutQuery} />
         </PreferencesProvider>
       </AuthProvider>
     </QueryClientProvider>
