@@ -10,9 +10,9 @@ import {
 } from "@/components/stitch-icons";
 
 // Stitch tab bar (checked against the Home, Saved and Settings designs): five tabs, 10px labels,
-// muted when idle, forest green and semibold when active.
+// muted when idle, near-black (soft white in dark mode) and semibold when active.
 const TAB_CLASS =
-  "flex min-h-12 w-full flex-col items-center justify-center gap-1 text-vs-text-secondary transition-colors hover:text-vs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:text-vs-primary [&[data-status=active]>span]:font-semibold";
+  "flex min-h-12 w-full flex-col items-center justify-center gap-1 text-nav-inactive transition-colors hover:text-nav-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:text-nav-active [&[data-status=active]>span]:font-semibold";
 const LABEL_CLASS = "text-[10px] font-medium leading-none tracking-tight";
 const ICON_CLASS = "h-5 w-5";
 
@@ -49,7 +49,7 @@ function ReadTab() {
 
 export function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-vs-border bg-vs-bg/95 font-stitch backdrop-blur-md">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-nav-border bg-nav-bg/95 font-stitch backdrop-blur-md">
       <ul className="mx-auto grid max-w-[30rem] grid-cols-5 px-4 pt-0.5 pb-[max(0.125rem,env(safe-area-inset-bottom))]">
         <li>
           <Link to="/" activeOptions={{ exact: true }} className={TAB_CLASS}>

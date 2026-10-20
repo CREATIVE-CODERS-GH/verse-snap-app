@@ -473,7 +473,7 @@ function ReflectionPage() {
                   touch();
                 }}
                 placeholder="Pour out your heart, observations, prayer requests, or personal action steps..."
-                className="min-h-[160px] w-full resize-none overflow-hidden bg-transparent text-base leading-relaxed text-ch-on-surface placeholder:text-ch-outline/60 selection:bg-ch-primary-fixed focus:outline-none"
+                className="min-h-[160px] w-full resize-none overflow-hidden bg-transparent text-base leading-relaxed text-ch-on-surface placeholder:text-ch-outline/60 selection:bg-brand-primary-soft focus:outline-none"
               />
             </div>
             <PostureRow

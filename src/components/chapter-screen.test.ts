@@ -55,13 +55,16 @@ describe("chapter reader page keeps the existing behaviour", () => {
     expect(page).not.toMatch(/localStorage|sessionStorage|\bfetch\(|\.insert\(|\.upsert\(/);
   });
 
-  it("uses the cooler chapter palette tokens and the text-size scale", () => {
+  it("uses the shared brand colour system and the text-size scale", () => {
     const css = read("src/styles.css");
-    expect(css).toContain("--ch-surface: #f8f9ff;");
-    expect(css).toContain("--ch-primary: #004734;");
+    // The chapter-reader tokens are aliases of the one brand palette (owner-approved).
+    expect(css).toContain("--brand-canvas: #ffffff;");
+    expect(css).toContain("--brand-canvas: #121212;");
+    expect(css).toContain("--brand-primary: #1f5f4a;");
+    expect(css).toContain("--ch-surface: var(--brand-canvas);");
+    expect(css).toContain("--ch-primary: var(--brand-primary);");
     expect(css).toContain("--chapter-size: 1.25rem;");
     expect(css).toContain("@utility scripture-chapter");
-    expect(css).toContain("PROVISIONAL dark values for the chapter reader palette");
   });
 });
 

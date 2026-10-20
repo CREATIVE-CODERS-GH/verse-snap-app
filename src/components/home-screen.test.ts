@@ -62,20 +62,25 @@ describe("shared tab bar", () => {
   });
 });
 
-describe("design tokens (Option B)", () => {
+describe("design tokens (one brand colour system)", () => {
   const css = read("src/styles.css");
 
   it("adds the Stitch fonts and light tokens without replacing the app tokens", () => {
     expect(css).toContain('--font-display: "Playfair Display"');
     expect(css).toContain('--font-stitch: "Inter"');
-    expect(css).toContain("--vs-primary: #1f5f4a;");
-    expect(css).toContain("--vs-bg: #faf8f5;");
+    // The warm Stitch tokens are aliases of the brand palette.
+    expect(css).toContain("--brand-primary: #1f5f4a;");
+    expect(css).toContain("--brand-canvas: #ffffff;");
+    expect(css).toContain("--vs-primary: var(--brand-primary);");
+    expect(css).toContain("--vs-bg: var(--brand-canvas);");
     expect(css).toContain('--font-serif: "Source Serif 4"');
     expect(css).toContain('--font-sans: "Libre Franklin"');
   });
 
-  it("marks the dark values as provisional", () => {
-    expect(css).toContain("PROVISIONAL dark values");
-    expect(css.split("--vs-voice-from:").length).toBe(3); // light + dark
+  it("defines light and dark themes and keeps the highlight tones separate", () => {
+    expect(css.split("--brand-canvas:").length).toBe(3); // light + dark
+    for (const tone of ["amber", "sage", "sky", "rose", "lilac"]) {
+      expect(css.split(`--hl-${tone}:`).length, tone).toBe(3);
+    }
   });
 });

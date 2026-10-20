@@ -58,12 +58,19 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset["textSize"] = prefs.textSize;
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const dark = prefs.theme === "dark" || (prefs.theme === "system" && prefersDark);
-    root.classList.toggle("dark", dark);
-    // Keep the installed-app / browser chrome colour in sync with the app theme.
-    const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute("content", dark ? "#161310" : "#fcfaf6");
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () => {
+      const dark = prefs.theme === "dark" || (prefs.theme === "system" && media.matches);
+      root.classList.toggle("dark", dark);
+      // Keep the installed-app / browser chrome colour in sync with the app theme.
+      const themeColor = document.querySelector('meta[name="theme-color"]');
+      if (themeColor) themeColor.setAttribute("content", dark ? "#121212" : "#ffffff");
+    };
+    apply();
+    // "System" follows the device when it switches between light and dark.
+    if (prefs.theme !== "system") return;
+    media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
   }, [prefs]);
 
   const value = useMemo<PreferencesValue>(

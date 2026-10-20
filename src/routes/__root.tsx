@@ -95,7 +95,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "description",
         content: "A quiet, fast way to open and read any Bible verse.",
       },
-      { name: "theme-color", content: "#fcfaf6" },
+      { name: "theme-color", content: "#ffffff" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { name: "apple-mobile-web-app-title", content: "Verse Snap" },
@@ -133,11 +133,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: LazyErrorComponent,
 });
 
+// Applies the saved theme and text size before the first paint, so dark-mode readers never see a
+// white flash while the app loads. Mirrors PreferencesProvider (same storage key and rules).
+const THEME_BOOT_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem("versesnap.preferences")||"{}");var t=p.theme==="light"||p.theme==="dark"?p.theme:"system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;if(d)r.classList.add("dark");if(typeof p.textSize==="string")r.setAttribute("data-text-size",p.textSize);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",d?"#121212":"#ffffff");}catch(e){}})();`;
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    // The boot script may add the "dark" class before React hydrates.
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body>
         {children}

@@ -279,7 +279,7 @@ export function OrganizationCard({
           className="flex items-center justify-between gap-2 rounded-2xl bg-ch-container-low p-3 text-left text-ch-on-surface transition-colors hover:bg-ch-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
         >
           <span className="flex min-w-0 items-center gap-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ch-secondary-fixed text-ch-on-secondary-fixed-variant">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-gold-soft text-brand-gold-text">
               <FolderOpenIcon className="h-[18px] w-[18px]" aria-hidden />
             </span>
             <span className="flex min-w-0 flex-col">

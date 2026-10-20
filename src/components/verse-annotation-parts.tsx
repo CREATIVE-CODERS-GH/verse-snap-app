@@ -44,54 +44,55 @@ export interface ToneInfo {
   dot: string;
 }
 
+// Highlight tones use the dedicated --hl-* tokens so they stay distinct from the brand palette.
 export const TONES: readonly ToneInfo[] = [
   {
     id: "amber",
     label: "Amber",
     name: "Warm Ochre",
-    swatch: "bg-ch-secondary-container",
-    tint: "bg-ch-secondary-fixed/40",
-    dot: "bg-ch-secondary",
+    swatch: "bg-hl-amber",
+    tint: "bg-hl-amber/70",
+    dot: "bg-hl-amber-ink",
   },
   {
     id: "sage",
     label: "Sage",
     name: "Soft Sage",
-    swatch: "bg-ch-primary-fixed",
-    tint: "bg-ch-primary-fixed/45",
-    dot: "bg-ch-primary",
+    swatch: "bg-hl-sage",
+    tint: "bg-hl-sage/70",
+    dot: "bg-hl-sage-ink",
   },
   {
     id: "sky",
     label: "Sky",
     name: "Clear Sky",
-    swatch: "bg-ch-tertiary-fixed",
-    tint: "bg-ch-tertiary-fixed/60",
-    dot: "bg-ch-tertiary",
+    swatch: "bg-hl-sky",
+    tint: "bg-hl-sky/70",
+    dot: "bg-hl-sky-ink",
   },
   {
     id: "rose",
     label: "Rose",
     name: "Dusty Rose",
-    swatch: "bg-ch-error-container",
-    tint: "bg-ch-error-container/60",
-    dot: "bg-ch-error",
+    swatch: "bg-hl-rose",
+    tint: "bg-hl-rose/70",
+    dot: "bg-hl-rose-ink",
   },
   {
     id: "lilac",
     label: "Lilac",
     name: "Quiet Lilac",
-    swatch: "bg-ch-container-highest",
-    tint: "bg-ch-container-highest/70",
-    dot: "bg-ch-outline",
+    swatch: "bg-hl-lilac",
+    tint: "bg-hl-lilac/70",
+    dot: "bg-hl-lilac-ink",
   },
   {
     id: "clear",
     label: "Clear",
     name: "No highlight",
-    swatch: "bg-ch-container-high",
+    swatch: "bg-hl-clear",
     tint: "bg-ch-container-low",
-    dot: "bg-ch-outline",
+    dot: "bg-brand-icon-muted",
   },
 ];
 

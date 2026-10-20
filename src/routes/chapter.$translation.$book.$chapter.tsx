@@ -512,7 +512,7 @@ function ChapterPage() {
       {selected ? (
         <>
           <div
-            className="fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] dark:bg-black/45"
+            className="fixed inset-0 z-30 bg-brand-scrim-soft backdrop-blur-[2px]"
             onClick={closeAnnotation}
             aria-hidden
           />
@@ -558,7 +558,7 @@ function ChapterPage() {
                 icon={<BookmarkIcon className="h-[18px] w-[18px]" filled={Boolean(saved)} />}
                 iconClass="text-ch-primary"
                 badge={saved ? "Saved" : null}
-                badgeClass="bg-ch-primary-fixed text-ch-primary"
+                badgeClass="bg-brand-primary-soft text-ch-primary"
                 title="Bookmark Verse"
                 subtitle={saved ? "In your saved verses" : "Add to your saved verses"}
                 pressed={Boolean(saved)}
@@ -583,7 +583,7 @@ function ChapterPage() {
                 icon={<PaletteIcon className="h-[18px] w-[18px]" />}
                 iconClass="text-ch-tertiary"
                 badge="Art"
-                badgeClass="bg-ch-tertiary-fixed text-ch-tertiary"
+                badgeClass="bg-brand-teal-soft text-ch-tertiary"
                 title="Verse Card"
                 subtitle="Export image story"
                 onClick={() => void shareVerseCard(selected, (text) => showToast(text))}

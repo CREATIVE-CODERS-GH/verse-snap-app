@@ -10,12 +10,14 @@ const WIDTH = 1080;
 const HEIGHT = 1350;
 const PADDING = 96;
 
+// Drawn on a canvas, so CSS tokens are not available: these mirror the brand colours in
+// src/styles.css (light canvas, text, secondary text, gold accent text, border).
 const COLORS = {
-  background: "#fcfaf6",
-  text: "#1c1917",
-  muted: "#78716c",
-  accent: "#8a6d3b",
-  rule: "#e7e2d8",
+  background: "#ffffff",
+  text: "#111111",
+  muted: "#666666",
+  accent: "#8a5a2b",
+  rule: "#e5e5e5",
 };
 
 async function ensureFonts(): Promise<void> {

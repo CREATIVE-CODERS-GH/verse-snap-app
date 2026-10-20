@@ -317,7 +317,7 @@ export function VerseBlock({
 }
 
 export const VERSE_NUMBER_CLASS =
-  "relative mr-1 select-none text-xs font-semibold leading-4 text-ch-primary font-sans after:absolute after:-inset-2 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary";
+  "relative mr-1 select-none text-xs font-semibold leading-4 text-brand-text-faint font-sans after:absolute after:-inset-2 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary";
 
 export const FLOATING_NAV_BUTTON =
   "flex flex-1 items-center justify-center gap-1.5 rounded-full bg-ch-container-low px-3 py-2 text-[13px] font-semibold leading-[18px] text-ch-on-surface shadow-xs transition-all select-none hover:bg-ch-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary active:scale-95";

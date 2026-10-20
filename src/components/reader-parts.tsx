@@ -54,7 +54,7 @@ export function ReaderHeader({
 export function VerseFocus({ number, text }: { number: number; text: string }) {
   return (
     <p className="scripture-focus text-left text-vs-text selection:bg-vs-primary/15">
-      <sup className="mr-1 select-none font-display text-[0.64em] font-normal text-vs-text-secondary">
+      <sup className="mr-1 select-none font-display text-[0.64em] font-normal text-brand-text-faint">
         {number}
       </sup>
       {text}

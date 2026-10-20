@@ -171,9 +171,9 @@ export const PILL_OUTLINE =
 const SUGGESTION_ICONS: Record<SuggestionIcon, { icon: ReactNode; className: string }> = {
   droplet: { icon: <DropletIcon className="h-[15px] w-[15px]" />, className: "text-vs-primary" },
   sprout: { icon: <SproutIcon className="h-[15px] w-[15px]" />, className: "text-vs-tan" },
-  heart: { icon: <HeartIcon className="h-[15px] w-[15px]" />, className: "text-rose-600" },
+  heart: { icon: <HeartIcon className="h-[15px] w-[15px]" />, className: "text-brand-danger" },
   book: { icon: <BookOpenIcon className="h-[15px] w-[15px]" />, className: "text-vs-primary" },
-  sun: { icon: <SunIcon className="h-[15px] w-[15px]" />, className: "text-amber-500" },
+  sun: { icon: <SunIcon className="h-[15px] w-[15px]" />, className: "text-brand-gold" },
 };
 
 /** "Try searching for:" card with tappable suggestion chips. */
