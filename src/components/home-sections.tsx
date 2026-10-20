@@ -6,7 +6,7 @@ import { VerseRow } from "@/components/verse-row";
 import { useAuth } from "@/lib/auth";
 import { findBook } from "@/lib/bible/books";
 import { getStoredLastRead, type LastRead } from "@/lib/last-read";
-import { library } from "@/lib/library";
+import { library, type HistoryEntry } from "@/lib/library";
 
 /*
  * "Continue reading" and "Recent" were on the previous Home page. The approved Stitch Home design
@@ -52,7 +52,10 @@ export function RecentVerses() {
     queryKey: ["history", "recent", user?.id],
     queryFn: () => library.listHistory(4, user?.id),
   });
-  const items = recent ?? [];
+  // This list shows single verses; chapter visits appear on the History screen.
+  const items = (recent ?? []).filter(
+    (item): item is Extract<HistoryEntry, { kind: "verse" }> => item.kind === "verse",
+  );
   return (
     <section className="mt-10 pb-2">
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 border-b border-border pb-2">

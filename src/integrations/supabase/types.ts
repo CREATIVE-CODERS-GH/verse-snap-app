@@ -10,19 +10,41 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.18"
   }
   public: {
     Tables: {
+      ai_search_usage: {
+        Row: {
+          subject: string
+          used: number
+          window_kind: string
+          window_start: string
+        }
+        Insert: {
+          subject: string
+          used?: number
+          window_kind: string
+          window_start: string
+        }
+        Update: {
+          subject?: string
+          used?: number
+          window_kind?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       history: {
         Row: {
           book_id: string
           book_name: string
           chapter: number
           id: string
+          kind: string
           translation: string
           user_id: string
-          verse: number
+          verse: number | null
           verse_text: string
           viewed_at: string
         }
@@ -31,9 +53,10 @@ export type Database = {
           book_name: string
           chapter: number
           id?: string
+          kind?: string
           translation?: string
           user_id: string
-          verse: number
+          verse?: number | null
           verse_text?: string
           viewed_at?: string
         }
@@ -42,9 +65,10 @@ export type Database = {
           book_name?: string
           chapter?: number
           id?: string
+          kind?: string
           translation?: string
           user_id?: string
-          verse?: number
+          verse?: number | null
           verse_text?: string
           viewed_at?: string
         }
@@ -142,7 +166,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      consume_ai_search_quota: {
+        Args: {
+          p_day_limit: number
+          p_global_day_limit: number
+          p_global_month_limit: number
+          p_minute_limit: number
+          p_subject: string
+        }
+        Returns: {
+          allowed: boolean
+          reason: string
+          retry_after_seconds: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

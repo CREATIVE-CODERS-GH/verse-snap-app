@@ -16,7 +16,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/lib/auth";
-import { library, type LibraryEntry } from "@/lib/library";
+import { library, type HistoryEntry } from "@/lib/library";
 import { trackEvent } from "@/lib/analytics";
 
 /*
@@ -53,8 +53,8 @@ function timeLabel(iso: string): string {
   return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
-function groupByDay(entries: LibraryEntry[]) {
-  const groups: { label: string; entries: LibraryEntry[] }[] = [];
+function groupByDay(entries: HistoryEntry[]) {
+  const groups: { label: string; entries: HistoryEntry[] }[] = [];
   for (const entry of entries) {
     const label = dayLabel(entry.at);
     const last = groups[groups.length - 1];
@@ -62,6 +62,42 @@ function groupByDay(entries: LibraryEntry[]) {
     else groups.push({ label, entries: [entry] });
   }
   return groups;
+}
+
+const ROW_CLASS =
+  "group flex items-center justify-between py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus";
+
+/** One History row: clock, reference (a verse, or a whole chapter), time and chevron. */
+function HistoryRowContent({
+  label,
+  detail,
+  entry,
+}: {
+  label: string;
+  detail?: string;
+  entry: HistoryEntry;
+}) {
+  return (
+    <>
+      <span className="flex min-w-0 items-center gap-3.5">
+        <ClockIcon className="h-5 w-5 shrink-0 text-brand-text-muted" aria-hidden />
+        <span className="min-w-0">
+          <span className="block truncate text-[15px] font-bold leading-snug text-brand-text transition-colors group-hover:text-brand-primary">
+            {label}
+          </span>
+          <span className="mt-0.5 block text-xs text-brand-text-muted">
+            {detail ? `${detail} · ` : ""}
+            {timeLabel(entry.at)}
+            <span className="sr-only">, {entry.translation}</span>
+          </span>
+        </span>
+      </span>
+      <ChevronRightIcon
+        className="h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
+        aria-hidden
+      />
+    </>
+  );
 }
 
 function HistoryPage() {
@@ -170,33 +206,39 @@ function HistoryPage() {
               <ul className="mb-7 divide-y divide-brand-border">
                 {group.entries.map((entry) => (
                   <li key={entry.id}>
-                    <Link
-                      to="/verse/$translation/$book/$chapter/$verse"
-                      params={{
-                        translation: entry.translation,
-                        book: entry.bookId,
-                        chapter: String(entry.chapter),
-                        verse: String(entry.verse),
-                      }}
-                      className="group flex items-center justify-between py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
-                    >
-                      <span className="flex min-w-0 items-center gap-3.5">
-                        <ClockIcon className="h-5 w-5 shrink-0 text-brand-text-muted" aria-hidden />
-                        <span className="min-w-0">
-                          <span className="block truncate text-[15px] font-bold leading-snug text-brand-text transition-colors group-hover:text-brand-primary">
-                            {entry.bookName} {entry.chapter}:{entry.verse}
-                          </span>
-                          <span className="mt-0.5 block text-xs text-brand-text-muted">
-                            {timeLabel(entry.at)}
-                            <span className="sr-only">, {entry.translation}</span>
-                          </span>
-                        </span>
-                      </span>
-                      <ChevronRightIcon
-                        className="h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
-                        aria-hidden
-                      />
-                    </Link>
+                    {entry.kind === "chapter" ? (
+                      <Link
+                        to="/chapter/$translation/$book/$chapter"
+                        params={{
+                          translation: entry.translation,
+                          book: entry.bookId,
+                          chapter: String(entry.chapter),
+                        }}
+                        className={ROW_CLASS}
+                      >
+                        <HistoryRowContent
+                          label={`${entry.bookName} ${entry.chapter}`}
+                          detail="Chapter"
+                          entry={entry}
+                        />
+                      </Link>
+                    ) : (
+                      <Link
+                        to="/verse/$translation/$book/$chapter/$verse"
+                        params={{
+                          translation: entry.translation,
+                          book: entry.bookId,
+                          chapter: String(entry.chapter),
+                          verse: String(entry.verse),
+                        }}
+                        className={ROW_CLASS}
+                      >
+                        <HistoryRowContent
+                          label={`${entry.bookName} ${entry.chapter}:${entry.verse}`}
+                          entry={entry}
+                        />
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

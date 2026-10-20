@@ -14,6 +14,7 @@ import { lazy, useEffect, useRef, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { GuestMergePrompt } from "@/components/guest-merge-prompt";
 import { OAuthReturnNotice } from "@/components/oauth-return-notice";
 import { invalidateUserQueries, planAuthEvent } from "@/lib/auth-events";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
@@ -173,6 +174,11 @@ function AuthSync() {
       lastUserId.current = plan.userId;
       if (plan.invalidateRouter) router.invalidate();
       if (plan.invalidateQueries) void invalidateUserQueries(queryClient);
+      if (event === "SIGNED_OUT") {
+        // Account data is never kept on the device; also drop it from memory on sign-out.
+        queryClient.removeQueries({ queryKey: ["saved"] });
+        queryClient.removeQueries({ queryKey: ["history"] });
+      }
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
@@ -202,6 +208,7 @@ function RootComponent() {
         <PreferencesProvider>
           <AuthSync />
           <OAuthReturnNotice />
+          <GuestMergePrompt />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
           <Toaster position="top-center" />

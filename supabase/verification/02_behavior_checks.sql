@@ -187,12 +187,31 @@ begin
       raise exception 'role/JWT simulation not in effect (user=%, uid=%)', cur, uid;
     end if;
 
-    insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
-    insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
-    select count(*) into n from public.history where user_id = a;
-    if n <> 2 then raise exception 'expected 2 duplicate history rows, got %', n; end if;
+    if not exists (select 1 from information_schema.columns
+                    where table_schema = 'public' and table_name = 'history' and column_name = 'kind') then
+      -- Before 20261020000000_history_chapter_entries: duplicates are tolerated.
+      insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
+      insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
+      select count(*) into n from public.history where user_id = a;
+      if n <> 2 then raise exception 'expected 2 duplicate history rows, got %', n; end if;
+    else
+      -- After it: a second row for the same verse is rejected by history_entry_key.
+      insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
+      begin
+        insert into public.history (user_id, book_id, book_name, chapter, verse) values (a, 'PSA', 'Psalms', 23, 1);
+        raise exception 'a duplicate verse row was accepted';
+      exception when unique_violation then
+        null;
+      end;
+      -- the atomic write used by library.recordView once switched on
+      insert into public.history (user_id, translation, book_id, book_name, chapter, verse, kind)
+      values (a, 'KJAV', 'PSA', 'Psalms', 23, 1, 'verse')
+      on conflict on constraint history_entry_key do update set viewed_at = excluded.viewed_at;
+      select count(*) into n from public.history where user_id = a;
+      if n <> 1 then raise exception 'upsert left % rows', n; end if;
+    end if;
 
-    -- same two steps as library.recordView
+    -- same two steps as library.recordView before it is switched to the upsert
     delete from public.history
      where user_id = a and translation = 'KJAV' and book_id = 'PSA' and chapter = 23 and verse = 1;
     insert into public.history (user_id, translation, book_id, book_name, chapter, verse)
@@ -201,10 +220,10 @@ begin
     if n <> 1 then raise exception 'delete-then-insert left % rows', n; end if;
 
     reset role;
-    res := res || jsonb_build_object('test', 'history: duplicates tolerated; delete-then-insert leaves one row', 'passed', true);
+    res := res || jsonb_build_object('test', 'history: one row per verse after delete-then-insert (and upsert, when applied)', 'passed', true);
   exception when others then
     reset role;
-    res := res || jsonb_build_object('test', 'history: duplicates tolerated; delete-then-insert leaves one row', 'passed', false, 'detail', sqlerrm);
+    res := res || jsonb_build_object('test', 'history: one row per verse after delete-then-insert (and upsert, when applied)', 'passed', false, 'detail', sqlerrm);
   end;
 
   -- 6. A sees and updates only their own profile ---------------------------------

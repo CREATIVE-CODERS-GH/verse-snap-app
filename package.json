@@ -17,6 +17,10 @@
     "live:smoke": "vitest run --config vitest.live.config.ts smoke",
     "live:eval": "vitest run --config vitest.live.config.ts eval",
     "check:bundle": "node scripts/check-bundle-secrets.mjs",
+    "test:e2e:library": "node scripts/e2e/saved-history.mjs",
+    "test:e2e:merge": "node scripts/e2e/guest-merge.mjs",
+    "test:e2e:smoke": "node scripts/e2e/mobile-smoke.mjs",
+    "test:db:history": "node scripts/db/history-migration-test.mjs",
     "format": "prettier --write ."
   },
   "overrides": {

@@ -97,13 +97,34 @@ with checks(sort, check_name, pass) as (
          exists (select 1 from pg_constraint where conrelid = 'public.saved_verses'::regclass and contype = 'u')
 
   union all
-  select 71, 'history has NO unique constraint (by design)',
-         not exists (select 1 from pg_constraint where conrelid = 'public.history'::regclass and contype = 'u')
+  -- History's keys depend on whether 20261020000000_history_chapter_entries is applied
+  -- (it adds history.kind). Before: no unique key. After: exactly the NULLS NOT DISTINCT entry key.
+  select 71, case when h.upgraded
+                  then 'history has its NULLS NOT DISTINCT entry key (chapter entries applied)'
+                  else 'history has NO unique constraint (chapter entries not applied)' end,
+         case when h.upgraded
+              then (select array_agg(conname::text) = array['history_entry_key']
+                      from pg_constraint where conrelid = 'public.history'::regclass and contype = 'u')
+                   and coalesce((select i.indnullsnotdistinct from pg_index i
+                                  join pg_constraint c on c.conindid = i.indexrelid
+                                 where c.conname = 'history_entry_key'), false)
+              else not exists (select 1 from pg_constraint where conrelid = 'public.history'::regclass and contype = 'u') end
+  from (select exists (select 1 from information_schema.columns
+                        where table_schema = 'public' and table_name = 'history' and column_name = 'kind') as upgraded) h
 
   union all
-  select 72, 'index present: ' || i,
+  select 72, 'history verse/chapter check present (chapter entries applied)',
+         exists (select 1 from pg_constraint where conrelid = 'public.history'::regclass and conname = 'history_kind_verse_check')
+  where exists (select 1 from information_schema.columns
+                 where table_schema = 'public' and table_name = 'history' and column_name = 'kind')
+
+  union all
+  select 73, 'index present: ' || i,
          exists (select 1 from pg_indexes where schemaname = 'public' and indexname = i)
-  from unnest(array['saved_verses_user_created_idx','history_user_viewed_idx','history_user_verse_idx']) i
+  from unnest(array['saved_verses_user_created_idx','history_user_viewed_idx',
+                    case when exists (select 1 from information_schema.columns
+                                       where table_schema = 'public' and table_name = 'history' and column_name = 'kind')
+                         then 'history_entry_key' else 'history_user_verse_idx' end]) i
 
   union all
   -- 8. Defaults on the old Lovable data path are gone: no KJV seed row

@@ -71,6 +71,8 @@ export const Route = createFileRoute("/chapter/$translation/$book/$chapter")({
 });
 
 const TOAST_MS = 2200;
+/** How long a chapter must stay open before it is recorded in History. */
+const CHAPTER_VISIT_DELAY_MS = 4000;
 
 function ChapterPage() {
   const params = Route.useParams();
@@ -96,6 +98,39 @@ function ChapterPage() {
       setLastRead({ translation: params.translation, bookId: params.book, chapter: chapterNumber });
     }
   }, [query.data, params.translation, params.book, chapterNumber]);
+
+  // History: a chapter counts as read after a few seconds on it, so flicking through chapters or
+  // re-renders don't add entries. One entry per chapter and translation (moved to the top).
+  const chapterLoaded = Boolean(query.data);
+  useEffect(() => {
+    if (!chapterLoaded || authLoading || !book) return;
+    const timer = window.setTimeout(() => {
+      void library
+        .recordChapterVisit(
+          {
+            translation: params.translation,
+            bookId: params.book,
+            bookName: book.name,
+            chapter: chapterNumber,
+          },
+          user?.id,
+        )
+        .then((recorded) => {
+          if (recorded) void queryClient.invalidateQueries({ queryKey: ["history"] });
+        })
+        .catch(() => undefined);
+    }, CHAPTER_VISIT_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [
+    chapterLoaded,
+    authLoading,
+    book,
+    params.translation,
+    params.book,
+    chapterNumber,
+    user?.id,
+    queryClient,
+  ]);
 
   // Chapter-level neighbours, crossing book boundaries at the edges.
   const bookIndex = BIBLE_BOOKS.findIndex((item) => item.id === book?.id);
