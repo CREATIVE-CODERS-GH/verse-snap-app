@@ -1,9 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { VerseRow } from "@/components/verse-row";
+import { ChevronRightIcon, ClockIcon } from "@/components/stitch-icons";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,11 @@ import {
 import { useAuth } from "@/lib/auth";
 import { library, type LibraryEntry } from "@/lib/library";
 import { trackEvent } from "@/lib/analytics";
+
+/*
+ * History — Stitch "10 History": verses opened recently, grouped by day with the time each was
+ * opened. Uses the same history library as before (account when signed in, this device otherwise).
+ */
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -42,6 +47,10 @@ function dayLabel(iso: string): string {
   if (same(date, today)) return "Today";
   if (same(date, yesterday)) return "Yesterday";
   return date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+}
+
+function timeLabel(iso: string): string {
+  return new Date(iso).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
 }
 
 function groupByDay(entries: LibraryEntry[]) {
@@ -77,65 +86,124 @@ function HistoryPage() {
     onError: () => toast("Could not clear history"),
   });
 
+  const busy = loading || isLoading;
   const groups = groupByDay(data ?? []);
 
-  return (
-    <AppShell
-      title="History"
-      action={
-        data && data.length > 0 ? (
-          <AlertDialog>
-            <AlertDialogTrigger className="text-[0.8125rem] text-muted-foreground hover:text-foreground">
-              Clear
-            </AlertDialogTrigger>
-            <AlertDialogContent className="max-w-[22rem] rounded-lg">
-              <AlertDialogHeader className="text-left">
-                <AlertDialogTitle className="font-serif text-lg">Clear history?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This removes every verse from your history. Saved verses are not affected.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => clear.mutate()}>Clear history</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        ) : null
-      }
-    >
-      {loading || isLoading ? (
-        <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
-      ) : groups.length === 0 ? (
-        <div className="border-t border-border pt-8">
-          <p className="text-[0.9375rem] font-medium">No recent verses.</p>
-          <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-            Verses you open will appear here.
+  if (!busy && groups.length === 0) {
+    return (
+      <AppShell variant="stitch">
+        <main className="flex flex-1 flex-col items-center justify-center px-2 pb-10 text-center">
+          <h1 className="sr-only">History</h1>
+          <ClockIcon className="mb-6 h-14 w-14 text-brand-text" strokeWidth={1.6} aria-hidden />
+          <h2 className="font-display text-[26px] font-bold leading-tight tracking-tight text-brand-text">
+            No recent verses
+          </h2>
+          <p className="mt-3 max-w-[290px] text-[15px] leading-relaxed text-brand-text-muted">
+            Verses you open will appear here, so you can find your way back to them.
           </p>
-        </div>
-      ) : (
-        groups.map((group) => (
-          <section key={group.label} className="mt-6 first:mt-0">
-            <h2 className="border-b border-border pb-2 text-xs font-semibold uppercase tracking-[0.09em] text-muted-foreground">
-              {group.label}
-            </h2>
-            <ul>
-              {group.entries.map((entry) => (
-                <li key={entry.id}>
-                  <VerseRow
-                    translation={entry.translation}
-                    bookId={entry.bookId}
-                    bookName={entry.bookName}
-                    chapter={entry.chapter}
-                    verse={entry.verse}
-                    preview={entry.verseText}
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      )}
+          <Link
+            to="/search"
+            className="mt-8 rounded-full bg-brand-primary px-10 py-3.5 text-[15px] font-semibold text-brand-on-primary shadow-md transition-colors hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas"
+          >
+            Find a Verse
+          </Link>
+        </main>
+      </AppShell>
+    );
+  }
+
+  return (
+    <AppShell variant="stitch">
+      <main className="flex flex-1 flex-col">
+        <header className="flex items-baseline justify-between pb-2 pt-6">
+          <h1 className="text-3xl font-bold tracking-tight text-brand-text">History</h1>
+          {data && data.length > 0 ? (
+            <AlertDialog>
+              <AlertDialogTrigger className="rounded-md px-1 text-sm font-medium text-brand-text-muted transition-colors hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus">
+                Clear
+              </AlertDialogTrigger>
+              <AlertDialogContent className="max-w-[22rem] rounded-2xl border-brand-border bg-brand-surface font-stitch text-brand-text">
+                <AlertDialogHeader className="text-left">
+                  <AlertDialogTitle className="font-display text-lg">
+                    Clear history?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription className="text-brand-text-muted">
+                    This removes every verse from your history. Saved verses are not affected.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => clear.mutate()}
+                    className="rounded-full bg-brand-danger text-brand-on-danger hover:bg-brand-danger/90"
+                  >
+                    Clear history
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : null}
+        </header>
+
+        {busy ? (
+          <ul aria-label="Loading history" className="mt-4 divide-y divide-brand-border">
+            {[0, 1, 2, 3, 4].map((item) => (
+              <li key={item} className="flex items-center gap-3.5 py-3.5" aria-hidden>
+                <span className="h-5 w-5 animate-pulse rounded-full bg-brand-surface-strong" />
+                <span className="flex-1 space-y-1.5">
+                  <span className="block h-4 w-32 animate-pulse rounded bg-brand-surface-strong" />
+                  <span className="block h-3 w-16 animate-pulse rounded bg-brand-surface-muted" />
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          groups.map((group) => (
+            <section
+              key={group.label}
+              className="mt-4 first-of-type:mt-3 last:mb-0"
+              aria-label={group.label}
+            >
+              <h2 className="mb-3 text-[13px] font-semibold text-brand-text-muted">
+                {group.label}
+              </h2>
+              <ul className="mb-7 divide-y divide-brand-border">
+                {group.entries.map((entry) => (
+                  <li key={entry.id}>
+                    <Link
+                      to="/verse/$translation/$book/$chapter/$verse"
+                      params={{
+                        translation: entry.translation,
+                        book: entry.bookId,
+                        chapter: String(entry.chapter),
+                        verse: String(entry.verse),
+                      }}
+                      className="group flex items-center justify-between py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
+                    >
+                      <span className="flex min-w-0 items-center gap-3.5">
+                        <ClockIcon className="h-5 w-5 shrink-0 text-brand-text-muted" aria-hidden />
+                        <span className="min-w-0">
+                          <span className="block truncate text-[15px] font-bold leading-snug text-brand-text transition-colors group-hover:text-brand-primary">
+                            {entry.bookName} {entry.chapter}:{entry.verse}
+                          </span>
+                          <span className="mt-0.5 block text-xs text-brand-text-muted">
+                            {timeLabel(entry.at)}
+                            <span className="sr-only">, {entry.translation}</span>
+                          </span>
+                        </span>
+                      </span>
+                      <ChevronRightIcon
+                        className="h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
+                        aria-hidden
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        )}
+      </main>
     </AppShell>
   );
 }

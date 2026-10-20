@@ -20,66 +20,71 @@ import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { AuthProvider } from "@/lib/auth";
 import { PreferencesProvider } from "@/lib/preferences";
 import { registerServiceWorker } from "@/lib/pwa-register";
+import { isConnectionError, NetworkErrorScreen, PILL_OUTLINE } from "@/components/search-states";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex min-h-dvh items-center justify-center bg-brand-canvas px-6 font-stitch text-brand-text">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+        <p className="font-display text-7xl font-bold text-brand-text-faint">404</p>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight">Page not found</h1>
+        <p className="mt-2 text-sm leading-relaxed text-brand-text-muted">
+          The page you’re looking for doesn’t exist or has been moved.
         </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
+        <Link to="/" className={`${PILL_OUTLINE} mt-6`}>
+          Go home
+        </Link>
       </div>
-    </div>
+    </main>
   );
 }
 
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  const connection = isConnectionError(error);
   useEffect(() => {
+    if (connection) return; // a lost connection is not a bug worth reporting
     reportLovableError(error instanceof Error ? error : new Error(String(error)), {
       boundary: "tanstack_root_error_component",
     });
-  }, [error]);
+  }, [error, connection]);
+
+  const retry = () => {
+    router.invalidate();
+    reset?.();
+  };
+
+  // Stitch 16: a lost connection gets the Connection problem screen.
+  if (connection) {
+    return (
+      <NetworkErrorScreen
+        onRetry={retry}
+        offline={typeof navigator !== "undefined" && navigator.onLine === false}
+      />
+    );
+  }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex min-h-dvh items-center justify-center bg-brand-canvas px-6 font-stitch text-brand-text">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+        <h1 className="text-2xl font-bold tracking-tight">This page didn’t load</h1>
+        <p className="mt-2 text-sm leading-relaxed text-brand-text-muted">
+          Something went wrong on our end. You can try again or head back home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset?.();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <button type="button" onClick={retry} className={PILL_OUTLINE}>
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="text-sm font-medium text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
           >
             Go home
           </a>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -136,7 +141,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 // Applies the saved theme and text size before the first paint, so dark-mode readers never see a
 // white flash while the app loads. Mirrors PreferencesProvider (same storage key and rules).
-const THEME_BOOT_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem("versesnap.preferences")||"{}");var t=p.theme==="light"||p.theme==="dark"?p.theme:"system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;if(d)r.classList.add("dark");if(typeof p.textSize==="string")r.setAttribute("data-text-size",p.textSize);var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",d?"#121212":"#ffffff");}catch(e){}})();`;
+const THEME_BOOT_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem("versesnap.preferences")||"{}");var t=p.theme==="light"||p.theme==="dark"?p.theme:"system";var d=t==="dark"||(t==="system"&&window.matchMedia("(prefers-color-scheme: dark)").matches);var r=document.documentElement;if(d)r.classList.add("dark");if(typeof p.textSize==="string")r.setAttribute("data-text-size",p.textSize);if(p.typeface==="sans")r.setAttribute("data-typeface","sans");if(p.lineSpacing==="standard")r.setAttribute("data-line-spacing","standard");var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",d?"#121212":"#ffffff");}catch(e){}})();`;
 
 function RootShell({ children }: { children: ReactNode }) {
   return (

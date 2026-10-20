@@ -8,6 +8,7 @@ import {
 } from "./preferences-storage";
 
 export type { Preferences, TextSize, Theme };
+export type { LineSpacing, MicSensitivity, Narrator, Typeface } from "./preferences-storage";
 
 interface PreferencesValue extends Preferences {
   /** True once saved preferences have been read (or found absent). Do not act on `translation` before this. */
@@ -16,6 +17,10 @@ interface PreferencesValue extends Preferences {
   setTheme: (value: Theme) => void;
   setTranslation: (value: string) => void;
   setPlaybackSpeed: (value: string) => void;
+  /** Changes any other preference (typeface, line spacing, voice and audio settings). */
+  update: (patch: Partial<Preferences>) => void;
+  /** Puts the reading settings (size, typeface, spacing) back to their defaults. */
+  resetReading: () => void;
 }
 
 const STORAGE_KEY = "versesnap.preferences";
@@ -27,6 +32,8 @@ const PreferencesContext = createContext<PreferencesValue>({
   setTheme: () => {},
   setTranslation: () => {},
   setPlaybackSpeed: () => {},
+  update: () => {},
+  resetReading: () => {},
 });
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
@@ -58,6 +65,8 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     root.dataset["textSize"] = prefs.textSize;
+    root.dataset["typeface"] = prefs.typeface;
+    root.dataset["lineSpacing"] = prefs.lineSpacing;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
       const dark = prefs.theme === "dark" || (prefs.theme === "system" && media.matches);
@@ -81,6 +90,14 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       setTheme: (theme) => setPrefs((p) => ({ ...p, theme })),
       setTranslation: (translation) => setPrefs((p) => ({ ...p, translation })),
       setPlaybackSpeed: (playbackSpeed) => setPrefs((p) => ({ ...p, playbackSpeed })),
+      update: (patch) => setPrefs((p) => ({ ...p, ...patch })),
+      resetReading: () =>
+        setPrefs((p) => ({
+          ...p,
+          textSize: DEFAULTS.textSize,
+          typeface: DEFAULTS.typeface,
+          lineSpacing: DEFAULTS.lineSpacing,
+        })),
     }),
     [prefs, ready],
   );

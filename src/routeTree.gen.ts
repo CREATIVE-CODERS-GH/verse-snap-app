@@ -19,7 +19,12 @@ import { Route as ScanRouteImport } from './routes/scan'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as VoiceRouteImport } from './routes/voice'
+import { Route as SettingsTextSizeRouteImport } from './routes/settings_.text-size'
+import { Route as SettingsVoiceAudioRouteImport } from './routes/settings_.voice-audio'
 import { Route as ChapterTranslationBookChapterRouteImport } from './routes/chapter.$translation.$book.$chapter'
+import { Route as CardTranslationBookChapterVerseRouteImport } from './routes/card.$translation.$book.$chapter.$verse'
+import { Route as CompareTranslationBookChapterVerseRouteImport } from './routes/compare.$translation.$book.$chapter.$verse'
+import { Route as ReferencesTranslationBookChapterVerseRouteImport } from './routes/references.$translation.$book.$chapter.$verse'
 import { Route as ReflectTranslationBookChapterVerseRouteImport } from './routes/reflect.$translation.$book.$chapter.$verse'
 import { Route as VerseTranslationBookChapterVerseRouteImport } from './routes/verse.$translation.$book.$chapter.$verse'
 
@@ -73,10 +78,38 @@ const VoiceRoute = VoiceRouteImport.update({
   path: '/voice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsTextSizeRoute = SettingsTextSizeRouteImport.update({
+  id: '/settings_/text-size',
+  path: '/settings/text-size',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsVoiceAudioRoute = SettingsVoiceAudioRouteImport.update({
+  id: '/settings_/voice-audio',
+  path: '/settings/voice-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChapterTranslationBookChapterRoute =
   ChapterTranslationBookChapterRouteImport.update({
     id: '/chapter/$translation/$book/$chapter',
     path: '/chapter/$translation/$book/$chapter',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CardTranslationBookChapterVerseRoute =
+  CardTranslationBookChapterVerseRouteImport.update({
+    id: '/card/$translation/$book/$chapter/$verse',
+    path: '/card/$translation/$book/$chapter/$verse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CompareTranslationBookChapterVerseRoute =
+  CompareTranslationBookChapterVerseRouteImport.update({
+    id: '/compare/$translation/$book/$chapter/$verse',
+    path: '/compare/$translation/$book/$chapter/$verse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ReferencesTranslationBookChapterVerseRoute =
+  ReferencesTranslationBookChapterVerseRouteImport.update({
+    id: '/references/$translation/$book/$chapter/$verse',
+    path: '/references/$translation/$book/$chapter/$verse',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ReflectTranslationBookChapterVerseRoute =
@@ -103,7 +136,12 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
+  '/settings/text-size': typeof SettingsTextSizeRoute
+  '/settings/voice-audio': typeof SettingsVoiceAudioRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/card/$translation/$book/$chapter/$verse': typeof CardTranslationBookChapterVerseRoute
+  '/compare/$translation/$book/$chapter/$verse': typeof CompareTranslationBookChapterVerseRoute
+  '/references/$translation/$book/$chapter/$verse': typeof ReferencesTranslationBookChapterVerseRoute
   '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -118,7 +156,12 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
+  '/settings/text-size': typeof SettingsTextSizeRoute
+  '/settings/voice-audio': typeof SettingsVoiceAudioRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/card/$translation/$book/$chapter/$verse': typeof CardTranslationBookChapterVerseRoute
+  '/compare/$translation/$book/$chapter/$verse': typeof CompareTranslationBookChapterVerseRoute
+  '/references/$translation/$book/$chapter/$verse': typeof ReferencesTranslationBookChapterVerseRoute
   '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -134,7 +177,12 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
+  '/settings_/text-size': typeof SettingsTextSizeRoute
+  '/settings_/voice-audio': typeof SettingsVoiceAudioRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/card/$translation/$book/$chapter/$verse': typeof CardTranslationBookChapterVerseRoute
+  '/compare/$translation/$book/$chapter/$verse': typeof CompareTranslationBookChapterVerseRoute
+  '/references/$translation/$book/$chapter/$verse': typeof ReferencesTranslationBookChapterVerseRoute
   '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
@@ -151,7 +199,12 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/voice'
+    | '/settings/text-size'
+    | '/settings/voice-audio'
     | '/chapter/$translation/$book/$chapter'
+    | '/card/$translation/$book/$chapter/$verse'
+    | '/compare/$translation/$book/$chapter/$verse'
+    | '/references/$translation/$book/$chapter/$verse'
     | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesByTo: FileRoutesByTo
@@ -166,7 +219,12 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/voice'
+    | '/settings/text-size'
+    | '/settings/voice-audio'
     | '/chapter/$translation/$book/$chapter'
+    | '/card/$translation/$book/$chapter/$verse'
+    | '/compare/$translation/$book/$chapter/$verse'
+    | '/references/$translation/$book/$chapter/$verse'
     | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   id:
@@ -181,7 +239,12 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/voice'
+    | '/settings_/text-size'
+    | '/settings_/voice-audio'
     | '/chapter/$translation/$book/$chapter'
+    | '/card/$translation/$book/$chapter/$verse'
+    | '/compare/$translation/$book/$chapter/$verse'
+    | '/references/$translation/$book/$chapter/$verse'
     | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesById: FileRoutesById
@@ -197,7 +260,12 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   VoiceRoute: typeof VoiceRoute
+  SettingsTextSizeRoute: typeof SettingsTextSizeRoute
+  SettingsVoiceAudioRoute: typeof SettingsVoiceAudioRoute
   ChapterTranslationBookChapterRoute: typeof ChapterTranslationBookChapterRoute
+  CardTranslationBookChapterVerseRoute: typeof CardTranslationBookChapterVerseRoute
+  CompareTranslationBookChapterVerseRoute: typeof CompareTranslationBookChapterVerseRoute
+  ReferencesTranslationBookChapterVerseRoute: typeof ReferencesTranslationBookChapterVerseRoute
   ReflectTranslationBookChapterVerseRoute: typeof ReflectTranslationBookChapterVerseRoute
   VerseTranslationBookChapterVerseRoute: typeof VerseTranslationBookChapterVerseRoute
 }
@@ -274,11 +342,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings_/text-size': {
+      id: '/settings_/text-size'
+      path: '/settings/text-size'
+      fullPath: '/settings/text-size'
+      preLoaderRoute: typeof SettingsTextSizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings_/voice-audio': {
+      id: '/settings_/voice-audio'
+      path: '/settings/voice-audio'
+      fullPath: '/settings/voice-audio'
+      preLoaderRoute: typeof SettingsVoiceAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/chapter/$translation/$book/$chapter': {
       id: '/chapter/$translation/$book/$chapter'
       path: '/chapter/$translation/$book/$chapter'
       fullPath: '/chapter/$translation/$book/$chapter'
       preLoaderRoute: typeof ChapterTranslationBookChapterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/card/$translation/$book/$chapter/$verse': {
+      id: '/card/$translation/$book/$chapter/$verse'
+      path: '/card/$translation/$book/$chapter/$verse'
+      fullPath: '/card/$translation/$book/$chapter/$verse'
+      preLoaderRoute: typeof CardTranslationBookChapterVerseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare/$translation/$book/$chapter/$verse': {
+      id: '/compare/$translation/$book/$chapter/$verse'
+      path: '/compare/$translation/$book/$chapter/$verse'
+      fullPath: '/compare/$translation/$book/$chapter/$verse'
+      preLoaderRoute: typeof CompareTranslationBookChapterVerseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/references/$translation/$book/$chapter/$verse': {
+      id: '/references/$translation/$book/$chapter/$verse'
+      path: '/references/$translation/$book/$chapter/$verse'
+      fullPath: '/references/$translation/$book/$chapter/$verse'
+      preLoaderRoute: typeof ReferencesTranslationBookChapterVerseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reflect/$translation/$book/$chapter/$verse': {
@@ -309,7 +412,14 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   VoiceRoute: VoiceRoute,
+  SettingsTextSizeRoute: SettingsTextSizeRoute,
+  SettingsVoiceAudioRoute: SettingsVoiceAudioRoute,
   ChapterTranslationBookChapterRoute: ChapterTranslationBookChapterRoute,
+  CardTranslationBookChapterVerseRoute: CardTranslationBookChapterVerseRoute,
+  CompareTranslationBookChapterVerseRoute:
+    CompareTranslationBookChapterVerseRoute,
+  ReferencesTranslationBookChapterVerseRoute:
+    ReferencesTranslationBookChapterVerseRoute,
   ReflectTranslationBookChapterVerseRoute:
     ReflectTranslationBookChapterVerseRoute,
   VerseTranslationBookChapterVerseRoute: VerseTranslationBookChapterVerseRoute,

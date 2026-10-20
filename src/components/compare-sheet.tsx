@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { SheetFrame } from "@/components/chapter-sheets";
+import { ArrowRightIcon } from "@/components/stitch-icons";
 import { bibleService } from "@/lib/bible/service";
 import type { VerseRef } from "@/lib/bible/types";
 
@@ -93,6 +95,20 @@ export function CompareSheet({
             />
           ))}
         </ul>
+      ) : null}
+      {open ? (
+        <Link
+          to="/compare/$translation/$book/$chapter/$verse"
+          params={{
+            translation: currentCode,
+            book: reference.bookId,
+            chapter: String(reference.chapter),
+            verse: String(reference.verse),
+          }}
+          className="mb-2 mt-1 flex items-center justify-center gap-1.5 rounded-full border border-brand-border py-3 text-[14px] font-semibold text-brand-primary transition-colors hover:bg-brand-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+        >
+          Open full comparison <ArrowRightIcon className="h-4 w-4" aria-hidden />
+        </Link>
       ) : null}
     </SheetFrame>
   );

@@ -1,12 +1,26 @@
-import { createFileRoute } from "@tanstack/react-router";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { VerseRow } from "@/components/verse-row";
-import { Button } from "@/components/ui/button";
+import {
+  BookmarkIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  SearchIcon,
+  TuneIcon,
+} from "@/components/stitch-icons";
+import { BIBLE_BOOKS } from "@/lib/bible/books";
 import { useAuth } from "@/lib/auth";
-import { library } from "@/lib/library";
+import { library, type LibraryEntry } from "@/lib/library";
+import { cn } from "@/lib/utils";
+
+/*
+ * Saved — Stitch "09 Saved Verses" (list) and "14 Saved Empty State". Uses the same saved-verse
+ * library as the verse screens (account when signed in, this device otherwise).
+ */
 
 export const Route = createFileRoute("/saved")({
   head: () => ({
@@ -22,9 +36,47 @@ export const Route = createFileRoute("/saved")({
   component: SavedPage,
 });
 
+type SortOrder = "newest" | "oldest" | "bible";
+
+const SORT_LABELS: Record<SortOrder, string> = {
+  newest: "Newest first",
+  oldest: "Oldest first",
+  bible: "Bible order",
+};
+
+const BOOK_ORDER = new Map(BIBLE_BOOKS.map((book, index) => [book.id, index]));
+
+const ICON_BUTTON =
+  "flex h-10 w-10 items-center justify-center rounded-full text-brand-text transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus";
+const MENU_ITEM =
+  "flex w-full cursor-pointer select-none items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors data-[highlighted]:bg-brand-surface-muted";
+
+function reference(entry: LibraryEntry): string {
+  return `${entry.bookName} ${entry.chapter}:${entry.verse}`;
+}
+
+function sortEntries(entries: LibraryEntry[], order: SortOrder): LibraryEntry[] {
+  const list = [...entries];
+  if (order === "bible") {
+    return list.sort(
+      (a, b) =>
+        (BOOK_ORDER.get(a.bookId) ?? 999) - (BOOK_ORDER.get(b.bookId) ?? 999) ||
+        a.chapter - b.chapter ||
+        a.verse - b.verse,
+    );
+  }
+  list.sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+  return order === "oldest" ? list.reverse() : list;
+}
+
 function SavedPage() {
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState("");
+  const [order, setOrder] = useState<SortOrder>("newest");
+  const [editing, setEditing] = useState(false);
+  const searchRef = useRef<HTMLInputElement | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["saved", user?.id],
@@ -41,44 +93,201 @@ function SavedPage() {
     onError: () => toast("Could not remove that verse"),
   });
 
+  const entries = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const filtered = (data ?? []).filter(
+      (entry) =>
+        !needle ||
+        reference(entry).toLowerCase().includes(needle) ||
+        entry.verseText.toLowerCase().includes(needle) ||
+        entry.translation.toLowerCase().includes(needle),
+    );
+    return sortEntries(filtered, order);
+  }, [data, order, query]);
+
+  const busy = loading || isLoading;
+  const empty = !busy && (!data || data.length === 0);
+
   return (
-    <AppShell title="Saved">
-      {loading || isLoading ? (
-        <p className="text-[0.9375rem] text-muted-foreground">Loading…</p>
-      ) : !data || data.length === 0 ? (
-        <div className="border-t border-border pt-8">
-          <p className="text-[0.9375rem] font-medium">No saved verses yet.</p>
-          <p className="mt-1 text-[0.9375rem] text-muted-foreground">
-            Save verses you want to come back to.
+    <AppShell variant="stitch">
+      {empty ? (
+        /* ---------- 14 Saved Empty State ---------- */
+        <main className="flex flex-1 flex-col items-center justify-center px-2 pb-10 text-center">
+          <h1 className="sr-only">Saved</h1>
+          <BookmarkIcon className="mb-6 h-14 w-14 text-brand-text" strokeWidth={1.6} aria-hidden />
+          <h2 className="font-display text-[26px] font-bold leading-tight tracking-tight text-brand-text">
+            No saved verses yet
+          </h2>
+          <p className="mt-3 max-w-[290px] text-[15px] leading-relaxed text-brand-text-muted">
+            When you find a verse you want to remember, tap the save icon on the verse screen.
           </p>
-        </div>
+          <Link
+            to="/search"
+            className="mt-8 rounded-full bg-brand-primary px-10 py-3.5 text-[15px] font-semibold text-brand-on-primary shadow-md transition-colors hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas"
+          >
+            Find a Verse
+          </Link>
+        </main>
       ) : (
-        <ul className="border-t border-border">
-          {data.map((entry) => (
-            <li key={entry.id}>
-              <VerseRow
-                translation={entry.translation}
-                bookId={entry.bookId}
-                bookName={entry.bookName}
-                chapter={entry.chapter}
-                verse={entry.verse}
-                preview={entry.verseText}
-                trailing={
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="ghost"
-                    aria-label={`Remove ${entry.bookName} ${entry.chapter}:${entry.verse}`}
-                    onClick={() => remove.mutate(entry.id)}
-                    className="h-11 w-11 text-muted-foreground hover:text-foreground"
+        /* ---------- 09 Saved Verses ---------- */
+        <main className="flex flex-1 flex-col">
+          <header className="flex items-center justify-between pb-3 pt-5">
+            <h1 className="text-[32px] font-bold leading-tight tracking-tight text-brand-text">
+              Saved
+            </h1>
+            <div className="-mr-2 flex items-center gap-2">
+              <button
+                type="button"
+                aria-label={searching ? "Close search" : "Search saved verses"}
+                aria-expanded={searching}
+                onClick={() => {
+                  const next = !searching;
+                  setSearching(next);
+                  if (!next) setQuery("");
+                  else window.requestAnimationFrame(() => searchRef.current?.focus());
+                }}
+                className={ICON_BUTTON}
+              >
+                {searching ? (
+                  <CloseIcon className="h-[22px] w-[22px]" strokeWidth={2} />
+                ) : (
+                  <SearchIcon className="h-[22px] w-[22px]" strokeWidth={2} />
+                )}
+              </button>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <button type="button" aria-label="Sort and organize" className={ICON_BUTTON}>
+                    <TuneIcon className="h-[22px] w-[22px]" />
+                  </button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content
+                    align="end"
+                    sideOffset={6}
+                    className="z-[70] min-w-52 rounded-2xl border border-brand-border bg-brand-surface p-1.5 font-stitch text-brand-text shadow-xl"
                   >
-                    <X className="h-4 w-4" aria-hidden />
-                  </Button>
-                }
+                    <DropdownMenu.Label className="px-3 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand-text-muted">
+                      Sort by
+                    </DropdownMenu.Label>
+                    <DropdownMenu.RadioGroup
+                      value={order}
+                      onValueChange={(value) => setOrder(value as SortOrder)}
+                    >
+                      {(Object.keys(SORT_LABELS) as SortOrder[]).map((key) => (
+                        <DropdownMenu.RadioItem key={key} value={key} className={MENU_ITEM}>
+                          {SORT_LABELS[key]}
+                          <DropdownMenu.ItemIndicator>
+                            <CheckIcon className="h-4 w-4 text-brand-primary" />
+                          </DropdownMenu.ItemIndicator>
+                        </DropdownMenu.RadioItem>
+                      ))}
+                    </DropdownMenu.RadioGroup>
+                    <DropdownMenu.Separator className="my-1 h-px bg-brand-border" />
+                    <DropdownMenu.Item className={MENU_ITEM} onSelect={() => setEditing((v) => !v)}>
+                      {editing ? "Done editing" : "Edit list"}
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Root>
+            </div>
+          </header>
+
+          {searching ? (
+            <div className="mb-2">
+              <label htmlFor="saved-search" className="sr-only">
+                Search saved verses
+              </label>
+              <input
+                ref={searchRef}
+                id="saved-search"
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by reference or words"
+                className="h-11 w-full rounded-full border border-brand-border bg-brand-surface px-4 text-[15px] text-brand-text placeholder:text-brand-text-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
               />
-            </li>
-          ))}
-        </ul>
+            </div>
+          ) : null}
+
+          {editing ? (
+            <div className="mb-1 flex items-center justify-between rounded-xl bg-brand-surface-muted px-3 py-2 text-[13px] text-brand-text-muted">
+              Tap ✕ to remove a verse.
+              <button
+                type="button"
+                onClick={() => setEditing(false)}
+                className="rounded-full px-2 py-0.5 font-semibold text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+              >
+                Done
+              </button>
+            </div>
+          ) : null}
+
+          {busy ? (
+            <ul aria-label="Loading saved verses" className="divide-y divide-brand-border">
+              {[0, 1, 2, 3].map((item) => (
+                <li key={item} className="space-y-2 py-4" aria-hidden>
+                  <span className="block h-4 w-32 animate-pulse rounded bg-brand-surface-strong" />
+                  <span className="block h-3 w-full animate-pulse rounded bg-brand-surface-muted" />
+                  <span className="block h-3 w-2/3 animate-pulse rounded bg-brand-surface-muted" />
+                </li>
+              ))}
+            </ul>
+          ) : entries.length === 0 ? (
+            <p className="py-10 text-center text-[15px] text-brand-text-muted" role="status">
+              No saved verses match “{query.trim()}”.
+            </p>
+          ) : (
+            <ul className="divide-y divide-brand-border">
+              {entries.map((entry) => (
+                <li key={entry.id} className="flex items-start">
+                  <Link
+                    to="/verse/$translation/$book/$chapter/$verse"
+                    params={{
+                      translation: entry.translation,
+                      book: entry.bookId,
+                      chapter: String(entry.chapter),
+                      verse: String(entry.verse),
+                    }}
+                    className="group flex min-w-0 flex-1 items-start justify-between py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
+                  >
+                    <span className="min-w-0 space-y-1 pr-4">
+                      <span className="block text-base font-bold text-brand-text transition-colors group-hover:text-brand-primary">
+                        {reference(entry)}
+                      </span>
+                      {entry.verseText ? (
+                        <span className="line-clamp-2 block text-sm leading-relaxed text-brand-text-muted">
+                          {entry.verseText}
+                        </span>
+                      ) : null}
+                      <span className="block pt-0.5 text-xs font-semibold tracking-wider text-brand-text-faint">
+                        {entry.translation}
+                      </span>
+                    </span>
+                    {editing ? null : (
+                      <ChevronRightIcon
+                        className="mt-1 h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
+                        aria-hidden
+                      />
+                    )}
+                  </Link>
+                  {editing ? (
+                    <button
+                      type="button"
+                      aria-label={`Remove ${reference(entry)}`}
+                      onClick={() => remove.mutate(entry.id)}
+                      disabled={remove.isPending}
+                      className={cn(
+                        "mt-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-brand-text-muted transition-colors hover:bg-brand-danger-soft hover:text-brand-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus disabled:opacity-50",
+                      )}
+                    >
+                      <CloseIcon className="h-4 w-4" strokeWidth={2.2} />
+                    </button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+        </main>
       )}
     </AppShell>
   );

@@ -19,7 +19,7 @@ describe("parseStoredPreferences", () => {
       translation: "BSB",
       playbackSpeed: "1.5x",
     });
-    expect(parseStoredPreferences(raw)).toEqual({
+    expect(parseStoredPreferences(raw)).toMatchObject({
       textSize: "xlarge",
       theme: "dark",
       translation: "BSB",
@@ -34,7 +34,7 @@ describe("parseStoredPreferences", () => {
       translation: "",
       playbackSpeed: "9x",
     });
-    expect(parseStoredPreferences(raw)).toEqual({
+    expect(parseStoredPreferences(raw)).toMatchObject({
       textSize: "medium",
       theme: "system",
       translation: "KJAV",
@@ -45,7 +45,7 @@ describe("parseStoredPreferences", () => {
   it("upgrades the old KJV code and fills in missing fields", () => {
     expect(
       parseStoredPreferences(JSON.stringify({ translation: "KJV", textSize: "large" })),
-    ).toEqual({
+    ).toMatchObject({
       textSize: "large",
       theme: "system",
       translation: "KJAV",

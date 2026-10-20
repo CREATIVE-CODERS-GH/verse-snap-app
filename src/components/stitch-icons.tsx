@@ -514,3 +514,47 @@ export function FlipCameraIcon(props: IconProps) {
     </Outline>
   );
 }
+
+export function DatabaseIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <ellipse cx="12" cy="5.5" rx="7.5" ry="2.75" />
+      <path d="M4.5 5.5v6.5c0 1.52 3.36 2.75 7.5 2.75s7.5-1.23 7.5-2.75V5.5M4.5 12v6.5c0 1.52 3.36 2.75 7.5 2.75s7.5-1.23 7.5-2.75V12" />
+    </Outline>
+  );
+}
+
+export function ShieldIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.3-7.5 9.5-4.3-1.2-7.5-4.9-7.5-9.5V6L12 3z" />
+      <path d="M9 12l2 2 4-4" />
+    </Outline>
+  );
+}
+
+export function DocumentIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5z" />
+      <path d="M14 3v5h5M9 13h6M9 17h4" />
+    </Outline>
+  );
+}
+
+export function InfoIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 8h.01" />
+    </Outline>
+  );
+}
+
+export function DownloadIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={2} {...props}>
+      <path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14" />
+    </Outline>
+  );
+}

@@ -215,3 +215,69 @@ export function SuggestionCard({
     </section>
   );
 }
+
+/** Full-screen frame for the app-wide states below: centred on the canvas, on its own page. */
+function FullScreenFrame({ children }: { children: ReactNode }) {
+  return (
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-brand-canvas px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)] font-stitch text-brand-text">
+      <div className="w-full max-w-[30rem]">{children}</div>
+    </main>
+  );
+}
+
+/** Stitch "15 — Loading State" as a whole screen (page loading, slow first load). */
+export function FullScreenLoading() {
+  return (
+    <FullScreenFrame>
+      <LoadingState />
+    </FullScreenFrame>
+  );
+}
+
+/**
+ * Stitch "16 — Network Error State" as a whole screen: wifi with an alert badge, "Connection
+ * problem", and Try again. `offline` adjusts the message when the device itself has no connection.
+ */
+export function NetworkErrorScreen({
+  onRetry,
+  offline = false,
+  secondary,
+}: {
+  onRetry: () => void;
+  offline?: boolean;
+  secondary?: ReactNode;
+}) {
+  return (
+    <FullScreenFrame>
+      <StateMessage
+        illustration={<ErrorIllustration />}
+        title="Connection problem"
+        titleClassName={ERROR_TITLE_CLASS}
+        action={
+          <div className="flex w-full flex-col items-center gap-3">
+            <button type="button" onClick={onRetry} className={PILL_OUTLINE}>
+              Try again
+            </button>
+            {secondary}
+          </div>
+        }
+      >
+        {offline
+          ? "You’re offline. Check your internet connection and try again. Chapters you’ve opened recently still work offline."
+          : "We couldn’t reach the Bible service. Please check your internet connection and try again."}
+      </StateMessage>
+    </FullScreenFrame>
+  );
+}
+
+/** True when an error looks like a lost connection rather than a bug. */
+export function isConnectionError(error: unknown): boolean {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) return true;
+  if (!error || typeof error !== "object") return false;
+  const { name, message, kind } = error as { name?: string; message?: string; kind?: string };
+  if (kind === "network") return true;
+  return (
+    (name === "TypeError" && /fetch|network|load failed/i.test(message ?? "")) ||
+    /Failed to fetch dynamically imported module|NetworkError|ERR_INTERNET/i.test(message ?? "")
+  );
+}

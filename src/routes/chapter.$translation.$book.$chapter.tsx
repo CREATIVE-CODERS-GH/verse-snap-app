@@ -23,6 +23,7 @@ import {
   StateMessage,
 } from "@/components/search-states";
 import { BookmarkIcon, EditNoteIcon, PaletteIcon, TuneIcon } from "@/components/stitch-icons";
+import { ShareSheet } from "@/components/share-sheet";
 import { TranslationSheet } from "@/components/translation-sheet";
 import {
   ActionTile,
@@ -49,7 +50,7 @@ import { useAuth } from "@/lib/auth";
 import { copyText } from "@/lib/copy-text";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
-import { shareVerseCard, shareVerseText, verseShareText } from "@/lib/share-verse-card";
+import { verseShareText } from "@/lib/share-verse-card";
 import { useSpeak } from "@/lib/use-speak";
 
 export const Route = createFileRoute("/chapter/$translation/$book/$chapter")({
@@ -145,6 +146,7 @@ function ChapterPage() {
   const [translationsOpen, setTranslationsOpen] = useState(false);
   const [textSizeOpen, setTextSizeOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const translationButtonRef = useRef<HTMLButtonElement | null>(null);
   const textSizeButtonRef = useRef<HTMLButtonElement | null>(null);
   const sheetRef = useRef<HTMLElement | null>(null);
@@ -188,6 +190,7 @@ function ChapterPage() {
     setMarkedVerse(null);
     setSheetExpanded(false);
     setCompareOpen(false);
+    setShareOpen(false);
     setToastVisible(false);
     setProgress(0);
     stopSpeech();
@@ -275,6 +278,7 @@ function ChapterPage() {
     setSelectedVerse(null);
     setSheetExpanded(false);
     setCompareOpen(false);
+    setShareOpen(false);
     stopSpeech();
     // Put keyboard focus back on the verse that was open.
     window.requestAnimationFrame(() => {
@@ -304,7 +308,7 @@ function ChapterPage() {
   }, [selectedVerse]);
 
   // Escape closes the sheet; Tab stays inside the toolbar and the sheet while it is open.
-  const overlayOpen = translationsOpen || textSizeOpen || compareOpen;
+  const overlayOpen = translationsOpen || textSizeOpen || compareOpen || shareOpen;
   useEffect(() => {
     if (selectedVerse === null) return;
     const onKey = (event: KeyboardEvent) => {
@@ -464,9 +468,7 @@ function ChapterPage() {
                               <SelectionToolbar
                                 onCopy={() => void handleCopy()}
                                 onCompare={() => setCompareOpen(true)}
-                                onShare={() =>
-                                  void shareVerseText(verse, (text) => showToast(text))
-                                }
+                                onShare={() => setShareOpen(true)}
                               />
                             ) : null
                           }
@@ -598,8 +600,13 @@ function ChapterPage() {
                 badge="Art"
                 badgeClass="bg-brand-teal-soft text-ch-tertiary"
                 title="Verse Card"
-                subtitle="Export image story"
-                onClick={() => void shareVerseCard(selected, (text) => showToast(text))}
+                subtitle="Design an image story"
+                onClick={() =>
+                  navigate({
+                    to: "/card/$translation/$book/$chapter/$verse",
+                    params: { ...params, verse: String(selected.verse) },
+                  })
+                }
               />
               <ActionTile
                 icon={<TuneIcon className="h-[18px] w-[18px]" />}
@@ -610,7 +617,12 @@ function ChapterPage() {
                   .slice(0, 4)
                   .map((item) => item.code)
                   .join(", ")}${otherEditions.length > 4 ? "…" : ""}`}
-                onClick={() => setCompareOpen(true)}
+                onClick={() =>
+                  navigate({
+                    to: "/compare/$translation/$book/$chapter/$verse",
+                    params: { ...params, verse: String(selected.verse) },
+                  })
+                }
               />
             </div>
             <SpokenCard
@@ -623,7 +635,10 @@ function ChapterPage() {
                 total={crossRefs.total}
                 chips={crossRefs.chips}
                 onExploreAll={() =>
-                  showToast("Cross-reference explorer isn't connected yet — sample content")
+                  navigate({
+                    to: "/references/$translation/$book/$chapter/$verse",
+                    params: { ...params, verse: String(selected.verse) },
+                  })
                 }
                 chipNode={(chip, index) =>
                   chip.target ? (
@@ -670,6 +685,18 @@ function ChapterPage() {
         positionClass={selected ? "top-3" : "bottom-[calc(8rem+env(safe-area-inset-bottom))]"}
         {...(toast?.action ? { action: toast.action } : {})}
       />
+
+      {selected ? (
+        <ShareSheet
+          open={shareOpen}
+          onOpenChange={(open) => {
+            if (!open) overlayClosedAt.current = Date.now();
+            setShareOpen(open);
+          }}
+          verse={selected}
+          notify={(text) => showToast(text)}
+        />
+      ) : null}
 
       {selected ? (
         <CompareSheet

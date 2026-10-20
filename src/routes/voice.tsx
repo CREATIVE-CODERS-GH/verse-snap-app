@@ -90,7 +90,7 @@ function referenceLabel(reference: ParsedReference): string {
 
 function VoicePage() {
   const navigate = useNavigate();
-  const { translation } = usePreferences();
+  const { translation, speechLanguage, autoListen, ready } = usePreferences();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const startingRef = useRef(false);
   const startTimerRef = useRef<number | null>(null);
@@ -167,7 +167,7 @@ function VoicePage() {
     recognitionRef.current = recognition;
     recognition.continuous = false;
     recognition.interimResults = true;
-    recognition.lang = "en-US";
+    recognition.lang = speechLanguage;
     recognition.maxAlternatives = 3;
 
     recognition.onstart = () => {
@@ -284,19 +284,33 @@ function VoicePage() {
       setState("error");
       setMessage("Voice search couldn't start. Try again.");
     }
-  }, [navigate, openReference, stopRecognition]);
+  }, [navigate, openReference, stopRecognition, speechLanguage]);
 
+  // Starts listening on open unless "Auto-listen on launch" is turned off in Voice & Audio.
+  const autoStarted = useRef(false);
   useEffect(() => {
     mountedRef.current = true;
-    const timer = window.setTimeout(startListening, 0);
+    let timer = 0;
+    if (ready && autoListen && !autoStarted.current) {
+      autoStarted.current = true;
+      timer = window.setTimeout(startListening, 0);
+    }
     return () => {
-      mountedRef.current = false;
       window.clearTimeout(timer);
-      stopRecognition(true);
     };
-  }, [startListening, stopRecognition]);
+  }, [ready, autoListen, startListening]);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      stopRecognition(true);
+    },
+    [stopRecognition],
+  );
 
   const goBack = useBackOrHome();
+  // With auto-listen off, the page waits for a tap instead of starting by itself.
+  const waitingForTap = state === "idle" && !autoStarted.current && !autoListen;
+  const idleText = waitingForTap ? "Tap the microphone to start." : "Starting the microphone…";
   const failed = state === "error" || state === "unsupported";
   const showExamples = !heard && (state === "idle" || state === "listening");
   const heading =
@@ -309,7 +323,7 @@ function VoicePage() {
           : "Speak a Bible reference";
   const status =
     state === "idle"
-      ? "Starting the microphone…"
+      ? idleText
       : state === "listening"
         ? "Listening…"
         : state === "processing"
@@ -398,7 +412,7 @@ function VoicePage() {
             </div>
           ) : null}
           {state === "idle" ? (
-            <p className="text-[13px] text-brand-text-muted">Starting the microphone…</p>
+            <p className="text-[13px] text-brand-text-muted">{idleText}</p>
           ) : null}
         </div>
 

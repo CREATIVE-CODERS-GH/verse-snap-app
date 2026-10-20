@@ -48,9 +48,9 @@ describe("single-verse reading screen (Stitch 06)", () => {
       'trackEvent("verse_opened")',
       'trackEvent("verse_saved")',
       'trackEvent("verse_copied")',
-      'trackEvent("verse_shared")',
       'trackEvent("verse_listened")',
-      "createVerseImageBlob(verse)",
+      // Share opens the Share Options sheet (Stitch 13), which handles text and image sharing.
+      "<ShareSheet",
       "SpeechSynthesisUtterance",
       "Number.parseFloat(playbackSpeed)",
       'toast("Copied")',

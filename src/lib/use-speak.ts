@@ -1,10 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { trackEvent } from "./analytics";
-import { usePreferences } from "./preferences";
+import { usePreferences, type Narrator } from "./preferences";
+
+/** Narrator styles from Settings → Voice & Audio, applied to the browser voice. */
+export const NARRATOR_TONE: Record<Narrator, { pitch: number; pace: number }> = {
+  classic: { pitch: 0.9, pace: 1 },
+  gentle: { pitch: 1.1, pace: 0.95 },
+  peaceful: { pitch: 1, pace: 0.85 },
+};
 
 /** Reads text aloud with the browser's voice, at the playback speed saved in Settings. */
 export function useSpeak(notify?: (message: string) => void) {
-  const { playbackSpeed } = usePreferences();
+  const { playbackSpeed, narrator } = usePreferences();
   const [speaking, setSpeaking] = useState(false);
 
   const stop = useCallback(() => {
@@ -25,7 +32,9 @@ export function useSpeak(notify?: (message: string) => void) {
         return;
       }
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = Number.parseFloat(playbackSpeed) || 1;
+      const tone = NARRATOR_TONE[narrator] ?? NARRATOR_TONE.classic;
+      utterance.rate = (Number.parseFloat(playbackSpeed) || 1) * tone.pace;
+      utterance.pitch = tone.pitch;
       utterance.onend = () => setSpeaking(false);
       utterance.onerror = () => setSpeaking(false);
       window.speechSynthesis.cancel();
@@ -33,7 +42,7 @@ export function useSpeak(notify?: (message: string) => void) {
       trackEvent("verse_listened");
       setSpeaking(true);
     },
-    [notify, playbackSpeed, speaking, stop],
+    [notify, playbackSpeed, narrator, speaking, stop],
   );
 
   return { speaking, toggle, stop };
