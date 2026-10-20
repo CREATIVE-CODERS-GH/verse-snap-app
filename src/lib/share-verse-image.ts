@@ -32,11 +32,7 @@ async function ensureFonts(): Promise<void> {
 }
 
 /** Greedy word wrap for a canvas context at the current font. */
-function wrapLines(
-  context: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string[] {
+function wrapLines(context: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
   for (const paragraph of text.split(/\n+/)) {
     const words = paragraph.split(/\s+/).filter(Boolean);
@@ -129,6 +125,9 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
 }
 
 export function verseImageFileName(verse: Verse): string {
-  const slug = verse.reference.replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  const slug = verse.reference
+    .replace(/[^\w]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
   return `verse-snap-${slug}-${verse.translation.toLowerCase()}.png`;
 }

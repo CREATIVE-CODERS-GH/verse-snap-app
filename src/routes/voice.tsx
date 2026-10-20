@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { bibleService, type VerseRef } from "@/lib/bible/service";
 import { classifyQuery } from "@/lib/bible/classify-query";
+import { routeQuery } from "@/lib/bible/search-router";
 import type { ParsedReference } from "@/lib/bible/parse-reference";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
@@ -211,10 +212,11 @@ function VoicePage() {
         // Not a reference — use the first meaningful speech alternative as a description.
         for (let index = 0; index < Math.min(latest.length, 3); index += 1) {
           const spoken = latest[index]?.transcript ?? "";
-          const intent = spoken ? classifyQuery(spoken) : null;
-          if (intent?.kind === "description") {
+          const decision = spoken ? routeQuery(spoken) : null;
+          if (decision?.canTryAi) {
             trackEvent("voice_search_success", { kind: "description" });
-            navigate({ to: "/search", search: { q: intent.query } });
+            // Free search handles it; AI starts only from the explicit "Try Smart Search" button.
+            navigate({ to: "/search", search: { q: decision.query } });
             return;
           }
         }

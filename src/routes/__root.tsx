@@ -8,11 +8,13 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { lazy, useEffect, type ReactNode } from "react";
+import { lazy, useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { OAuthReturnNotice } from "@/components/oauth-return-notice";
+import { invalidateUserQueries, planAuthEvent } from "@/lib/auth-events";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { AuthProvider } from "@/lib/auth";
 import { PreferencesProvider } from "@/lib/preferences";
@@ -113,9 +115,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap",
       },
-      { rel: "icon", href: "/icon.svg", type: "image/svg+xml" },
+      {
+        // Stitch design system fonts (Playfair Display + Inter), used by rebuilt screens.
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap",
+      },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", href: "/icons/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/icons/icon-192.png", type: "image/png", sizes: "192x192" },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+      { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png", sizes: "180x180" },
     ],
   }),
   shellComponent: RootShell,
@@ -141,13 +150,17 @@ function RootShell({ children }: { children: ReactNode }) {
 function AuthSync() {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const lastUserId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      // supabase-js repeats SIGNED_IN whenever a tab regains focus. Only real changes refresh data,
+      // and paid AI search results are never invalidated (see src/lib/auth-events.ts).
+      const plan = planAuthEvent(event, session?.user?.id ?? null, lastUserId.current);
+      lastUserId.current = plan.userId;
+      if (plan.invalidateRouter) router.invalidate();
+      if (plan.invalidateQueries) void invalidateUserQueries(queryClient);
     });
     return () => data.subscription.unsubscribe();
   }, [router, queryClient]);
@@ -167,6 +180,7 @@ function RootComponent() {
       <AuthProvider>
         <PreferencesProvider>
           <AuthSync />
+          <OAuthReturnNotice />
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
           <Outlet />
           <Toaster position="top-center" />

@@ -1,28 +1,36 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  Bookmark,
-  BookmarkCheck,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Share2,
-  Square,
-  Volume2,
-} from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
-import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  NAV_CARD_DISABLED,
+  NAV_CARD_LINK,
+  ReaderAction,
+  ReaderHeader,
+  VerseFocus,
+  VerseNavCardContent,
+} from "@/components/reader-parts";
+import {
+  ERROR_TITLE_CLASS,
+  ErrorIllustration,
+  LoadingState,
+  NoResultsIllustration,
+  PILL_OUTLINE,
+  StateMessage,
+} from "@/components/search-states";
+import {
+  ArrowRightIcon,
+  CopyDocIcon,
+  PagesIcon,
+  SaveBookmarkIcon,
+  ShareNodesIcon,
+  StopSquareIcon,
+  VolumeIcon,
+} from "@/components/stitch-icons";
+import { TranslationSheet } from "@/components/translation-sheet";
 import { findBook } from "@/lib/bible/books";
-import { BibleServiceError } from "@/lib/bible/types";
+import { BibleServiceError, type Verse } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
 import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
 import { useAuth } from "@/lib/auth";
@@ -30,6 +38,7 @@ import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
 import { createVerseImageBlob, verseImageFileName } from "@/lib/share-verse-image";
+import { useBackOrHome } from "@/lib/use-back-or-home";
 
 export const Route = createFileRoute("/verse/$translation/$book/$chapter/$verse")({
   head: ({ params }) => {
@@ -239,172 +248,193 @@ function VersePage() {
 
   const providerError = verseQuery.error instanceof BibleServiceError ? verseQuery.error : null;
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
-  const errorMessage =
-    providerError?.kind === "network"
-      ? offline
-        ? "You’re offline, and this verse isn’t saved on this device yet. Verses you’ve opened recently are available offline — reconnect to read this one."
-        : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
-      : providerError?.kind === "translation"
-        ? "That translation isn't available."
-        : "That Bible reference doesn't look right.";
-  const actionClass =
-    "flex min-h-14 flex-1 flex-col items-center justify-center gap-1.5 py-2 text-[0.75rem] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50";
+  const networkProblem = providerError?.kind === "network";
+  const errorMessage = networkProblem
+    ? offline
+      ? "You’re offline, and this verse isn’t saved on this device yet. Verses you’ve opened recently are available offline — reconnect to read this one."
+      : "Verse Snap couldn’t reach the Bible. Check your connection and try again."
+    : providerError?.kind === "translation"
+      ? "That translation isn't available."
+      : "That Bible reference doesn't look right.";
+
+  const goBack = useBackOrHome();
+  const [translationsOpen, setTranslationsOpen] = useState(false);
+  const translationButtonRef = useRef<HTMLButtonElement | null>(null);
+  const shownTranslation = verse?.translation ?? params.translation;
+
+  const neighbourCard = (
+    direction: "previous" | "next",
+    neighbour: Verse | null | undefined,
+  ): ReactNode => {
+    if (!neighbour) {
+      return (
+        <span
+          className={NAV_CARD_DISABLED}
+          aria-disabled="true"
+          aria-label={direction === "previous" ? "No previous verse" : "No next verse"}
+        >
+          <VerseNavCardContent direction={direction} reference="—" />
+        </span>
+      );
+    }
+    const reference = `${neighbour.bookName} ${neighbour.chapter}:${neighbour.verse}`;
+    return (
+      <Link
+        to="/verse/$translation/$book/$chapter/$verse"
+        params={{
+          translation: params.translation,
+          book: neighbour.bookId,
+          chapter: String(neighbour.chapter),
+          verse: String(neighbour.verse),
+        }}
+        aria-label={`${direction === "previous" ? "Previous" : "Next"} verse: ${reference}`}
+        className={NAV_CARD_LINK}
+      >
+        <VerseNavCardContent direction={direction} reference={reference} />
+      </Link>
+    );
+  };
 
   return (
-    <AppShell>
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 pt-7">
-        <Link
-          to="/search"
-          className="flex min-w-0 items-center gap-1 text-[0.8125rem] text-muted-foreground hover:text-foreground"
-        >
-          <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden /> Search
-        </Link>
-        <Select
-          value={params.translation}
-          onValueChange={(value) =>
-            navigate({
-              to: "/verse/$translation/$book/$chapter/$verse",
-              params: { ...params, translation: value },
-            })
-          }
-        >
-          <SelectTrigger
-            className="h-8 w-auto gap-1.5 border-border text-[0.8125rem]"
-            aria-label="Translation"
-          >
-            <SelectValue>{params.translation}</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {(translations ?? BIBLE_TRANSLATIONS).map((item) => (
-              <SelectItem key={item.code} value={item.code}>
-                {item.code} · {item.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <article className="mt-10">
-        <h1 className="font-serif text-2xl font-semibold">
-          {ref.bookName} {ref.chapter}:{ref.verse}
-        </h1>
-        <p className="mt-1 text-[0.8125rem] text-muted-foreground">
-          {verse?.translation ?? params.translation} ·{" "}
-          {translationName(verse?.translation ?? params.translation)}
-        </p>
-        {verseQuery.isLoading ? (
-          <p className="mt-5 text-[0.9375rem] text-muted-foreground">Finding verse…</p>
-        ) : verse ? (
-          <p className="scripture mt-7">{verse.text}</p>
-        ) : (
-          <div className="mt-5">
-            <p className="text-[0.9375rem] leading-relaxed text-muted-foreground">{errorMessage}</p>
-            {verseQuery.isError ? (
-              <Button variant="outline" className="mt-4" onClick={() => verseQuery.refetch()}>
-                Try again
-              </Button>
-            ) : null}
-          </div>
-        )}
-      </article>
-
-      <div className="mt-8 flex border-y border-border">
-        <Button
-          type="button"
-          variant="ghost"
-          className={`${actionClass} h-auto rounded-none`}
-          onClick={handleListen}
-          disabled={!verse}
-        >
-          {speaking ? (
-            <Square className="h-[1.125rem] w-[1.125rem]" aria-hidden />
+    <>
+      <AppShell
+        variant="stitch"
+        hideNav
+        header={
+          <ReaderHeader
+            title={`${ref.bookName} ${ref.chapter}:${ref.verse}`}
+            translation={params.translation}
+            onBack={goBack}
+            onOpenTranslations={() => setTranslationsOpen(true)}
+            translationButtonRef={translationButtonRef}
+          />
+        }
+      >
+        <main className="-mt-4 flex flex-1 flex-col justify-center px-2 py-6">
+          {verseQuery.isLoading ? (
+            <LoadingState />
+          ) : verse ? (
+            <article className="flex flex-col items-center" aria-label={verse.reference}>
+              <VerseFocus number={verse.verse} text={verse.text} />
+              <p className="mt-8 text-center text-xs font-medium tracking-wide text-vs-text-secondary">
+                {verse.reference} ({verse.translation})
+                <span className="sr-only">, {translationName(verse.translation)}</span>
+              </p>
+              <div className="mt-6 flex w-full justify-center">
+                <Link
+                  to="/chapter/$translation/$book/$chapter"
+                  params={{
+                    translation: params.translation,
+                    book: params.book,
+                    chapter: String(ref.chapter),
+                  }}
+                  className="group flex items-center gap-2 rounded-full border border-vs-primary/20 bg-vs-primary/10 px-4 py-2 text-vs-primary transition-colors hover:bg-vs-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-vs-primary/20"
+                >
+                  <PagesIcon className="h-4 w-4" aria-hidden />
+                  <span className="text-xs font-semibold tracking-wide">
+                    Read in {ref.bookName} {ref.chapter}
+                  </span>
+                  <ArrowRightIcon
+                    className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </Link>
+              </div>
+              <div
+                className="mt-6 flex w-full max-w-[280px] items-center justify-between px-2"
+                role="group"
+                aria-label="Verse actions"
+              >
+                <ReaderAction
+                  label={saved ? "Saved" : "Save"}
+                  pressed={Boolean(saved)}
+                  icon={<SaveBookmarkIcon className="h-[19px] w-[19px]" filled={Boolean(saved)} />}
+                  onClick={() => toggleSave.mutate()}
+                  disabled={!verse || toggleSave.isPending}
+                />
+                <ReaderAction
+                  label="Share"
+                  icon={<ShareNodesIcon className="h-[19px] w-[19px]" />}
+                  onClick={handleShare}
+                  disabled={!verse}
+                />
+                <ReaderAction
+                  label="Copy"
+                  icon={<CopyDocIcon className="h-[19px] w-[19px]" />}
+                  onClick={handleCopy}
+                  disabled={!verse}
+                />
+                <ReaderAction
+                  label={speaking ? "Stop" : "Listen"}
+                  icon={
+                    speaking ? (
+                      <StopSquareIcon className="h-[19px] w-[19px]" />
+                    ) : (
+                      <VolumeIcon className="h-[19px] w-[19px]" />
+                    )
+                  }
+                  onClick={handleListen}
+                  disabled={!verse}
+                />
+              </div>
+            </article>
+          ) : networkProblem ? (
+            <StateMessage
+              illustration={<ErrorIllustration />}
+              title="Connection problem"
+              titleClassName={ERROR_TITLE_CLASS}
+              action={
+                <button type="button" className={PILL_OUTLINE} onClick={() => verseQuery.refetch()}>
+                  Try again
+                </button>
+              }
+            >
+              {errorMessage}
+            </StateMessage>
           ) : (
-            <Volume2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
+            <StateMessage
+              illustration={<NoResultsIllustration />}
+              title="Verse not found"
+              action={
+                verseQuery.isError ? (
+                  <button
+                    type="button"
+                    className={PILL_OUTLINE}
+                    onClick={() => verseQuery.refetch()}
+                  >
+                    Try again
+                  </button>
+                ) : null
+              }
+            >
+              {errorMessage}
+            </StateMessage>
           )}
-          {speaking ? "Stop" : "Listen"}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className={`${actionClass} h-auto rounded-none`}
-          onClick={() => toggleSave.mutate()}
-          disabled={!verse || toggleSave.isPending}
-        >
-          {saved ? (
-            <BookmarkCheck
-              className="h-[1.125rem] w-[1.125rem] text-primary"
-              strokeWidth={1.75}
-              aria-hidden
-            />
-          ) : (
-            <Bookmark className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
-          )}
-          {saved ? "Saved" : "Save"}
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className={`${actionClass} h-auto rounded-none`}
-          onClick={handleCopy}
-          disabled={!verse}
-        >
-          <Copy className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
-          Copy
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          className={`${actionClass} h-auto rounded-none`}
-          onClick={handleShare}
-          disabled={!verse}
-        >
-          <Share2 className="h-[1.125rem] w-[1.125rem]" strokeWidth={1.75} aria-hidden />
-          Share
-        </Button>
-      </div>
+        </main>
 
-      <nav className="mt-6 flex items-center justify-between text-[0.875rem]">
-        {neighbours?.previous ? (
-          <Link
-            to="/verse/$translation/$book/$chapter/$verse"
-            params={{
-              translation: params.translation,
-              book: neighbours.previous.bookId,
-              chapter: String(neighbours.previous.chapter),
-              verse: String(neighbours.previous.verse),
-            }}
-            className="flex items-center gap-1 text-primary"
-          >
-            <ChevronLeft className="h-4 w-4" aria-hidden />
-            Previous
-          </Link>
-        ) : (
-          <span className="flex items-center gap-1 text-muted-foreground/60">
-            <ChevronLeft className="h-4 w-4" aria-hidden />
-            Previous
-          </span>
-        )}
-        {neighbours?.next ? (
-          <Link
-            to="/verse/$translation/$book/$chapter/$verse"
-            params={{
-              translation: params.translation,
-              book: neighbours.next.bookId,
-              chapter: String(neighbours.next.chapter),
-              verse: String(neighbours.next.verse),
-            }}
-            className="flex items-center gap-1 text-primary"
-          >
-            Next
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </Link>
-        ) : (
-          <span className="flex items-center gap-1 text-muted-foreground/60">
-            Next
-            <ChevronRight className="h-4 w-4" aria-hidden />
-          </span>
-        )}
-      </nav>
-    </AppShell>
+        {verse ? (
+          <footer className="-mx-1 flex items-stretch justify-between gap-3 pb-3">
+            {neighbourCard("previous", neighbours?.previous)}
+            {neighbourCard("next", neighbours?.next)}
+          </footer>
+        ) : null}
+      </AppShell>
+
+      <TranslationSheet
+        open={translationsOpen}
+        onOpenChange={setTranslationsOpen}
+        returnFocusRef={translationButtonRef}
+        current={shownTranslation}
+        options={translations ?? BIBLE_TRANSLATIONS}
+        onConfirm={(code) => {
+          setTranslationsOpen(false);
+          if (code === params.translation) return;
+          navigate({
+            to: "/verse/$translation/$book/$chapter/$verse",
+            params: { ...params, translation: code },
+          });
+        }}
+      />
+    </>
   );
 }

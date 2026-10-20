@@ -17,6 +17,83 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: "Libre Franklin", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  /* Stitch design system: used only by screens already rebuilt from the approved designs. */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-stitch: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-vs-bg: var(--vs-bg);
+  --color-vs-surface: var(--vs-surface);
+  --color-vs-primary: var(--vs-primary);
+  --color-vs-text: var(--vs-text);
+  --color-vs-text-secondary: var(--vs-text-secondary);
+  --color-vs-border: var(--vs-border);
+  --color-vs-card-border: var(--vs-card-border);
+  --color-vs-ring: var(--vs-ring);
+  /* Chapter reader (Stitch 22) palette: cooler surfaces and a deeper green than the warm screens. */
+  --color-ch-surface: var(--ch-surface);
+  --color-ch-on-surface: var(--ch-on-surface);
+  --color-ch-on-surface-variant: var(--ch-on-surface-variant);
+  --color-ch-primary: var(--ch-primary);
+  --color-ch-on-primary: var(--ch-on-primary);
+  --color-ch-primary-container: var(--ch-primary-container);
+  --color-ch-on-primary-container: var(--ch-on-primary-container);
+  --color-ch-primary-fixed: var(--ch-primary-fixed);
+  --color-ch-secondary: var(--ch-secondary);
+  --color-ch-secondary-container: var(--ch-secondary-container);
+  --color-ch-on-secondary-container: var(--ch-on-secondary-container);
+  --color-ch-outline: var(--ch-outline);
+  --color-ch-container-lowest: var(--ch-container-lowest);
+  --color-ch-container-low: var(--ch-container-low);
+  --color-ch-container: var(--ch-container);
+  --color-ch-container-high: var(--ch-container-high);
+  --color-ch-container-highest: var(--ch-container-highest);
+  --color-ch-inverse-surface: var(--ch-inverse-surface);
+  --color-ch-inverse-on-surface: var(--ch-inverse-on-surface);
+  --color-ch-secondary-fixed: var(--ch-secondary-fixed);
+  --color-ch-tertiary: var(--ch-tertiary);
+  --color-ch-tertiary-fixed: var(--ch-tertiary-fixed);
+  --color-ch-error: var(--ch-error);
+  --color-ch-error-container: var(--ch-error-container);
+  --color-ch-on-secondary-fixed-variant: var(--ch-on-secondary-fixed-variant);
+  --color-vs-on-primary: var(--vs-on-primary);
+  --color-vs-icon-muted: var(--vs-icon-muted);
+  --color-vs-border-strong: var(--vs-border-strong);
+  --color-vs-container: var(--vs-container);
+  --color-vs-illus: var(--vs-illus);
+  --color-vs-tan: var(--vs-tan);
+  --color-vs-error: var(--vs-error);
+  --color-vs-badge-high-bg: var(--vs-badge-high-bg);
+  --color-vs-badge-high-text: var(--vs-badge-high-text);
+  --color-vs-badge-good-bg: var(--vs-badge-good-bg);
+  --color-vs-badge-good-text: var(--vs-badge-good-text);
+  --color-vs-badge-related-bg: var(--vs-badge-related-bg);
+  --color-vs-badge-related-text: var(--vs-badge-related-text);
+  --color-vs-cam-bg: var(--vs-cam-bg);
+  --color-vs-cam-text: var(--vs-cam-text);
+  --color-vs-cam-border: var(--vs-cam-border);
+  --color-vs-voice-from: var(--vs-voice-from);
+  --color-vs-voice-to: var(--vs-voice-to);
+  --color-vs-voice-glow: var(--vs-voice-glow);
+  --color-vs-voice-icon-from: var(--vs-voice-icon-from);
+  --color-vs-voice-icon-to: var(--vs-voice-icon-to);
+  --color-vs-voice-heading: var(--vs-voice-heading);
+  --color-vs-voice-text: var(--vs-voice-text);
+  --color-vs-voice-shadow: var(--vs-voice-shadow);
+  --color-vs-camera-from: var(--vs-camera-from);
+  --color-vs-camera-to: var(--vs-camera-to);
+  --color-vs-camera-glow: var(--vs-camera-glow);
+  --color-vs-camera-icon-from: var(--vs-camera-icon-from);
+  --color-vs-camera-icon-to: var(--vs-camera-icon-to);
+  --color-vs-camera-heading: var(--vs-camera-heading);
+  --color-vs-camera-text: var(--vs-camera-text);
+  --color-vs-camera-shadow: var(--vs-camera-shadow);
+  --color-vs-search-from: var(--vs-search-from);
+  --color-vs-search-to: var(--vs-search-to);
+  --color-vs-search-glow: var(--vs-search-glow);
+  --color-vs-search-icon-from: var(--vs-search-icon-from);
+  --color-vs-search-icon-to: var(--vs-search-icon-to);
+  --color-vs-search-heading: var(--vs-search-heading);
+  --color-vs-search-text: var(--vs-search-text);
+  --color-vs-search-shadow: var(--vs-search-shadow);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -112,6 +189,81 @@
   --sidebar-ring: oklch(0.46 0.055 215);
   /* Reading size, changed from Settings */
   --verse-size: 1.3125rem;
+
+  /* Stitch "Verse Snap UI Reconstruction" tokens (light = approved design values). */
+  --vs-bg: #faf8f5;
+  --vs-surface: #ffffff;
+  --vs-primary: #1f5f4a;
+  --vs-text: #1f2937;
+  --vs-text-secondary: #6b7280;
+  --vs-border: #e5e7eb;
+  --vs-card-border: rgb(255 255 255 / 0.7);
+  --vs-ring: rgb(255 255 255 / 0.8);
+  --ch-surface: #f8f9ff;
+  --ch-on-surface: #121c2a;
+  --ch-on-surface-variant: #404944;
+  --ch-primary: #004734;
+  --ch-on-primary: #ffffff;
+  --ch-primary-container: #1f5f4a;
+  --ch-on-primary-container: #97d7bc;
+  --ch-primary-fixed: #b0f0d4;
+  --ch-secondary: #7d562d;
+  --ch-secondary-container: #ffca98;
+  --ch-on-secondary-container: #7a532a;
+  --ch-outline: #707974;
+  --ch-container-lowest: #ffffff;
+  --ch-container-low: #eff4ff;
+  --ch-container: #e6eeff;
+  --ch-container-high: #dee9fc;
+  --ch-container-highest: #d9e3f6;
+  --ch-inverse-surface: #27313f;
+  --ch-inverse-on-surface: #eaf1ff;
+  --ch-secondary-fixed: #ffdcbd;
+  --ch-tertiary: #00388c;
+  --ch-tertiary-fixed: #dae2ff;
+  --ch-error: #ba1a1a;
+  --ch-error-container: #ffdad6;
+  --ch-on-secondary-fixed-variant: #623f18;
+  --vs-on-primary: #ffffff;
+  --vs-icon-muted: #9ca3af;
+  --vs-border-strong: #d1d5db;
+  --vs-container: #f3efea;
+  --vs-illus: rgb(234 230 223 / 0.7);
+  --vs-tan: #d4a373;
+  --vs-error: #ef4444;
+  --vs-badge-high-bg: #e7f4ee;
+  --vs-badge-high-text: #1f5f4a;
+  --vs-badge-good-bg: #edf7f1;
+  --vs-badge-good-text: #2d755c;
+  --vs-badge-related-bg: #f3f4f6;
+  --vs-badge-related-text: #6b7280;
+  --vs-cam-bg: #faf3eb;
+  --vs-cam-text: #7d562d;
+  --vs-cam-border: rgb(240 221 200 / 0.6);
+  --vs-voice-from: #edf7f1;
+  --vs-voice-to: #e3f0e8;
+  --vs-voice-glow: rgb(110 231 183 / 0.2);
+  --vs-voice-icon-from: #1f5f4a;
+  --vs-voice-icon-to: #124233;
+  --vs-voice-heading: #132a22;
+  --vs-voice-text: #4e6359;
+  --vs-voice-shadow: rgb(2 44 34 / 0.2);
+  --vs-camera-from: #fef6ee;
+  --vs-camera-to: #faede0;
+  --vs-camera-glow: rgb(252 211 77 / 0.2);
+  --vs-camera-icon-from: #d4985f;
+  --vs-camera-icon-to: #b87b41;
+  --vs-camera-heading: #321e0f;
+  --vs-camera-text: #6f5541;
+  --vs-camera-shadow: rgb(69 26 3 / 0.2);
+  --vs-search-from: #eef4fe;
+  --vs-search-to: #e3edfd;
+  --vs-search-glow: rgb(147 197 253 / 0.2);
+  --vs-search-icon-from: #2f6fed;
+  --vs-search-icon-to: #1c51c6;
+  --vs-search-heading: #10254c;
+  --vs-search-text: #455a7f;
+  --vs-search-shadow: rgb(23 37 84 / 0.2);
 }
 
 .dark {
@@ -160,19 +312,148 @@
   --sidebar-accent-foreground: oklch(0.94 0.005 85);
   --sidebar-border: oklch(1 0 0 / 12%);
   --sidebar-ring: oklch(0.74 0.06 210);
+
+  /* PROVISIONAL dark values for the Stitch tokens: the approved designs are light only. */
+  --vs-bg: oklch(0.19 0.008 70);
+  --vs-surface: oklch(0.225 0.008 70);
+  --vs-primary: oklch(0.74 0.09 158);
+  --vs-text: oklch(0.94 0.005 85);
+  --vs-text-secondary: oklch(0.71 0.011 80);
+  --vs-border: oklch(1 0 0 / 12%);
+  --vs-card-border: rgb(255 255 255 / 0.08);
+  --vs-ring: rgb(255 255 255 / 0.12);
+  /* PROVISIONAL dark values for the chapter reader palette. */
+  --ch-surface: #0e1520;
+  --ch-on-surface: #e2eafa;
+  --ch-on-surface-variant: #b4c2bb;
+  --ch-primary: #94d4b9;
+  --ch-on-primary: #00382a;
+  --ch-primary-container: #1f5f4a;
+  --ch-on-primary-container: #b0f0d4;
+  --ch-primary-fixed: #b0f0d4;
+  --ch-secondary: #f0bd8b;
+  --ch-secondary-container: #623f18;
+  --ch-on-secondary-container: #ffdcbd;
+  --ch-outline: #8a948e;
+  --ch-container-lowest: #0a1019;
+  --ch-container-low: #141d2b;
+  --ch-container: #1a2538;
+  --ch-container-high: #212e45;
+  --ch-container-highest: #2a3a55;
+  --ch-inverse-surface: #e2eafa;
+  --ch-inverse-on-surface: #121c2a;
+  --ch-secondary-fixed: #4a3118;
+  --ch-tertiary: #b1c5ff;
+  --ch-tertiary-fixed: #2a3b66;
+  --ch-error: #ffb4ab;
+  --ch-error-container: #5b2b2b;
+  --ch-on-secondary-fixed-variant: #ffdcbd;
+  --vs-on-primary: oklch(0.19 0.01 70);
+  --vs-icon-muted: oklch(0.6 0.01 80);
+  --vs-border-strong: oklch(1 0 0 / 22%);
+  --vs-container: oklch(0.28 0.009 70);
+  --vs-illus: rgb(255 255 255 / 0.06);
+  --vs-tan: oklch(0.72 0.09 62);
+  --vs-error: oklch(0.65 0.18 27);
+  --vs-badge-high-bg: oklch(0.3 0.04 158);
+  --vs-badge-high-text: oklch(0.82 0.08 158);
+  --vs-badge-good-bg: oklch(0.27 0.03 158);
+  --vs-badge-good-text: oklch(0.76 0.07 158);
+  --vs-badge-related-bg: oklch(0.28 0.009 70);
+  --vs-badge-related-text: oklch(0.71 0.011 80);
+  --vs-cam-bg: oklch(0.3 0.03 62);
+  --vs-cam-text: oklch(0.82 0.06 66);
+  --vs-cam-border: rgb(255 255 255 / 0.08);
+  --vs-voice-from: oklch(0.27 0.028 158);
+  --vs-voice-to: oklch(0.24 0.03 158);
+  --vs-voice-glow: rgb(110 231 183 / 0.08);
+  --vs-voice-icon-from: oklch(0.5 0.09 158);
+  --vs-voice-icon-to: oklch(0.38 0.08 158);
+  --vs-voice-heading: oklch(0.88 0.03 158);
+  --vs-voice-text: oklch(0.72 0.03 158);
+  --vs-voice-shadow: rgb(0 0 0 / 0.35);
+  --vs-camera-from: oklch(0.27 0.025 62);
+  --vs-camera-to: oklch(0.24 0.028 62);
+  --vs-camera-glow: rgb(252 211 77 / 0.08);
+  --vs-camera-icon-from: oklch(0.6 0.09 62);
+  --vs-camera-icon-to: oklch(0.5 0.09 60);
+  --vs-camera-heading: oklch(0.9 0.025 68);
+  --vs-camera-text: oklch(0.75 0.03 66);
+  --vs-camera-shadow: rgb(0 0 0 / 0.35);
+  --vs-search-from: oklch(0.27 0.035 258);
+  --vs-search-to: oklch(0.24 0.038 258);
+  --vs-search-glow: rgb(147 197 253 / 0.08);
+  --vs-search-icon-from: oklch(0.6 0.14 258);
+  --vs-search-icon-to: oklch(0.5 0.14 258);
+  --vs-search-heading: oklch(0.9 0.02 258);
+  --vs-search-text: oklch(0.73 0.04 258);
+  --vs-search-shadow: rgb(0 0 0 / 0.35);
 }
 
+/* Single-verse reading view (Stitch 06): 28px by default, scaled by the same Settings preference. */
+:root {
+  --verse-focus-size: 1.75rem;
+  --chapter-size: 1.25rem;
+}
 [data-text-size="small"] {
   --verse-size: 1.1875rem;
+  --verse-focus-size: 1.5rem;
+  --chapter-size: 1.0625rem;
 }
 [data-text-size="medium"] {
   --verse-size: 1.3125rem;
+  --verse-focus-size: 1.75rem;
+  --chapter-size: 1.25rem;
 }
 [data-text-size="large"] {
   --verse-size: 1.5rem;
+  --verse-focus-size: 2rem;
+  --chapter-size: 1.4375rem;
 }
 [data-text-size="xlarge"] {
   --verse-size: 1.75rem;
+  --verse-focus-size: 2.25rem;
+  --chapter-size: 1.625rem;
+}
+
+/* Chapter reader (Stitch 22): Playfair at 20px with a 2.1 line height, scaled by the text-size setting. */
+@utility scripture-chapter {
+  font-family: var(--font-display);
+  font-size: var(--chapter-size);
+  font-weight: 400;
+  line-height: 2.1;
+}
+
+/* The floating verse toolbar nudges up and down very slightly (Stitch 23). */
+@keyframes bounce-subtle {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -3px);
+  }
+}
+
+@utility animate-bounce-subtle {
+  animation: bounce-subtle 2.4s ease-in-out infinite;
+}
+
+/* Horizontal chip rows scroll without a visible scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scripture-focus {
+  font-family: var(--font-display);
+  font-size: var(--verse-focus-size);
+  font-weight: 400;
+  line-height: 1.48;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
 }
 
 @utility scripture {

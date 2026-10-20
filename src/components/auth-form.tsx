@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
+import { clearOAuthPending, markOAuthPending } from "@/lib/oauth-return";
 
 export type AuthMode = "signin" | "signup";
 
@@ -19,6 +19,7 @@ export function AuthForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [checkEmail, setCheckEmail] = useState(false);
 
   async function handleSubmit(event: React.FormEvent) {
@@ -49,16 +50,36 @@ export function AuthForm({
     }
   }
 
-  async function handleGoogle() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast("Google sign-in did not complete");
-      return;
+  // Returning with the browser's Back button from Google restores this page from
+  // the back/forward cache with the button still disabled; re-enable it.
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) setGoogleBusy(false);
     }
-    if (result.redirected) return;
-    onSignedIn?.();
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
+
+  async function handleGoogle() {
+    if (googleBusy) return;
+    setGoogleBusy(true);
+    markOAuthPending();
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: { prompt: "select_account" },
+        },
+      });
+      if (error) throw error;
+      // Success: the browser is now navigating to Google, so the button stays disabled.
+      // A cancelled or rejected attempt is reported by OAuthReturnNotice on return.
+    } catch {
+      clearOAuthPending();
+      setGoogleBusy(false);
+      toast("Google sign-in did not complete. Please try again.");
+    }
   }
 
   async function handleReset() {
@@ -145,8 +166,9 @@ export function AuthForm({
         variant="outline"
         className="h-11 w-full border-border bg-transparent"
         onClick={handleGoogle}
+        disabled={googleBusy}
       >
-        Continue with Google
+        {googleBusy ? "Opening Google…" : "Continue with Google"}
       </Button>
 
       <div className="mt-5 space-y-2 text-[0.875rem]">

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BooksRouteImport } from './routes/books'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
@@ -19,6 +20,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as ChapterTranslationBookChapterRouteImport } from './routes/chapter.$translation.$book.$chapter'
+import { Route as ReflectTranslationBookChapterVerseRouteImport } from './routes/reflect.$translation.$book.$chapter.$verse'
 import { Route as VerseTranslationBookChapterVerseRouteImport } from './routes/verse.$translation.$book.$chapter.$verse'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BooksRoute = BooksRouteImport.update({
+  id: '/books',
+  path: '/books',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -72,6 +79,12 @@ const ChapterTranslationBookChapterRoute =
     path: '/chapter/$translation/$book/$chapter',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ReflectTranslationBookChapterVerseRoute =
+  ReflectTranslationBookChapterVerseRouteImport.update({
+    id: '/reflect/$translation/$book/$chapter/$verse',
+    path: '/reflect/$translation/$book/$chapter/$verse',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const VerseTranslationBookChapterVerseRoute =
   VerseTranslationBookChapterVerseRouteImport.update({
     id: '/verse/$translation/$book/$chapter/$verse',
@@ -82,6 +95,7 @@ const VerseTranslationBookChapterVerseRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
@@ -90,11 +104,13 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
@@ -103,12 +119,14 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
@@ -117,6 +135,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/voice': typeof VoiceRoute
   '/chapter/$translation/$book/$chapter': typeof ChapterTranslationBookChapterRoute
+  '/reflect/$translation/$book/$chapter/$verse': typeof ReflectTranslationBookChapterVerseRoute
   '/verse/$translation/$book/$chapter/$verse': typeof VerseTranslationBookChapterVerseRoute
 }
 export interface FileRouteTypes {
@@ -124,6 +143,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/books'
     | '/history'
     | '/reset-password'
     | '/saved'
@@ -132,11 +152,13 @@ export interface FileRouteTypes {
     | '/settings'
     | '/voice'
     | '/chapter/$translation/$book/$chapter'
+    | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/books'
     | '/history'
     | '/reset-password'
     | '/saved'
@@ -145,11 +167,13 @@ export interface FileRouteTypes {
     | '/settings'
     | '/voice'
     | '/chapter/$translation/$book/$chapter'
+    | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/books'
     | '/history'
     | '/reset-password'
     | '/saved'
@@ -158,12 +182,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/voice'
     | '/chapter/$translation/$book/$chapter'
+    | '/reflect/$translation/$book/$chapter/$verse'
     | '/verse/$translation/$book/$chapter/$verse'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  BooksRoute: typeof BooksRoute
   HistoryRoute: typeof HistoryRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
@@ -172,6 +198,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   VoiceRoute: typeof VoiceRoute
   ChapterTranslationBookChapterRoute: typeof ChapterTranslationBookChapterRoute
+  ReflectTranslationBookChapterVerseRoute: typeof ReflectTranslationBookChapterVerseRoute
   VerseTranslationBookChapterVerseRoute: typeof VerseTranslationBookChapterVerseRoute
 }
 
@@ -189,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/books': {
+      id: '/books'
+      path: '/books'
+      fullPath: '/books'
+      preLoaderRoute: typeof BooksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -247,6 +281,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChapterTranslationBookChapterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reflect/$translation/$book/$chapter/$verse': {
+      id: '/reflect/$translation/$book/$chapter/$verse'
+      path: '/reflect/$translation/$book/$chapter/$verse'
+      fullPath: '/reflect/$translation/$book/$chapter/$verse'
+      preLoaderRoute: typeof ReflectTranslationBookChapterVerseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verse/$translation/$book/$chapter/$verse': {
       id: '/verse/$translation/$book/$chapter/$verse'
       path: '/verse/$translation/$book/$chapter/$verse'
@@ -260,6 +301,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  BooksRoute: BooksRoute,
   HistoryRoute: HistoryRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
@@ -268,6 +310,8 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   VoiceRoute: VoiceRoute,
   ChapterTranslationBookChapterRoute: ChapterTranslationBookChapterRoute,
+  ReflectTranslationBookChapterVerseRoute:
+    ReflectTranslationBookChapterVerseRoute,
   VerseTranslationBookChapterVerseRoute: VerseTranslationBookChapterVerseRoute,
 }
 export const routeTree = rootRouteImport

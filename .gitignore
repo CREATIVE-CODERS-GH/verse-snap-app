@@ -31,3 +31,13 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Supabase CLI local link state
+supabase/.temp/
+
+# Local record of manual live OpenAI test spending, and evaluation outputs
+.ai-spend-ledger.json
+evals/ai-search/results-*.json
+
+# Vercel build output and local project link
+.vercel
