@@ -12,7 +12,14 @@ import path from "node:path";
 export const MIGRATIONS = "supabase/migrations";
 export const read = (file) => fs.readFileSync(file, "utf8");
 
-export async function startDatabase({ port = Number(process.env.DB_TEST_PORT ?? 54330) } = {}) {
+/**
+ * `initdbFlags` (optional) go to initdb, e.g. ["--encoding=UTF8", "--locale=en-US"] to match Supabase's
+ * UTF-8 databases; the default cluster is whatever the platform picks (WIN1252 on Windows).
+ */
+export async function startDatabase({
+  port = Number(process.env.DB_TEST_PORT ?? 54330),
+  initdbFlags = [],
+} = {}) {
   const depsDir = process.env.DB_TEST_DEPS;
   if (!depsDir) {
     console.error(
@@ -34,6 +41,7 @@ export async function startDatabase({ port = Number(process.env.DB_TEST_PORT ?? 
     password,
     port,
     persistent: false,
+    ...(initdbFlags.length ? { initdbFlags } : {}),
     onLog: () => {},
     onError: () => {},
   });
@@ -133,5 +141,12 @@ export async function startDatabase({ port = Number(process.env.DB_TEST_PORT ?? 
   /** The last result set of a multi-statement query. */
   const lastRows = (result) => (Array.isArray(result) ? result[result.length - 1] : result).rows;
 
-  return { db, q, connect, check, shutdown, applyMigrations, asUser, expectError, lastRows };
+  /** Stops the database and deletes it without exiting the process (for tests run by another runner). */
+  const stop = async () => {
+    await db.end().catch(() => {});
+    await server.stop().catch(() => {});
+    fs.rmSync(dataDir, { recursive: true, force: true });
+  };
+
+  return { db, q, connect, check, shutdown, stop, applyMigrations, asUser, expectError, lastRows };
 }
