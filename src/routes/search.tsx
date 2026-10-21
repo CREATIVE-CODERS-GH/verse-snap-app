@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
@@ -14,10 +14,15 @@ import {
   PILL_OUTLINE,
   PILL_PRIMARY,
   PreparingIllustration,
-  ResultRowContent,
   StateMessage,
   SuggestionCard,
 } from "@/components/search-states";
+import {
+  CorrectedQueryNote,
+  ExactQueryNote,
+  SearchResultsList,
+  UnindexedNotice,
+} from "@/components/search-results";
 import { SparkleIcon } from "@/components/stitch-icons";
 import {
   aiSearchQueryOptions,
@@ -31,14 +36,22 @@ import {
   readSavedSearch,
 } from "@/lib/bible/ai/search-session";
 import {
+  classifyFreeSearchError,
+  FREE_SEARCH_PAGE_SIZE,
   FREE_SEARCH_PREPARING_MESSAGE,
+  freeSearchInfiniteOptions,
+  getFreeSearchProvider,
+  resultSummary,
+  searchedSummary,
   SMART_SEARCH_LABEL,
-  startFreeSearch,
+  SMART_SEARCH_OFFERED,
+  unindexedNotice,
 } from "@/lib/bible/free-search";
 import { decideSubmit } from "@/lib/bible/search-interaction";
 import { routeMessage, routeQuery } from "@/lib/bible/search-router";
 import { SEARCH_SUGGESTIONS, type SearchSuggestion } from "@/lib/bible/search-suggestions";
 import { deriveSearchView } from "@/lib/bible/search-view";
+import { searchFreeBible } from "@/lib/bible/free-search.functions";
 import { searchScripture } from "@/lib/bible/search.functions";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences } from "@/lib/preferences";
@@ -93,6 +106,8 @@ function SearchPage() {
   const submittedDecision = useMemo(() => (submitted ? routeQuery(submitted) : null), [submitted]);
   // Only a real description that could use AI help is searched; references, vague text and nonsense never are.
   const description = submittedDecision?.canTryAi ? submittedDecision.query : "";
+  // Free search takes any meaningful query, even one word; Smart Search (above) needs a real description.
+  const freeQuery = submittedDecision?.canSearchFree ? submittedDecision.query : "";
   const stopMessage = submittedDecision ? routeMessage(submittedDecision) : null;
 
   // A saved successful result for this exact search, if this tab already paid for it.
@@ -145,11 +160,48 @@ function SearchPage() {
     }
   }, [ready, description, translation, saved, canRun]);
 
-  // Free search is what Enter and Search start. While its index is not installed it reports "preparing".
-  const freeSearch = useMemo(
-    () => (description ? startFreeSearch(description) : null),
-    [description],
+  // Free search is what Enter and Search start. It runs on the server (see free-search.functions.ts);
+  // until the index is switched on it answers "preparing". Pages of 25 are fetched as they are needed,
+  // and a search that is replaced by a newer one is cancelled.
+  const runFreeSearch = useServerFn(searchFreeBible);
+  const freeProvider = useMemo(() => getFreeSearchProvider(runFreeSearch), [runFreeSearch]);
+  // "Search instead for <original>": the person chose their own wording for this search. The corrected
+  // spelling is remembered so they can switch back. A new search always starts with typos repaired.
+  const [exactChoice, setExactChoice] = useState<{
+    query: string;
+    corrected: string | null;
+  } | null>(null);
+  const exact = exactChoice !== null && exactChoice.query === freeQuery;
+  useEffect(() => setExactChoice(null), [freeQuery]);
+  const freeSearch = useInfiniteQuery(
+    freeSearchInfiniteOptions({
+      provider: freeProvider,
+      query: freeQuery,
+      enabled: ready,
+      repair: !exact,
+    }),
   );
+  const freePages = freeSearch.data?.pages ?? [];
+  const firstFreePage = freePages[0];
+  const lastFreePage = freePages.at(-1);
+  const freeResults = freePages.flatMap((page) => page.results);
+  const freeTotal = firstFreePage?.total ?? 0;
+  const freeNotice = firstFreePage ? unindexedNotice(firstFreePage) : null;
+  const freeSearched = searchedSummary(firstFreePage?.searchedEditions ?? []);
+  // How many result rows are on screen; a new search starts again from the first page.
+  const [shown, setShown] = useState(FREE_SEARCH_PAGE_SIZE);
+  useEffect(() => setShown(FREE_SEARCH_PAGE_SIZE), [freeQuery]);
+  // Reveal 10 more; when that passes what is loaded, fetch the next page from the server.
+  const showMoreFree = () => {
+    setShown((n) => n + FREE_SEARCH_PAGE_SIZE);
+    if (
+      freeResults.length < shown + FREE_SEARCH_PAGE_SIZE &&
+      freeSearch.hasNextPage &&
+      !freeSearch.isFetchingNextPage
+    ) {
+      void freeSearch.fetchNextPage();
+    }
+  };
 
   // The only place the search page asks for paid AI search: an explicit tap on "Try Smart Search".
   const startSmartSearch = () => {
@@ -233,6 +285,7 @@ function SearchPage() {
   const view = deriveSearchView({
     hasSubmitted: Boolean(submitted),
     canTryAi: Boolean(submittedDecision?.canTryAi),
+    canSearch: Boolean(submittedDecision?.canSearchFree),
     stopMessage,
     ready,
     canRun,
@@ -246,9 +299,53 @@ function SearchPage() {
           errorMessage: search.data.errorMessage,
         }
       : undefined,
-    freeStatus: freeSearch?.status ?? "preparing",
+    freeStatus: firstFreePage?.status ?? "preparing",
+    free: freeQuery
+      ? {
+          isPending: freeSearch.isFetching && !freeSearch.data,
+          isError: freeSearch.isError,
+          errorKind: freeSearch.isError ? classifyFreeSearchError(freeSearch.error) : undefined,
+          resultCount: freeResults.length,
+        }
+      : undefined,
   });
 
+  const retryFreeSearch = (
+    <button type="button" className={PILL_PRIMARY} onClick={() => void freeSearch.refetch()}>
+      Try again
+    </button>
+  );
+  const smartSearchButton =
+    SMART_SEARCH_OFFERED && description ? (
+      <button type="button" className={PILL_OUTLINE} onClick={startSmartSearch}>
+        <SparkleIcon className="mr-2 h-4 w-4" />
+        {SMART_SEARCH_LABEL}
+      </button>
+    ) : null;
+  // Free search comes first; Smart Search is only ever a secondary, explicit choice.
+  const freeActions = (
+    <div className="flex w-full max-w-[260px] flex-col items-stretch gap-3">
+      {retryFreeSearch}
+      {smartSearchButton}
+    </div>
+  );
+
+  // Typo repair wording: "Showing results for shepherd / Search instead for sheperd", and back again.
+  const queryNote = exact ? (
+    <ExactQueryNote
+      original={freeQuery}
+      corrected={exactChoice?.corrected ?? null}
+      onUseCorrected={() => setExactChoice(null)}
+    />
+  ) : firstFreePage?.correctedQuery ? (
+    <CorrectedQueryNote
+      corrected={firstFreePage.correctedQuery}
+      original={freeQuery}
+      onUseOriginal={() =>
+        setExactChoice({ query: freeQuery, corrected: firstFreePage.correctedQuery ?? null })
+      }
+    />
+  ) : null;
   const retrySmartSearch = (
     <button type="button" className={PILL_OUTLINE} onClick={() => void search.refetch()}>
       {SMART_SEARCH_LABEL} again
@@ -321,46 +418,73 @@ function SearchPage() {
             <StateMessage
               illustration={<PreparingIllustration />}
               title={FREE_SEARCH_PREPARING_MESSAGE.replace(/\.$/, "")}
-              action={
-                <button type="button" className={PILL_PRIMARY} onClick={startSmartSearch}>
-                  <SparkleIcon className="h-4 w-4" />
-                  {SMART_SEARCH_LABEL}
-                </button>
-              }
+              action={freeActions}
             >
-              You can still open a verse by reference. Smart Search uses AI, is limited, and only
-              runs when you ask.
+              {SMART_SEARCH_OFFERED
+                ? "You can still open a verse by reference. Smart Search uses AI, is limited, and only runs when you ask."
+                : "You can still open a verse by reference."}
             </StateMessage>
             {suggestions}
           </>
+        ) : view.kind === "free_loading" ? (
+          <LoadingState />
+        ) : view.kind === "free_results" ? (
+          <>
+            {queryNote}
+            <SearchResultsList
+              items={freeResults}
+              shown={shown}
+              onShowMore={showMoreFree}
+              summary={resultSummary(
+                Math.min(shown, freeResults.length),
+                freeTotal,
+                Boolean(lastFreePage?.limitReached) && shown >= freeResults.length,
+              )}
+              canLoadMore={Boolean(freeSearch.hasNextPage)}
+              loadingMore={freeSearch.isFetchingNextPage}
+              moreError={freeSearch.isFetchNextPageError}
+              onRetryMore={() => void freeSearch.fetchNextPage()}
+            />
+            {freeNotice ? <UnindexedNotice message={freeNotice} /> : null}
+          </>
+        ) : view.kind === "free_no_results" ? (
+          <>
+            {queryNote}
+            <StateMessage
+              illustration={<NoResultsIllustration />}
+              title="No verses found"
+              action={freeActions}
+            >
+              {freeSearched
+                ? `We couldn't find any verses matching your search in ${freeSearched}. Try checking your spelling or searching for broader keywords.`
+                : "We couldn't find any verses matching your search. Try checking your spelling or searching for broader keywords."}
+            </StateMessage>
+            {freeNotice ? <UnindexedNotice message={freeNotice} /> : null}
+            {suggestions}
+          </>
+        ) : view.kind === "free_error" ? (
+          <StateMessage
+            illustration={<ErrorIllustration />}
+            title={view.reason === "network" ? "Connection problem" : "Search didn't finish"}
+            titleClassName={ERROR_TITLE_CLASS}
+            action={freeActions}
+          >
+            {view.reason === "network"
+              ? "We couldn't reach the Bible service. Please check your internet connection and try again."
+              : view.reason === "limit"
+                ? "You've searched a lot in a short time. Please wait a moment and try again."
+                : view.reason === "timeout"
+                  ? "That search took too long. Please try again."
+                  : "Something went wrong while searching. Please try again."}
+          </StateMessage>
         ) : view.kind === "loading" ? (
           <LoadingState />
         ) : view.kind === "results" ? (
-          <>
-            <h2 className="sr-only">Relevant verses</h2>
-            <ul className="divide-y divide-vs-border/70">
-              {results.map((item) => (
-                <li key={`${item.bookId}-${item.chapter}-${item.verse}`}>
-                  <Link
-                    to="/verse/$translation/$book/$chapter/$verse"
-                    params={{
-                      translation,
-                      book: item.bookId,
-                      chapter: String(item.chapter),
-                      verse: String(item.verse),
-                    }}
-                    className="block py-4 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  >
-                    <ResultRowContent
-                      reference={item.reference}
-                      translation={item.translation}
-                      text={item.text}
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
+          <SearchResultsList
+            items={results}
+            shown={shown}
+            onShowMore={() => setShown((n) => n + FREE_SEARCH_PAGE_SIZE)}
+          />
         ) : view.kind === "no_results" ? (
           <>
             <StateMessage

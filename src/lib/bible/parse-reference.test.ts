@@ -30,7 +30,8 @@ describe("backward compatibility (golden file)", () => {
       .map(([input, expected]) => ({ input, expected, actual: parseReference(input) }))
       .filter(({ expected, actual }) => JSON.stringify(actual) !== JSON.stringify(expected));
     expect(changed.slice(0, 10)).toEqual([]);
-  });
+    // Parses the whole golden file: about 5 s when many test files run at once, so allow for that.
+  }, 30_000);
 
   it("keeps the original results through parseReferenceOrBook as well", () => {
     const changed = entries

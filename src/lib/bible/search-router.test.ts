@@ -116,11 +116,50 @@ describe("queries that never reach AI", () => {
     }
   });
 
-  it("asks for more when there is too little to search", () => {
-    for (const query of ["love", "ok", "the", "faith", "  hope  ", "hello"]) {
+  it("a single meaningful word is a keyword search: free search yes, Smart Search no", () => {
+    for (const query of [
+      "love",
+      "faith",
+      "  hope  ",
+      "hello",
+      "Melchizedek",
+      "Jehovah",
+      "sheperd",
+      "Selah",
+    ]) {
+      const decision = routeQuery(query);
+      expect(decision.route, query).toBe("keyword");
+      expect(decision.canTryAi, query).toBe(false);
+      expect(decision.canSearchFree, query).toBe(true);
+      expect(decision.query, query).toBe(query.trim());
+      expect(routeMessage(decision), query).toBeNull();
+    }
+  });
+
+  it("real descriptions can use free search too, and Smart Search stays an explicit extra", () => {
+    const decision = routeQuery("verse about being thankful");
+    expect(decision).toMatchObject({ route: "needs_ai", canTryAi: true, canSearchFree: true });
+  });
+
+  it("nothing else reaches free search: references, nonsense, over-long and empty text", () => {
+    for (const query of [
+      "John 3:16",
+      "xqzvwk",
+      "qwerty asdf",
+      "a loving god ".repeat(20),
+      "",
+      "   ",
+    ]) {
+      expect(routeQuery(query).canSearchFree, query).toBe(false);
+    }
+  });
+
+  it("asks for more when there is nothing meaningful to search", () => {
+    for (const query of ["the", "a", "and of", "to be or"]) {
       const decision = routeQuery(query);
       expect(decision.route, query).toBe("refine");
       expect(decision.canTryAi).toBe(false);
+      expect(decision.canSearchFree).toBe(false);
     }
     expect(routeQuery("").route).toBe("refine");
     expect(routeQuery("   ").route).toBe("refine");

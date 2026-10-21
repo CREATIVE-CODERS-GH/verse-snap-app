@@ -12,6 +12,7 @@ import type { ParsedReference } from "./parse-reference";
  *   free_confident  free full-text search found the verse: show it, offer no AI
  *   free_adequate   free search found something plausible: show it, AI help may be offered
  *   needs_ai        no usable free result and the query is a real description: AI help may be offered
+ *   keyword         a single meaningful word: free full-text search only (never AI)
  *   refine          too short, too vague or too long: ask for a better query (never AI)
  *   nonsense        keyboard mashing or non-text: say so (never AI)
  *
@@ -64,6 +65,8 @@ export interface RouteDecision {
   reference?: ParsedReference;
   /** The person may ask for AI help with this query. */
   canTryAi: boolean;
+  /** The query is worth sending to the free full-text search (one word is enough; AI needs more). */
+  canSearchFree: boolean;
   /** Short machine-readable reasons; never contains the query text. */
   reasons: string[];
   analysis: QueryAnalysis;
@@ -123,11 +126,25 @@ function hasEnoughWords(analysis: QueryAnalysis): boolean {
   return count >= ROUTER_THRESHOLDS.minContentWords || (count >= 1 && analysis.topicCue);
 }
 
+const FREE_SEARCHABLE: readonly SearchRoute[] = [
+  "needs_ai",
+  "keyword",
+  "free_confident",
+  "free_adequate",
+];
+
 /**
  * Decides how to handle a query. Pure: same input, same answer, no I/O.
  * `free` (optional) carries the findings of a free full-text search once one exists.
  */
 export function routeQuery(raw: string, free?: FreeSearchSignals): RouteDecision {
+  const decision = decideRoute(raw, free);
+  return { ...decision, canSearchFree: FREE_SEARCHABLE.includes(decision.route) };
+}
+
+type RouteCore = Omit<RouteDecision, "canSearchFree">;
+
+function decideRoute(raw: string, free?: FreeSearchSignals): RouteCore {
   const text = raw.trim();
   const emptyAnalysis = analyzeQuery("");
 
@@ -196,6 +213,10 @@ export function routeQuery(raw: string, free?: FreeSearchSignals): RouteDecision
   }
 
   if (!hasEnoughWords(analysis)) {
+    // One meaningful word is a keyword search: fine for free search, too little for AI.
+    if (analysis.contentWords.length === 1) {
+      return { ...base, route: "keyword", canTryAi: false, reasons: ["single_keyword"] };
+    }
     return { ...base, route: "refine", canTryAi: false, reasons: ["too_few_words"] };
   }
   return {

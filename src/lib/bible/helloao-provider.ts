@@ -8,6 +8,7 @@ import {
   type VerseRef,
 } from "./types";
 import { BIBLE_TRANSLATIONS, resolveTranslation } from "./translations";
+import { assembleVerseText } from "./verse-text";
 
 const BASE_URL = "https://bible.helloao.org/api";
 
@@ -26,18 +27,6 @@ interface ApiChapter {
 }
 
 const booksPromises = new Map<string, Promise<ApiBook[]>>();
-
-function readableText(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value.map(readableText).join("");
-  if (!value || typeof value !== "object") return "";
-  const item = value as Record<string, unknown>;
-  // Footnotes can separate words without whitespace in the API content.
-  if ("noteId" in item) return " ";
-  if (typeof item["text"] === "string") return item["text"];
-  if (Array.isArray(item["content"])) return readableText(item["content"]);
-  return "";
-}
 
 const REQUEST_TIMEOUT_MS = 12_000;
 
@@ -113,7 +102,7 @@ async function fetchChapter(
     const item = block as { type?: unknown; number?: unknown; content?: unknown };
     if (item.type !== "verse" || typeof item.number !== "number") return [];
     const verseRef: VerseRef = { ...ref, bookName: localBook.name, verse: item.number };
-    const text = readableText(item.content).replace(/\s+/g, " ").trim();
+    const text = assembleVerseText(item.content);
     return text
       ? [{ ...verseRef, translation: edition.code, text, reference: formatReference(verseRef) }]
       : [];

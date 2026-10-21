@@ -14,8 +14,8 @@ export type SubmitAction =
       kind: "free_search";
       /** The text to search for. */
       query: string;
-      /** Smart Search may be offered as a separate, explicit button. */
-      canOfferSmartSearch: true;
+      /** Smart Search may be offered as a separate, explicit button (not for a single keyword). */
+      canOfferSmartSearch: boolean;
     }
   | { kind: "stop"; message: string };
 
@@ -26,8 +26,8 @@ export function decideSubmit(text: string): SubmitAction {
   if (decision.route === "reference" && decision.reference) {
     return { kind: "open_reference", reference: decision.reference };
   }
-  if (decision.canTryAi) {
-    return { kind: "free_search", query: decision.query, canOfferSmartSearch: true };
+  if (decision.canSearchFree) {
+    return { kind: "free_search", query: decision.query, canOfferSmartSearch: decision.canTryAi };
   }
   return {
     kind: "stop",

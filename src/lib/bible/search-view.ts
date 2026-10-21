@@ -1,5 +1,5 @@
 import type { AiStatus } from "./ai/types";
-import type { FreeSearchStatus } from "./free-search";
+import type { FreeSearchErrorKind, FreeSearchStatus } from "./free-search";
 
 /**
  * Which state the search page shows. Pure and independent of React so the distinctions the approved
@@ -14,6 +14,13 @@ export type SearchView =
   | { kind: "idle" }
   /** A description, and the free full-text index is not installed yet. */
   | { kind: "unindexed" }
+  /** Free search is running. */
+  | { kind: "free_loading" }
+  | { kind: "free_results" }
+  /** Free search searched the indexed editions and found nothing. */
+  | { kind: "free_no_results" }
+  /** Free search itself failed; the person can retry it. */
+  | { kind: "free_error"; reason: FreeSearchErrorKind }
   /** Smart Search (explicitly requested) is running. */
   | { kind: "loading" }
   | { kind: "results" }
@@ -30,6 +37,8 @@ export interface SearchViewInput {
   hasSubmitted: boolean;
   /** Whether the submitted text is a real description that Smart Search could be offered for. */
   canTryAi: boolean;
+  /** Whether the text can be searched at all (one word is enough). Defaults to `canTryAi`. */
+  canSearch?: boolean | undefined;
   /** Router message for refine / nonsense queries, otherwise null. */
   stopMessage: string | null;
   ready: boolean;
@@ -46,17 +55,27 @@ export interface SearchViewInput {
       }
     | undefined;
   freeStatus: FreeSearchStatus;
+  /**
+   * The state of the free search request. Omitted before free search is wired in, in which case a
+   * description shows "unindexed" while the index is being prepared.
+   */
+  free?:
+    | {
+        isPending: boolean;
+        isError: boolean;
+        errorKind?: FreeSearchErrorKind | undefined;
+        resultCount: number;
+      }
+    | undefined;
 }
 
 export function deriveSearchView(input: SearchViewInput): SearchView {
   if (!input.hasSubmitted) return { kind: "initial" };
-  if (!input.canTryAi) {
+  if (!(input.canSearch ?? input.canTryAi)) {
     return input.stopMessage ? { kind: "hint", message: input.stopMessage } : { kind: "initial" };
   }
   if (!input.ready) return { kind: "idle" };
-  if (!input.canRun) {
-    return input.freeStatus === "preparing" ? { kind: "unindexed" } : { kind: "idle" };
-  }
+  if (!input.canRun) return freeView(input);
 
   const count = input.data?.resultCount ?? 0;
   // A good result is never hidden by a later failure.
@@ -76,4 +95,14 @@ export function deriveSearchView(input: SearchViewInput): SearchView {
   }
   if (input.data) return { kind: "no_results" };
   return input.isPending ? { kind: "loading" } : { kind: "idle" };
+}
+
+/** Free search is what Enter and Search start; Smart Search states only follow an explicit request. */
+function freeView(input: SearchViewInput): SearchView {
+  const free = input.free;
+  if (!free) return input.freeStatus === "preparing" ? { kind: "unindexed" } : { kind: "idle" };
+  if (free.resultCount > 0) return { kind: "free_results" };
+  if (free.isError) return { kind: "free_error", reason: free.errorKind ?? "failed" };
+  if (free.isPending) return { kind: "free_loading" };
+  return input.freeStatus === "preparing" ? { kind: "unindexed" } : { kind: "free_no_results" };
 }

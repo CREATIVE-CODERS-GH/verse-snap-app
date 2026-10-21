@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import {
   FREE_SEARCH_PREPARING_MESSAGE,
   SMART_SEARCH_LABEL,
-  getFreeSearchStatus,
-  startFreeSearch,
+  getFreeSearchProvider,
+  preparingProvider,
 } from "./free-search";
 import { decideSubmit } from "./search-interaction";
 
@@ -46,7 +46,9 @@ describe("decideSubmit (Enter / Search)", () => {
   });
 
   it("explains vague and nonsense queries instead of searching", () => {
-    expect(decideSubmit("love")).toMatchObject({ kind: "stop" });
+    // One meaningful word is a keyword search now (free search, never Smart Search).
+    expect(decideSubmit("love")).toMatchObject({ kind: "free_search", canOfferSmartSearch: false });
+    expect(decideSubmit("the")).toMatchObject({ kind: "stop" });
     expect(decideSubmit("asdf qwerty zxcv")).toMatchObject({ kind: "stop" });
   });
 
@@ -58,12 +60,11 @@ describe("decideSubmit (Enter / Search)", () => {
 });
 
 describe("free search while the index is unavailable", () => {
-  it("reports that it is being prepared and returns no results", () => {
-    expect(getFreeSearchStatus()).toBe("preparing");
-    expect(startFreeSearch("mark my words and listen carefully")).toEqual({
-      status: "preparing",
-      results: [],
-    });
+  it("reports that it is being prepared and returns no results", async () => {
+    expect(getFreeSearchProvider()).toBe(preparingProvider);
+    await expect(
+      preparingProvider.search({ query: "mark my words and listen carefully", limit: 10 }),
+    ).resolves.toMatchObject({ status: "preparing", results: [], total: 0, searchedEditions: [] });
   });
 
   it("uses the agreed wording", () => {
@@ -73,7 +74,9 @@ describe("free search while the index is unavailable", () => {
 
   it("does not use the network", async () => {
     // The shared test setup blocks fetch; a call would throw.
-    expect(() => startFreeSearch("a real description of a verse")).not.toThrow();
+    await expect(
+      preparingProvider.search({ query: "a real description of a verse", limit: 10 }),
+    ).resolves.toMatchObject({ status: "preparing" });
   });
 });
 
@@ -158,6 +161,7 @@ describe("a search submitted before hydration is not lost", () => {
   it("the router sees the same decision for a native submission as for a hydrated one", () => {
     expect(decideSubmit("psalms 23:1-6").kind).toBe("open_reference");
     expect(decideSubmit("mark my words and listen carefully").kind).toBe("free_search");
-    expect(decideSubmit("love").kind).toBe("stop");
+    expect(decideSubmit("love").kind).toBe("free_search");
+    expect(decideSubmit("the").kind).toBe("stop");
   });
 });

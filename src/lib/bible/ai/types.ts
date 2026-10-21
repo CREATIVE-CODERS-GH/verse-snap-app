@@ -12,7 +12,14 @@ export interface ScriptureSearchResult {
 
 /** How the router decided to handle a query (see src/lib/bible/search-router.ts). */
 export type SearchRoute =
-  "reference" | "free_confident" | "free_adequate" | "needs_ai" | "refine" | "nonsense";
+  | "reference"
+  | "free_confident"
+  | "free_adequate"
+  | "needs_ai"
+  /** One meaningful word ("grace", "Melchizedek"): free search only, never AI. */
+  | "keyword"
+  | "refine"
+  | "nonsense";
 
 /** Where the results came from. */
 export type SearchSource = "reference" | "text" | "ai" | "mixed";
