@@ -45,7 +45,7 @@ describe("book groups", () => {
     );
   });
 
-  it("matches the approved New Testament categories and the 14 Pauline books", () => {
+  it("matches the approved New Testament categories: 13 Pauline books, Hebrews with the General Epistles", () => {
     expect(groupsOf("nt").map((group) => group.label)).toEqual([
       "Gospels & Acts",
       "Pauline Epistles",
@@ -53,8 +53,20 @@ describe("book groups", () => {
       "Prophecy",
     ]);
     const pauline = BOOK_GROUPS.find((group) => group.id === "pauline")!;
-    expect(booksOfGroup(pauline)).toHaveLength(14);
+    expect(booksOfGroup(pauline)).toHaveLength(13);
     expect(booksOfGroup(pauline)[0]?.id).toBe("romans");
+    expect(booksOfGroup(pauline).map((book) => book.id)).not.toContain("hebrews");
+    const general = BOOK_GROUPS.find((group) => group.id === "general")!;
+    expect(booksOfGroup(general).map((book) => book.id)).toEqual([
+      "hebrews",
+      "james",
+      "1peter",
+      "2peter",
+      "1john",
+      "2john",
+      "3john",
+      "jude",
+    ]);
   });
 
   it("badges look like the design", () => {

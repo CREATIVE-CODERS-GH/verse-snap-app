@@ -101,7 +101,6 @@ export const BOOK_GROUPS: readonly BookGroup[] = [
       "2timothy",
       "titus",
       "philemon",
-      "hebrews",
     ],
   },
   {
@@ -109,7 +108,7 @@ export const BOOK_GROUPS: readonly BookGroup[] = [
     testament: "nt",
     label: "General Epistles",
     kind: "General Epistle",
-    bookIds: ["james", "1peter", "2peter", "1john", "2john", "3john", "jude"],
+    bookIds: ["hebrews", "james", "1peter", "2peter", "1john", "2john", "3john", "jude"],
   },
   {
     id: "prophecy",
