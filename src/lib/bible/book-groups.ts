@@ -165,15 +165,3 @@ export function searchBooks(query: string): BibleBook[] {
   });
   return scored.sort((a, b) => a.rank - b.rank || a.index - b.index).map((item) => item.book);
 }
-
-/** "Colossians, Thessalonians, Timothy and more below": the next few distinct book names. */
-export function moreBelowHint(remaining: readonly BibleBook[]): string {
-  const names: string[] = [];
-  for (const book of remaining) {
-    const base = book.name.replace(/^\d\s*/, "");
-    if (!names.includes(base)) names.push(base);
-    if (names.length === 3) break;
-  }
-  const more = remaining.length > 0 ? " and more below" : "";
-  return `${names.join(", ")}${more}`;
-}

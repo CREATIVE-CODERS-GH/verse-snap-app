@@ -19,7 +19,6 @@ import {
   booksOfTestament,
   groupOfBook,
   groupsOf,
-  moreBelowHint,
   searchBooks,
 } from "@/lib/bible/book-groups";
 import { BIBLE_BOOKS } from "@/lib/bible/books";
@@ -87,13 +86,6 @@ describe("book groups", () => {
     expect(searchBooks("zzzz")).toEqual([]);
     expect(searchBooks("JOHN")[0]?.id).toBe("john");
     expect(searchBooks("song of")[0]?.id).toBe("songofsolomon");
-  });
-
-  it("describes what is below the visible rows", () => {
-    const pauline = BOOK_GROUPS.find((group) => group.id === "pauline")!;
-    const remaining = booksOfGroup(pauline).slice(6);
-    expect(moreBelowHint(remaining)).toBe("Colossians, Thessalonians, Timothy and more below");
-    expect(moreBelowHint([])).toBe("");
   });
 });
 

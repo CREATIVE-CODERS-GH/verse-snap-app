@@ -10,7 +10,6 @@ import {
   CONTINUE_BAR_OUTER,
   ContinueBarContent,
   GroupHeading,
-  MoreBelowHint,
   TestamentTabs,
 } from "@/components/book-index-parts";
 import { BottomNav } from "@/components/bottom-nav";
@@ -22,7 +21,6 @@ import {
   booksOfTestament,
   groupOfBook,
   groupsOf,
-  moreBelowHint,
   searchBooks,
   type Testament,
 } from "@/lib/bible/book-groups";
@@ -76,6 +74,8 @@ function BooksPage() {
   const [toastVisible, setToastVisible] = useState(false);
   const toastTimer = useRef<number | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  // Just after the last visible book: when it scrolls into view the rest of the group appears.
+  const revealRef = useRef<HTMLDivElement | null>(null);
   const shownBookId = useRef<string | null>(expandedId);
 
   const showToast = (text: string) => {
@@ -129,6 +129,26 @@ function BooksPage() {
     return expandedIndex >= VISIBLE_ROWS ? [...head, books[expandedIndex]!] : head;
   }, [books, showAll, searching, expandedId]);
   const hiddenBooks = books.filter((book) => !visibleBooks.includes(book));
+  const hasHidden = hiddenBooks.length > 0;
+
+  // The rest of the group appears on its own as the person scrolls towards the end of the list
+  // (a little before it, so the rows are already there), or at once if the list fits on screen.
+  useEffect(() => {
+    const marker = revealRef.current;
+    if (!hasHidden || !marker) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setShowAll(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) setShowAll(true);
+      },
+      { rootMargin: "0px 0px 240px 0px" },
+    );
+    observer.observe(marker);
+    return () => observer.disconnect();
+  }, [hasHidden, category, testament]);
   const counts = {
     ot: booksOfTestament("ot").length,
     nt: booksOfTestament("nt").length,
@@ -227,11 +247,16 @@ function BooksPage() {
               </StateMessage>
             ) : (
               <div className="flex flex-col gap-2">
-                {visibleBooks.map((book) => {
+                {visibleBooks.map((book, index) => {
                   const kind = (groupOfBook(book.id) ?? activeGroup).kind;
+                  // Rows that appear while scrolling fade in gently.
+                  const revealed =
+                    showAll && !searching && index >= VISIBLE_ROWS
+                      ? "animate-in fade-in-0 slide-in-from-bottom-2 duration-300 motion-reduce:animate-none"
+                      : undefined;
                   if (book.id !== expandedId) {
                     return (
-                      <div key={book.id}>
+                      <div key={book.id} className={revealed}>
                         <BookRow book={book} kind={kind} onSelect={() => chooseBook(book.id)} />
                       </div>
                     );
@@ -256,12 +281,7 @@ function BooksPage() {
                     </div>
                   );
                 })}
-                {hiddenBooks.length > 0 ? (
-                  <MoreBelowHint
-                    text={moreBelowHint(hiddenBooks)}
-                    onShowAll={() => setShowAll(true)}
-                  />
-                ) : null}
+                {hasHidden ? <div ref={revealRef} aria-hidden className="h-px" /> : null}
               </div>
             )}
           </div>

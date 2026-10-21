@@ -5,7 +5,6 @@ import {
   ChevronUpIcon,
   ChevronRightIcon,
   CloseIcon,
-  InfinityIcon,
   MicIcon,
   PlayIcon,
   SearchIcon,
@@ -292,21 +291,6 @@ export function BookRow({
         <ChevronRightIcon className="h-5 w-5 text-ch-outline" aria-hidden />
       </span>
     </button>
-  );
-}
-
-export function MoreBelowHint({ text, onShowAll }: { text: string; onShowAll: () => void }) {
-  return (
-    <div className="mb-2 mt-4 flex items-center justify-center">
-      <button
-        type="button"
-        onClick={onShowAll}
-        className="flex items-center gap-2 rounded-full px-2 py-1 text-[11px] font-medium leading-[14px] text-ch-outline transition-colors hover:text-ch-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
-      >
-        <InfinityIcon className="h-4 w-4" aria-hidden />
-        <span>{text}</span>
-      </button>
-    </div>
   );
 }
 
