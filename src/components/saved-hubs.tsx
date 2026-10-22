@@ -12,7 +12,6 @@ import {
   PagesIcon,
   PaletteIcon,
   SearchIcon,
-  StickyNoteIcon,
   StopSquareIcon,
   VolumeIcon,
 } from "@/components/stitch-icons";
@@ -58,14 +57,15 @@ const TAB_LABELS: Record<SavedTab, string> = {
 
 const TAB_ICONS: Record<SavedTab, (active: boolean) => ReactNode> = {
   verses: (active) => <BookmarkIcon className="h-[17px] w-[17px]" filled={active} />,
+  notes: () => <EditNoteIcon className="h-[17px] w-[17px]" />,
   highlights: () => <HighlighterIcon className="h-[17px] w-[17px]" />,
-  notes: () => <StickyNoteIcon className="h-[17px] w-[17px]" />,
 };
 
 /**
- * The Verses · Highlights · Notes toggle (Stitch 33/34/31 "Segmented Tabs"): a row of rounded
- * pills, each with an icon, its label and a count badge. The active pill is solid brand green; the
- * others are pale. The tab is kept in the address (?tab=).
+ * The Verses · Notes · Highlights toggle (Stitch 31 "Segment Controller"): one rounded track split
+ * into equal segments. The active segment is a raised thumb with its label in brand green; the
+ * others are plain muted text. The counts are in each segment's accessible name. The tab is kept
+ * in the address (?tab=).
  */
 export function SavedTabs({
   active,
@@ -77,43 +77,37 @@ export function SavedTabs({
   tabs: readonly SavedTab[];
 }) {
   return (
-    <nav
-      aria-label="Saved sections"
-      className="-mx-5 mb-3 flex items-center gap-2 overflow-x-auto px-5 py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-    >
-      {tabs.map((tab) => {
-        const on = tab === active;
-        return (
-          <Link
-            key={tab}
-            to="/saved"
-            search={{ tab }}
-            replace
-            aria-current={on ? "page" : undefined}
-            className={cn(
-              "flex min-h-10 shrink-0 items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas",
-              on
-                ? "bg-brand-primary text-brand-on-primary shadow-sm active:scale-95"
-                : "bg-brand-surface-muted text-brand-text-muted hover:bg-brand-surface-strong hover:text-brand-text",
-            )}
-          >
-            {TAB_ICONS[tab](on)}
-            <span>{TAB_LABELS[tab]}</span>
-            {counts[tab] !== undefined ? (
-              <span
-                className={cn(
-                  "ml-0.5 rounded-full px-1.5 py-0.5 text-[11px] leading-tight",
-                  on
-                    ? "bg-white/20 font-semibold text-brand-on-primary"
-                    : "bg-brand-surface-strong font-medium text-brand-text-muted",
-                )}
-              >
-                {counts[tab]}
+    <nav aria-label="Saved sections" className="mb-3">
+      <div
+        className="grid h-11 items-center gap-1 rounded-full border border-brand-border bg-brand-surface-strong p-1 shadow-inner"
+        style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+      >
+        {tabs.map((tab) => {
+          const on = tab === active;
+          const count = counts[tab];
+          return (
+            <Link
+              key={tab}
+              to="/saved"
+              search={{ tab }}
+              replace
+              aria-current={on ? "page" : undefined}
+              aria-label={count === undefined ? TAB_LABELS[tab] : `${TAB_LABELS[tab]}, ${count}`}
+              className={cn(
+                "flex h-full items-center justify-center gap-1 rounded-full px-2 text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus",
+                on
+                  ? "bg-brand-surface font-semibold text-brand-primary shadow-sm"
+                  : "font-medium text-brand-text-muted hover:text-brand-text",
+              )}
+            >
+              <span className={on ? "text-brand-primary" : "text-brand-text-faint"}>
+                {TAB_ICONS[tab](on)}
               </span>
-            ) : null}
-          </Link>
-        );
-      })}
+              <span>{TAB_LABELS[tab]}</span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
@@ -139,11 +133,8 @@ export function SavedSearchBar({
     }
   }, [dictation.state]);
   return (
-    <div className="relative mb-3 flex w-full items-center">
-      <SearchIcon
-        className="pointer-events-none absolute left-3.5 h-5 w-5 text-brand-text-muted"
-        aria-hidden
-      />
+    <div className="mb-3 flex h-11 w-full items-center rounded-full border border-brand-border bg-brand-surface-muted px-4 shadow-inner transition-all focus-within:border-brand-primary focus-within:ring-2 focus-within:ring-brand-focus">
+      <SearchIcon className="mr-2 h-5 w-5 shrink-0 text-brand-text-faint" aria-hidden />
       <label htmlFor="saved-search" className="sr-only">
         {placeholder}
       </label>
@@ -154,7 +145,7 @@ export function SavedSearchBar({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className="h-11 w-full rounded-full border border-brand-border bg-brand-surface pl-10 pr-12 text-[15px] text-brand-text shadow-sm placeholder:text-brand-text-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+        className="w-full min-w-0 border-0 bg-transparent p-0 text-[15px] text-brand-text placeholder:text-brand-text-faint focus:outline-none focus:ring-0"
       />
       <button
         type="button"
@@ -162,8 +153,8 @@ export function SavedSearchBar({
         aria-pressed={dictation.state === "listening"}
         onClick={dictation.toggle}
         className={cn(
-          "absolute right-1 flex h-9 w-9 items-center justify-center rounded-full text-brand-primary transition-colors hover:bg-brand-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus",
-          dictation.state === "listening" && "animate-pulse bg-brand-surface-muted",
+          "-mr-2.5 ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-brand-text-faint transition-colors hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus",
+          dictation.state === "listening" && "animate-pulse text-brand-primary",
         )}
       >
         <MicIcon className="h-[19px] w-[19px]" aria-hidden />

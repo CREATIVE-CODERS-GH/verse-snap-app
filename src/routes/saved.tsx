@@ -125,7 +125,7 @@ function SavedPage() {
   const journalOn = journal.persists(user?.id);
   const highlightsOn = highlights.persists(user?.id);
   const tabs: readonly SavedTab[] = journalOn
-    ? ["verses", "highlights", "notes"]
+    ? ["verses", "notes", "highlights"]
     : ["verses", "highlights"];
   const requested = Route.useSearch().tab ?? "verses";
   const tab: SavedTab = tabs.includes(requested) ? requested : "verses";

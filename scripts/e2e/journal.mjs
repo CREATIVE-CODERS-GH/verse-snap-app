@@ -199,7 +199,7 @@ await go("/saved?tab=notes", "!!document.querySelector('ul[aria-label=Reflection
 check(
   "the Notes tab is selected and shows its count",
   await ev(
-    "document.querySelector('nav[aria-label=\"Saved sections\"] a[aria-current=page]')?.innerText.replace(/\\s+/g, ' ').trim() === 'Notes 1'",
+    "document.querySelector('nav[aria-label=\"Saved sections\"] a[aria-current=page]')?.getAttribute('aria-label') === 'Notes, 1'",
   ),
 );
 check(

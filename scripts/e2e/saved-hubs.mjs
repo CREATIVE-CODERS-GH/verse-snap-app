@@ -103,7 +103,7 @@ const typeSearch = async (value) => {
 };
 const activePill = () =>
   ev(
-    "document.querySelector('nav[aria-label=\"Saved sections\"] a[aria-current=page]')?.innerText.replace(/\\s+/g, ' ').trim()",
+    "document.querySelector('nav[aria-label=\"Saved sections\"] a[aria-current=page]')?.getAttribute('aria-label')",
   );
 
 await viewport(320, 700);
@@ -125,15 +125,23 @@ check(
 );
 check(
   "the toggle shows three pills with counts, Verses active",
-  (await activePill()) === "Verses 3" &&
+  (await activePill()) === "Verses, 3" &&
     (await ev("document.querySelectorAll('nav[aria-label=\"Saved sections\"] a').length")) === 3,
   await activePill(),
 );
 check(
-  "the active pill is solid green and the others are pale",
+  "the toggle is one rounded track of equal segments, in the Stitch 31 order, with a raised thumb on the active one",
   await ev(`(() => {
-  const links = [...document.querySelectorAll('nav[aria-label="Saved sections"] a')];
-  return /bg-brand-primary\\b/.test(links[0].className) && links.slice(1).every((x) => /bg-brand-surface-muted/.test(x.className));
+  const track = document.querySelector('nav[aria-label="Saved sections"] > div');
+  const links = [...track.querySelectorAll('a')];
+  const order = links.map((x) => x.innerText.trim()).join(',');
+  const widths = links.map((x) => Math.round(x.getBoundingClientRect().width));
+  const t = track.getBoundingClientRect();
+  return order === 'Verses,Notes,Highlights' &&
+    Math.max(...widths) - Math.min(...widths) <= 1 &&
+    t.height >= 44 && t.width >= 260 &&
+    /rounded-full/.test(track.className) && /shadow-sm/.test(links[0].className) &&
+    links.slice(1).every((x) => !/shadow-sm/.test(x.className));
 })()`),
 );
 check(
@@ -147,7 +155,7 @@ check(
   await ev(`(() => {
   const nav = document.querySelector('nav[aria-label="Saved sections"]').getBoundingClientRect();
   const input = document.querySelector('#saved-search');
-  return !!input && input.placeholder === 'Search saved verses, books, or topics...' && input.getBoundingClientRect().top >= nav.bottom - 1 && input.getBoundingClientRect().height >= 44;
+  return !!input && input.placeholder === 'Search saved verses, books, or topics...' && input.parentElement.getBoundingClientRect().top >= nav.bottom - 1 && input.parentElement.getBoundingClientRect().height >= 44;
 })()`),
 );
 check(
@@ -223,7 +231,7 @@ await clickByText("nav[aria-label='Saved sections'] a", "Highlights");
 await waitFor("!!document.querySelector('section[aria-label=\"Highlights\"]')", 6000);
 check(
   "the Highlights pill is active and the address keeps the tab",
-  (await activePill()) === "Highlights 3" &&
+  (await activePill()) === "Highlights, 3" &&
     (await ev("location.search")).includes("tab=highlights"),
   await activePill(),
 );
@@ -261,7 +269,7 @@ check("no sideways scrolling on Highlights", !(await sideways()));
 // ================= Notes =================
 await clickByText("nav[aria-label='Saved sections'] a", "Notes");
 await waitFor("!!document.querySelector('ul[aria-label=Reflections]')", 6000);
-check("the Notes pill is active", (await activePill()) === "Notes 1", await activePill());
+check("the Notes pill is active", (await activePill()) === "Notes, 1", await activePill());
 check(
   "the Notes placeholder shows",
   await ev(
@@ -296,7 +304,7 @@ check("Open Note opens the reflection editor", true);
 
 // ================= reload keeps the tab; empty state =================
 await go("/saved?tab=notes", "!!document.querySelector('ul[aria-label=Reflections]')");
-check("reloading keeps the Notes tab", (await activePill()) === "Notes 1");
+check("reloading keeps the Notes tab", (await activePill()) === "Notes, 1");
 await ev(
   `(() => { for (const k of ${JSON.stringify(Object.values(KEYS))}) localStorage.removeItem(k); })()`,
 );

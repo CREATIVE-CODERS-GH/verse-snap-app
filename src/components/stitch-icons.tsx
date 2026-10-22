@@ -569,14 +569,3 @@ export function HighlighterIcon(props: IconProps) {
     </Outline>
   );
 }
-
-/** A sticky note with a folded corner (Stitch "sticky_note_2"). */
-export function StickyNoteIcon(props: IconProps) {
-  return (
-    <Outline strokeWidth={1.8} {...props}>
-      <path d="M5 4h14a1 1 0 011 1v9l-6 6H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
-      <path d="M14 20v-5a1 1 0 011-1h5" />
-      <path d="M8 9h8M8 13h3" />
-    </Outline>
-  );
-}
