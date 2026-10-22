@@ -376,7 +376,8 @@ export function HighlightPicker({
   active,
   onChange,
 }: {
-  active: Tone;
+  /** The chosen colour; null when none is (for example several verses with different colours). */
+  active: Tone | null;
   onChange: (tone: Tone) => void;
 }) {
   return (

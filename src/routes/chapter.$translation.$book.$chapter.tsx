@@ -13,6 +13,11 @@ import {
   VerseBlock,
 } from "@/components/chapter-reader-parts";
 import { BottomNav } from "@/components/bottom-nav";
+import {
+  MultiSelectBar,
+  NoteIconButton,
+  ReflectionNoteDialog,
+} from "@/components/reader-multi-parts";
 import { TextSizeSheet } from "@/components/chapter-sheets";
 import { CompareSheet } from "@/components/compare-sheet";
 import {
@@ -49,6 +54,8 @@ import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
 import { copyText } from "@/lib/copy-text";
 import { highlights } from "@/lib/highlights";
+import { journal } from "@/lib/journal";
+import { reflectionsByVerse, toggleVerse } from "@/lib/verse-selection";
 import { library } from "@/lib/library";
 import { usePreferences } from "@/lib/preferences";
 import { verseShareText } from "@/lib/share-verse-card";
@@ -196,6 +203,10 @@ function ChapterPage() {
   const [sheetExpanded, setSheetExpanded] = useState(false);
   // A single tap only marks a verse; the options open on the second tap.
   const [markedVerse, setMarkedVerse] = useState<number | null>(null);
+  // Several verses chosen to highlight together (null = not choosing).
+  const [multi, setMulti] = useState<number[] | null>(null);
+  // The verse whose saved reflection is open in the note dialog.
+  const [noteVerse, setNoteVerse] = useState<number | null>(null);
   // Highlight colours chosen in this visit, per verse ("clear" = removed). They are saved as they
   // are chosen (see pickTone) and take precedence over the stored highlights loaded below.
   const [tones, setTones] = useState<Record<number, Tone>>({});
@@ -227,6 +238,8 @@ function ChapterPage() {
     setSelectedVerse(null);
     setTones({});
     setMarkedVerse(null);
+    setMulti(null);
+    setNoteVerse(null);
     setSheetExpanded(false);
     setCompareOpen(false);
     setShareOpen(false);
@@ -239,6 +252,8 @@ function ChapterPage() {
   // Signing in or out shows that person's highlights only.
   useEffect(() => {
     setTones({});
+    setMulti(null);
+    setNoteVerse(null);
   }, [user?.id]);
 
   // Stored highlights for this chapter, translation and person (refetched on return to the tab,
@@ -250,10 +265,11 @@ function ChapterPage() {
   });
   const toneOf = (verse: number): Tone | undefined => tones[verse] ?? storedHighlights?.[verse];
 
-  const pickTone = (verse: number, tone: Tone) => {
+  /** Shows the colour at once and saves it; resolves false (after undoing it) if saving failed. */
+  const saveTone = (verse: number, tone: Tone): Promise<boolean> => {
     const previous = tones[verse];
     setTones((current) => ({ ...current, [verse]: tone }));
-    if (!highlights.persists(user?.id)) return;
+    if (!highlights.persists(user?.id)) return Promise.resolve(true);
     const ref = {
       translation: params.translation,
       bookId: params.book,
@@ -261,11 +277,12 @@ function ChapterPage() {
       verse,
     };
     const userId = user?.id;
-    highlightWrites.current = highlightWrites.current
+    const write = highlightWrites.current
       .then(() =>
         tone === "clear" ? highlights.remove(ref, userId) : highlights.set(ref, tone, userId),
       )
       .then(() => queryClient.invalidateQueries({ queryKey: ["highlights"] }))
+      .then(() => true)
       .catch(() => {
         setTones((current) => {
           const next = { ...current };
@@ -273,9 +290,76 @@ function ChapterPage() {
           else next[verse] = previous;
           return next;
         });
-        showToast("Couldn’t save the highlight. Try again.");
+        return false;
       });
+    highlightWrites.current = write;
+    return write;
   };
+
+  const pickTone = (verse: number, tone: Tone) => {
+    void saveTone(verse, tone).then((saved) => {
+      if (!saved) showToast("Couldn’t save the highlight. Try again.");
+    });
+  };
+
+  // --- choosing several verses ------------------------------------------------------------------
+  const startMulti = useCallback((verse: number) => {
+    setSelectedVerse(null);
+    setMarkedVerse(null);
+    setSheetExpanded(false);
+    setMulti((current) => (current === null ? [verse] : current));
+  }, []);
+
+  const toggleMulti = (verse: number) => {
+    setMulti((current) => {
+      if (current === null) return current;
+      const next = toggleVerse(current, verse);
+      return next.length === 0 ? null : next;
+    });
+  };
+
+  // Every chosen verse gets the colour; ones that fail are undone and counted, the rest stay.
+  const pickMultiTone = (tone: Tone) => {
+    const chosen = multi ?? [];
+    void Promise.all(chosen.map((verse) => saveTone(verse, tone))).then((results) => {
+      const failed = results.filter((saved) => !saved).length;
+      if (failed > 0) {
+        showToast(`Couldn’t save ${failed} of ${chosen.length} highlights. The others were saved.`);
+      }
+    });
+  };
+
+  // Escape ends choosing.
+  const choosing = multi !== null;
+  useEffect(() => {
+    if (!choosing) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMulti(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [choosing]);
+
+  // --- saved reflections (the same query as Saved and the editor) -------------------------------
+  const journalOn = journal.persists(user?.id);
+  const { data: allReflections } = useQuery({
+    queryKey: ["reflections", user?.id ?? "guest"],
+    queryFn: () => journal.listReflections(user?.id),
+    enabled: !authLoading && journalOn,
+  });
+  const chapterReflections = reflectionsByVerse(
+    allReflections ?? [],
+    params.translation,
+    params.book,
+    chapterNumber,
+  );
+  const noteReflection = noteVerse !== null ? (chapterReflections.get(noteVerse) ?? null) : null;
+  const { data: notebooks } = useQuery({
+    queryKey: ["notebooks", user?.id ?? "guest"],
+    queryFn: () => journal.listNotebooks(user?.id),
+    enabled: !authLoading && journalOn && noteVerse !== null,
+  });
+  const noteNotebook = notebooks?.find((item) => item.id === noteReflection?.notebookId)?.name;
 
   // Reading progress follows the scroll position.
   useEffect(() => {
@@ -437,6 +521,13 @@ function ChapterPage() {
   };
 
   const chosenTone = selectedVerse !== null ? toneOf(selectedVerse) : undefined;
+  // The colour every verse chosen together already has (null when they differ or have none).
+  const commonTone: Tone | null = (() => {
+    const first = multi?.length ? toneOf(multi[0]!) : undefined;
+    return first && first !== "clear" && multi!.every((verse) => toneOf(verse) === first)
+      ? first
+      : null;
+  })();
   const activeTone: Tone = chosenTone ?? "amber";
   const crossRefs = selected
     ? getSampleCrossReferences(params.book, chapterNumber, selected.verse)
@@ -542,7 +633,22 @@ function ChapterPage() {
                             ) : undefined
                           }
                           marked={!isSelected && markedVerse === verse.verse}
-                          onSelect={() => tapVerse(verse.verse)}
+                          onSelect={() =>
+                            multi !== null ? toggleMulti(verse.verse) : tapVerse(verse.verse)
+                          }
+                          multi={{
+                            active: multi !== null,
+                            chosen: multi?.includes(verse.verse) ?? false,
+                            onStart: () => startMulti(verse.verse),
+                          }}
+                          noteNode={
+                            chapterReflections.has(verse.verse) ? (
+                              <NoteIconButton
+                                verse={verse.verse}
+                                onOpen={() => setNoteVerse(verse.verse)}
+                              />
+                            ) : undefined
+                          }
                           toolbar={
                             isSelected ? (
                               <SelectionToolbar
@@ -558,7 +664,13 @@ function ChapterPage() {
                                 to="/verse/$translation/$book/$chapter/$verse"
                                 params={{ ...params, verse: String(verse.verse) }}
                                 aria-label={`Open verse ${verse.verse}`}
-                                onClick={(event) => event.stopPropagation()}
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  if (multi !== null) {
+                                    event.preventDefault();
+                                    toggleMulti(verse.verse);
+                                  }
+                                }}
                                 className={VERSE_NUMBER_CLASS}
                               >
                                 {verse.verse}
@@ -752,6 +864,13 @@ function ChapterPage() {
             ) : null}
           </AnnotationSheet>
         </>
+      ) : multi !== null ? (
+        <MultiSelectBar
+          count={multi.length}
+          active={commonTone}
+          onPick={pickMultiTone}
+          onDone={() => setMulti(null)}
+        />
       ) : (
         <FloatingChapterNav
           previous={floatingLink(previous, "previous")}
@@ -796,6 +915,24 @@ function ChapterPage() {
         />
       ) : null}
 
+      <ReflectionNoteDialog
+        open={noteVerse !== null}
+        onOpenChange={(open) => {
+          if (!open) setNoteVerse(null);
+        }}
+        reference={`${ref.bookName} ${chapterNumber}:${noteVerse ?? ""} (${params.translation})`}
+        reflection={noteReflection}
+        notebookName={noteNotebook}
+        onEdit={() => {
+          const verse = noteVerse;
+          setNoteVerse(null);
+          if (verse === null) return;
+          navigate({
+            to: "/reflect/$translation/$book/$chapter/$verse",
+            params: { ...params, verse: String(verse) },
+          });
+        }}
+      />
       <TranslationSheet
         open={translationsOpen}
         onOpenChange={setTranslationsOpen}

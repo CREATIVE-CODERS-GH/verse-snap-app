@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from "react";
+import { useEffect, useRef, type ReactNode, type Ref } from "react";
 import {
   ArrowLeftIcon,
   BookmarkIcon,
@@ -8,6 +8,7 @@ import {
   ChevronRightIcon,
   PersonIcon,
 } from "@/components/stitch-icons";
+import { LONG_PRESS_MOVE_PX, LONG_PRESS_MS } from "@/lib/verse-selection";
 
 /*
  * Presentational pieces of the chapter reader (Stitch "22 — Continuous Chapter Reading"), using the
@@ -234,6 +235,13 @@ interface VerseBlockProps {
   toolbar?: ReactNode;
   /** The row under the selected verse ("Active selection: v.2 …"). */
   selectionFooter?: ReactNode;
+  /** The saved-reflection icon, shown after the verse number. */
+  noteNode?: ReactNode;
+  /**
+   * Choosing several verses: a long press (touch) or Ctrl/Cmd-click or Shift+Enter starts it; once
+   * `active`, a tap on any verse is handled by `onSelect` (the page toggles it).
+   */
+  multi?: { active: boolean; chosen: boolean; onStart: () => void };
 }
 
 export function VerseBlock({
@@ -248,13 +256,26 @@ export function VerseBlock({
   tint,
   toolbar,
   selectionFooter,
+  noteNode,
+  multi,
 }: VerseBlockProps) {
+  const press = useRef<{ timer: number; x: number; y: number } | null>(null);
+  const startedAt = useRef(0);
+  const cancelPress = () => {
+    if (press.current) window.clearTimeout(press.current.timer);
+    press.current = null;
+  };
+  useEffect(() => cancelPress, []);
+  const chosen = Boolean(multi?.active && multi.chosen);
+
   const bar = (
     <div className="absolute bottom-0 left-0 top-0 w-1.5 rounded-l-xl bg-ch-primary" aria-hidden />
   );
   const body = (
     <p className="relative">
       {dropCapNode ?? numberNode}
+      {noteNode}
+      {chosen ? <span className="sr-only">(selected) </span> : null}
       {text}
     </p>
   );
@@ -280,22 +301,59 @@ export function VerseBlock({
       {...(marked ? { "data-marked": "true" } : {})}
       tabIndex={dimmed ? -1 : 0}
       {...(dimmed ? { inert: true } : {})}
-      onClick={() => {
+      {...(chosen ? { "data-multi-chosen": "true" } : {})}
+      onPointerDown={(event) => {
+        // A finger resting on the verse (not on its links or buttons) starts choosing several.
+        if (!multi || multi.active || event.pointerType === "mouse") return;
+        if ((event.target as HTMLElement).closest("a, button")) return;
+        cancelPress();
+        const timer = window.setTimeout(() => {
+          press.current = null;
+          startedAt.current = Date.now();
+          window.getSelection()?.removeAllRanges();
+          multi.onStart();
+        }, LONG_PRESS_MS);
+        press.current = { timer, x: event.clientX, y: event.clientY };
+      }}
+      onPointerMove={(event) => {
+        const start = press.current;
+        if (
+          start &&
+          Math.hypot(event.clientX - start.x, event.clientY - start.y) > LONG_PRESS_MOVE_PX
+        ) {
+          cancelPress();
+        }
+      }}
+      onPointerUp={cancelPress}
+      onPointerCancel={cancelPress}
+      onContextMenu={(event) => {
+        // The long press that just started choosing must not also open the phone's text menu.
+        if (Date.now() - startedAt.current < 1000) event.preventDefault();
+      }}
+      onClick={(event) => {
+        // The lift that ends a long press is not a tap.
+        if (Date.now() - startedAt.current < 700) return;
+        if (multi && !multi.active && (event.ctrlKey || event.metaKey)) {
+          multi.onStart();
+          return;
+        }
         // Dragging to select text also ends in a click; do not treat that as choosing the verse.
         if (typeof window !== "undefined" && window.getSelection()?.toString()) return;
         onSelect();
       }}
       onKeyDown={(event) => {
-        // Enter or Space on the verse itself (not on its number link) chooses it.
+        // Enter or Space on the verse itself (not on its number link) chooses it; with Shift it
+        // starts choosing several.
         if (event.target !== event.currentTarget) return;
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          onSelect();
+          if (multi && !multi.active && event.shiftKey) multi.onStart();
+          else onSelect();
         }
       }}
-      className={`-mx-3 cursor-pointer touch-manipulation rounded-[3rem] p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary ${dimmed ? "pointer-events-none select-none opacity-35" : ""} ${marked ? `relative overflow-hidden shadow-sm ${tint ?? "bg-ch-container-low"}` : (tint ?? "hover:bg-ch-container-low/60")}`}
+      className={`-mx-3 cursor-pointer touch-manipulation rounded-[3rem] p-3 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary ${dimmed ? "pointer-events-none select-none opacity-35" : ""} ${marked || chosen ? `relative overflow-hidden shadow-sm ${tint ?? "bg-ch-container-low"}` : (tint ?? "hover:bg-ch-container-low/60")}`}
     >
-      {marked ? (
+      {marked || chosen ? (
         <>
           {bar}
           <div className="pl-2">{body}</div>
