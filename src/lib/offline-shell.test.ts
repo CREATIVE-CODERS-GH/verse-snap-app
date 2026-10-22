@@ -16,9 +16,9 @@ const template = readFileSync(join(root, "scripts/sw/sw.template.js"), "utf8");
 const code = template.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
 
 describe("which builds ship the offline worker", () => {
-  it("Production stays off until the owner flips the switch", () => {
-    expect(OFFLINE_IN_PRODUCTION).toBe(false);
-    expect(offlineSwBuild({ VERCEL_ENV: "production" })).toBe(false);
+  it("Production ships the worker while the owner's switch is on", () => {
+    expect(OFFLINE_IN_PRODUCTION).toBe(true);
+    expect(offlineSwBuild({ VERCEL_ENV: "production" })).toBe(true);
   });
 
   it("Preview builds ship it; a plain local build does not", () => {
@@ -29,7 +29,7 @@ describe("which builds ship the offline worker", () => {
 
   it("OFFLINE_SW overrides for local testing, in both directions", () => {
     expect(offlineSwBuild({ OFFLINE_SW: "1" })).toBe(true);
-    expect(offlineSwBuild({ OFFLINE_SW: "1", VERCEL_ENV: "production" })).toBe(true);
+    expect(offlineSwBuild({ OFFLINE_SW: "0", VERCEL_ENV: "production" })).toBe(false);
     expect(offlineSwBuild({ OFFLINE_SW: "0", VERCEL_ENV: "preview" })).toBe(false);
   });
 });

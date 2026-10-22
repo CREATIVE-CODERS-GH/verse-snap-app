@@ -6,7 +6,7 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 //
 // Offline support: scripts/sw/build-sw.mjs writes /sw.js after the build; scripts/sw/flag.mjs decides
-// per build whether it ships (Preview yes, Production not until accepted); see src/lib/pwa-register.ts.
+// per build whether it ships (Preview and Production, per OFFLINE_IN_PRODUCTION); see src/lib/pwa-register.ts.
 // The installable web app manifest and icons are static files in public/.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { offlineSwBuild } from "./scripts/sw/flag.mjs";

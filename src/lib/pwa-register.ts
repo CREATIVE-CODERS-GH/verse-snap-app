@@ -2,8 +2,8 @@
  * The only place the app's service worker is managed.
  *
  * The worker (/sw.js) is generated after the build by scripts/sw/build-sw.mjs and only exists in
- * builds where scripts/sw/flag.mjs says so (Preview builds; Production stays off until the Preview
- * is accepted). In every other build there is no /sw.js and nothing registers: the app only removes
+ * builds where scripts/sw/flag.mjs says so (Preview and Production builds while
+ * OFFLINE_IN_PRODUCTION is true). In every other build there is no /sw.js and nothing registers: the app only removes
  * a previously registered Verse Snap worker and its caches, if a browser still has them.
  *
  * Recovery: opening any page with ?sw=off unregisters the worker and deletes its caches.

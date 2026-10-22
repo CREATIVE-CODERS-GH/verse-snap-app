@@ -6,12 +6,12 @@
 **Batch 1F Stage 2 — offline app shell: pushed to the Preview branch, awaiting owner acceptance.** Stage 1 (IndexedDB
 downloads of WEB/ASV, popup controls, Reader fallback) is `708f502`/`acb866b`. Stage 2 adds a generated service
 worker (`scripts/sw/`, written into the build by `build-sw.mjs`; shipped only when `scripts/sw/flag.mjs` says so:
-Preview builds yes, Production no until `OFFLINE_IN_PRODUCTION` is flipped), a content-free `/offline-shell` route
+Preview and Production builds; Production switch `OFFLINE_IN_PRODUCTION = true`, set by the owner), a content-free `/offline-shell` route
 as the cached document, an offline note on Home, and the iPhone install guide (`install-guide.ts`: iOS Safari
 only, not standalone, not native via `VITE_NATIVE_APP`/Capacitor, remembered dismissal; independent of downloads
 and of the worker). Tests: `NITRO_PRESET=node-server OFFLINE_SW=1 npm run build` then `npm run test:e2e:offline-sw`
 (38 checks, cold offline with the server stopped). Next: real iPhone/Android check on the Preview, then decide
-whether to flip `OFFLINE_IN_PRODUCTION`.
+that the live Production site serves `/sw.js` and `/offline-shell` once Production is deployed.
 
 ## Done and live
 - Free Bible Search (WEB/ASV/BSB), Reflection Journal with account saving (Batch 1C), Reader improvements
