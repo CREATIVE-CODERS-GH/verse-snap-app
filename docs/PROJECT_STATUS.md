@@ -38,7 +38,6 @@
 ## Pending / needs approval
 - Production deploy of Batch 1E (owner).
 - Reflect screen: recovery actions for an invalid reference ("Search Manually" first).
-- Cross-reference out-of-range targets: proposed small fix (see `docs/NEXT_TASK.md`), not built.
 - Phase B search-index migration (`docs/audit/PHASE_B_PLAN.md`); AI search stays off.
 - KJAV for free search (UK rights); BBE/FBV licensing and UK KJV patent review.
 - Offline support (service worker disabled) — plan not approved.
@@ -46,8 +45,8 @@
 ## Known issues / risks
 - Offline service worker is **disabled** (`OFFLINE_ENABLED = false` in `pwa-register.ts`) after the
   `/sw.js` 404; the roadmap's offline item is stale.
-- Real signed-in Supabase flows are mostly tested against a mock in CI; check on a Preview with test
-  accounts (the account journal/highlights paths have not had a live two-account browser test).
+- Signed-in Supabase flows are tested against a mock in CI; the owner has tested the account journal and
+  privacy live on Production and Preview.
 - Cross-device sync is on page open/refocus, not realtime. Timestamps use the device clock.
 - `main` has diverged from this branch (12 commits, 5 conflicting files, including Search and Home);
   Production has been deployed from this branch, not `main`. Merging may also make Lovable apply
@@ -57,7 +56,8 @@
 - A Vercel deployment-protection bypass token was created by `vercel curl`; delete it in the project
   settings if not wanted.
 - Cross-references and Bible text depend on the HelloAO host at view time. About 0.03% of cross-reference
-  targets run past a chapter's end in our editions; they show partial text or a message.
+  targets run past a chapter's end in our editions; the end is clamped, or the passage shows "isn't in
+  this edition" with a link to the chapter.
 - `history` gives signed-in roles Supabase's default TRUNCATE/TRIGGER grants; not reachable via the API.
 - `reference parser` golden test can time out under full-suite load (passes alone). guest-merge and
   mobile-smoke browser suites occasionally fail once under load and pass on rerun.

@@ -28,7 +28,7 @@ import {
   type CrossGroup,
   type CrossPassage,
 } from "@/lib/bible/cross-references";
-import { useVerseCrossRefs } from "@/lib/bible/use-cross-references";
+import { usePassageFit, useVerseCrossRefs } from "@/lib/bible/use-cross-references";
 import { bibleService } from "@/lib/bible/service";
 import type { Verse } from "@/lib/bible/types";
 import { useAuth } from "@/lib/auth";
@@ -345,7 +345,7 @@ function ReferencesPage() {
 }
 
 function PassageCard({
-  passage,
+  passage: original,
   translation,
   anchor,
 }: {
@@ -355,6 +355,9 @@ function PassageCard({
 }) {
   const queryClient = useQueryClient();
   const { user, loading } = useAuth();
+  // The passage as it exists in this edition: the end verse clamped to the chapter's last verse.
+  const fit = usePassageFit(original, translation);
+  const passage = fit.passage;
   const numbers = Array.from({ length: passage.to - passage.from + 1 }, (_, i) => passage.from + i);
   const results = useQueries({
     queries: numbers.map((verse) => ({
@@ -411,6 +414,30 @@ function PassageCard({
     },
     onError: () => toast("Could not update saved verses"),
   });
+
+  if (!fit.available) {
+    return (
+      <article className="rounded-xl bg-brand-surface-muted p-3.5">
+        <h3 className="text-[15px] font-semibold text-brand-text">{label}</h3>
+        <p className="mt-2 text-[14px] leading-relaxed text-brand-text-muted">
+          This passage isn’t in this edition.
+        </p>
+        <div className="mt-2.5 flex items-center justify-between">
+          <span className="text-[11.5px] text-brand-text-muted">
+            {category} · {translation}
+          </span>
+          <Link
+            to="/chapter/$translation/$book/$chapter"
+            params={{ translation, book: passage.book, chapter: String(passage.chapter) }}
+            className="flex items-center gap-1 rounded-sm text-[12.5px] font-semibold text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+          >
+            Open {passage.bookName} {passage.chapter}{" "}
+            <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+        </div>
+      </article>
+    );
+  }
 
   return (
     <article className="rounded-xl bg-brand-surface-muted p-3.5">

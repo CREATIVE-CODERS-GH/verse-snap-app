@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { SheetFrame } from "@/components/chapter-sheets";
 import { ArrowRightIcon } from "@/components/stitch-icons";
 import { bibleService } from "@/lib/bible/service";
+import { usePassageFit } from "@/lib/bible/use-cross-references";
 import {
   CROSS_REF_ATTRIBUTION,
   passageLabel,
@@ -38,7 +39,7 @@ export function CrossRefAttribution({ className }: { className?: string }) {
 }
 
 function PassageRow({
-  passage,
+  passage: original,
   translation,
   onOpen,
 }: {
@@ -46,6 +47,8 @@ function PassageRow({
   translation: string;
   onOpen: () => void;
 }) {
+  const fit = usePassageFit(original, translation);
+  const passage = fit.passage;
   const label = passageLabel(passage);
   const { data, isLoading } = useQuery({
     // The same key as the explorer and the reader, so a verse already read is not fetched again.
@@ -60,9 +63,45 @@ function PassageRow({
         },
         translation,
       ),
+    enabled: fit.available,
     retry: 1,
     staleTime: 5 * 60_000,
   });
+  const title = (
+    <span className="flex items-center gap-2">
+      <span className="text-[15px] font-semibold text-brand-text group-hover:text-brand-primary">
+        {label}
+      </span>
+      <span className="rounded-full bg-brand-surface-muted px-2 py-0.5 text-[10.5px] font-semibold text-brand-gold-text">
+        {testamentOf(passage.book)}
+      </span>
+    </span>
+  );
+  const rowClass =
+    "group flex min-h-11 items-start justify-between gap-3 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus";
+  if (!fit.available) {
+    return (
+      <li>
+        <Link
+          to="/chapter/$translation/$book/$chapter"
+          params={{ translation, book: passage.book, chapter: String(passage.chapter) }}
+          onClick={onOpen}
+          className={rowClass}
+        >
+          <span className="min-w-0">
+            {title}
+            <span className="mt-1 block text-[13.5px] leading-snug text-brand-text-muted">
+              This passage isn’t in this edition. Open {passage.bookName} {passage.chapter}.
+            </span>
+          </span>
+          <ArrowRightIcon
+            className="mt-1 h-4 w-4 shrink-0 text-brand-text-faint group-hover:text-brand-primary"
+            aria-hidden
+          />
+        </Link>
+      </li>
+    );
+  }
   return (
     <li>
       <Link
@@ -74,17 +113,10 @@ function PassageRow({
           verse: String(passage.from),
         }}
         onClick={onOpen}
-        className="group flex min-h-11 items-start justify-between gap-3 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
+        className={rowClass}
       >
         <span className="min-w-0">
-          <span className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-brand-text group-hover:text-brand-primary">
-              {label}
-            </span>
-            <span className="rounded-full bg-brand-surface-muted px-2 py-0.5 text-[10.5px] font-semibold text-brand-gold-text">
-              {testamentOf(passage.book)}
-            </span>
-          </span>
+          {title}
           {data ? (
             <span className="mt-1 line-clamp-2 block font-display text-[14.5px] leading-relaxed text-brand-text-muted">
               “{data.text}”{passage.to !== passage.from ? " …" : ""}

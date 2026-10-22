@@ -3,6 +3,7 @@ import { BIBLE_BOOKS, fromApiBookId, toApiBookId } from "./books";
 import {
   CrossReferenceError,
   fetchChapterCrossRefs,
+  fitPassage,
   groupByTestament,
   parseChapterCrossRefs,
   passageLabel,
@@ -247,5 +248,30 @@ describe("fetching a chapter", () => {
     await expect(fetchChapterCrossRefs("john", 3, ok({ nope: true }))).rejects.toMatchObject({
       kind: "data",
     });
+  });
+});
+
+describe("passages that run past a chapter's end", () => {
+  it("clamps the end verse, marks a passage that starts too late as unavailable, and leaves the rest alone", () => {
+    const rev15 = passage({
+      book: "revelation",
+      bookName: "Revelation",
+      chapter: 15,
+      from: 6,
+      to: 21,
+    });
+    // Revelation 15 has 8 verses: 6–21 becomes 6–8.
+    const clamped = fitPassage(rev15, 8);
+    expect(clamped.available).toBe(true);
+    expect(passageLabel(clamped.passage)).toBe("Revelation 15:6–8");
+    expect(clamped.passage.score).toBe(rev15.score);
+    // Romans 16:27 in an edition whose chapter ends at verse 25: not there.
+    const doxology = passage({ book: "romans", bookName: "Romans", chapter: 16, from: 27, to: 27 });
+    expect(fitPassage(doxology, 25).available).toBe(false);
+    // A range that fits, and a chapter that has not loaded yet, are kept as they are.
+    expect(fitPassage(rev15, 21)).toEqual({ available: true, passage: rev15 });
+    expect(fitPassage(rev15, undefined)).toEqual({ available: true, passage: rev15 });
+    // The last verse itself is available.
+    expect(fitPassage(passage({ from: 25, to: 25 }), 25).available).toBe(true);
   });
 });

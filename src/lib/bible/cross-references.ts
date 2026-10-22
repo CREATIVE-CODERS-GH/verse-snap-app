@@ -180,6 +180,22 @@ export function passageLabel(
   return `${passage.bookName} ${passage.chapter}:${passage.from}${passage.to !== passage.from ? `–${passage.to}` : ""}`;
 }
 
+/**
+ * A passage as it exists in one edition. The dataset's verse numbers can run past the end of a
+ * chapter (a range that overshoots, or an edition that ends the chapter sooner): the end verse is
+ * clamped to the chapter's last verse, and a passage that starts after it is not available.
+ * `lastVerse` is unknown until the chapter has loaded, and then the passage is kept as it is.
+ */
+export function fitPassage(
+  passage: CrossPassage,
+  lastVerse: number | undefined,
+): { available: boolean; passage: CrossPassage } {
+  if (lastVerse === undefined) return { available: true, passage };
+  if (passage.from > lastVerse) return { available: false, passage };
+  if (passage.to <= lastVerse) return { available: true, passage };
+  return { available: true, passage: { ...passage, to: lastVerse } };
+}
+
 export function testamentOf(bookId: string): "OT" | "NT" | undefined {
   const testament = groupOfBook(bookId)?.testament;
   return testament === "ot" ? "OT" : testament === "nt" ? "NT" : undefined;
