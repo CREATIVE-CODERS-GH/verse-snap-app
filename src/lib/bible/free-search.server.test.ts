@@ -113,17 +113,21 @@ describe("configuration", () => {
   });
 });
 
-describe("Production safeguard", () => {
-  it("the flag is ignored on a Production deployment, whatever its value or spelling", () => {
-    for (const vercelEnv of ["production", "Production", " PRODUCTION "]) {
+describe("explicit feature flag", () => {
+  it("on Production the flag alone decides: off unless FREE_SEARCH_ENABLED is true", () => {
+    expect(readFreeSearchConfig({ VERCEL_ENV: "production" }).enabled).toBe(false);
+    expect(
+      readFreeSearchConfig({ FREE_SEARCH_ENABLED: "false", VERCEL_ENV: "production" }).enabled,
+    ).toBe(false);
+    for (const flag of ["true", " TRUE "]) {
       expect(
-        readFreeSearchConfig({ FREE_SEARCH_ENABLED: "true", VERCEL_ENV: vercelEnv }).enabled,
-        vercelEnv,
-      ).toBe(false);
+        readFreeSearchConfig({ FREE_SEARCH_ENABLED: flag, VERCEL_ENV: "production" }).enabled,
+        flag,
+      ).toBe(true);
     }
   });
 
-  it("Preview, development and a non-Vercel environment can still enable it", () => {
+  it("Preview, development and a non-Vercel environment behave the same", () => {
     for (const vercelEnv of ["preview", "development", undefined]) {
       expect(
         readFreeSearchConfig({ FREE_SEARCH_ENABLED: "true", VERCEL_ENV: vercelEnv }).enabled,
@@ -133,11 +137,19 @@ describe("Production safeguard", () => {
     expect(readFreeSearchConfig({ VERCEL_ENV: "preview" }).enabled).toBe(false);
   });
 
-  it("on Production a search answers 'preparing' without touching the database or the quota", async () => {
-    const { deps, calls } = harness({ env: { VERCEL_ENV: "production" } });
+  it("on Production without the flag a search answers 'preparing' and touches nothing", async () => {
+    const { deps, calls } = harness({
+      env: { FREE_SEARCH_ENABLED: "false", VERCEL_ENV: "production" },
+    });
     const response = ok(await runFreeSearch({ query: "shepherd" }, ctx(), deps));
     expect(response).toMatchObject({ status: "preparing", results: [] });
     expect(calls.order).toEqual([]);
+  });
+
+  it("on Production with the flag on it searches, rate limit first", async () => {
+    const { deps, calls } = harness({ env: { VERCEL_ENV: "production" } });
+    expect(ok(await runFreeSearch({ query: "shepherd" }, ctx(), deps)).status).toBe("ready");
+    expect(calls.order).toEqual(["editions", "quota", "search"]);
   });
 
   it("on Preview the same setup searches normally", async () => {

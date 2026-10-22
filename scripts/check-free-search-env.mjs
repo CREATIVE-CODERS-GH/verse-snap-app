@@ -87,12 +87,6 @@ export function checkEnv(env) {
     (env.VITE_SMART_SEARCH_OFFERED ?? "").trim().toLowerCase() !== "true",
   );
 
-  const vercelEnv = (env.VERCEL_ENV ?? "").trim().toLowerCase();
-  add(
-    "free search is not enabled on Production",
-    !(flag === "true" && vercelEnv === "production"),
-    vercelEnv ? `VERCEL_ENV: ${vercelEnv}` : "not on Vercel",
-  );
   return results;
 }
 

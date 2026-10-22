@@ -50,7 +50,7 @@ export interface FreeSearchLimits {
 }
 
 export interface FreeSearchConfig {
-  /** Master switch. Off unless FREE_SEARCH_ENABLED is "true" and this is not a Production deployment. */
+  /** Master switch. Off unless FREE_SEARCH_ENABLED is "true", in every environment. */
   enabled: boolean;
   /** Hard limit on one search, including the database call. */
   timeoutMs: number;
@@ -72,18 +72,9 @@ function positiveInt(value: string | undefined, fallback: number, max = 1_000_00
   return parsed >= 1 ? Math.min(parsed, max) : fallback;
 }
 
-/**
- * Free search can be switched on for Preview and development, never for Production: on a Vercel
- * Production deployment (VERCEL_ENV=production) the flag is ignored, whatever its value.
- */
-export function isProductionDeployment(env: Env = process.env): boolean {
-  return env["VERCEL_ENV"]?.trim().toLowerCase() === "production";
-}
-
 export function readFreeSearchConfig(env: Env = process.env): FreeSearchConfig {
   return {
-    enabled:
-      env["FREE_SEARCH_ENABLED"]?.trim().toLowerCase() === "true" && !isProductionDeployment(env),
+    enabled: env["FREE_SEARCH_ENABLED"]?.trim().toLowerCase() === "true",
     timeoutMs: Math.max(
       500,
       Math.min(5000, positiveInt(env["FREE_SEARCH_TIMEOUT_MS"], DEFAULT_TIMEOUT_MS, 60_000)),

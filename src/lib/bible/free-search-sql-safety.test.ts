@@ -187,7 +187,7 @@ describe("environment check script", () => {
     );
   });
 
-  it("refuses a short salt, a missing key, a leaked secret, AI on, and Production", async () => {
+  it("refuses a short salt, a missing key, a leaked secret, and AI on", async () => {
     expect(await failing({ ...good, RATE_LIMIT_SALT: "short" })).toEqual([
       expect.stringContaining("RATE_LIMIT_SALT"),
     ]);
@@ -200,9 +200,6 @@ describe("environment check script", () => {
     expect(await failing({ ...good, AI_SEARCH_ENABLED: "true" })).toEqual([
       expect.stringContaining("Smart Search"),
     ]);
-    expect(
-      await failing({ ...good, FREE_SEARCH_ENABLED: "true", VERCEL_ENV: "production" }),
-    ).toEqual([expect.stringContaining("Production")]);
   });
 
   it("allows a server-only OpenAI key while AI search is off, without reading its value", async () => {
