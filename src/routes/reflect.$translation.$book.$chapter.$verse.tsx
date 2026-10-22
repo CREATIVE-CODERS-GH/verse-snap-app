@@ -25,7 +25,6 @@ import {
   MORE_BUTTON_CLASS,
   NotebookActions,
   OrganizationCard,
-  PostureRow,
   ReferenceCard,
   TagsSection,
 } from "@/components/reflection-parts";
@@ -40,7 +39,7 @@ import { MoreHorizIcon } from "@/components/stitch-icons";
 import { TONES, toneInfo, type Tone } from "@/components/verse-annotation-parts";
 import { useAuth } from "@/lib/auth";
 import { findBook } from "@/lib/bible/books";
-import { getReflectionSuggestions, SPIRITUAL_POSTURES } from "@/lib/bible/reflection-sample";
+import { getReflectionSuggestions } from "@/lib/bible/reflection-sample";
 import { BibleServiceError } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
 import { copyText } from "@/lib/copy-text";
@@ -55,10 +54,8 @@ import {
 } from "@/lib/journal";
 import {
   applyFormat,
-  countWords,
   normaliseTag,
   scriptureCitation,
-  wordCountLabel,
   type FormatKind,
 } from "@/lib/reflection-format";
 import { useBackOrHome } from "@/lib/use-back-or-home";
@@ -228,8 +225,6 @@ function ReflectionPage() {
   const addTagButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const [posture, setPosture] = useState<string | null>(null);
-  const [postureOpen, setPostureOpen] = useState(false);
-  const postureButtonRef = useRef<HTMLButtonElement | null>(null);
   const [notebook, setNotebook] = useState<string | null>(null);
   const [notebooksOpen, setNotebooksOpen] = useState(false);
   const notebookButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -678,7 +673,6 @@ function ReflectionPage() {
     const tone = search.tone ?? saved;
     return tone ? toneInfo(tone) : null;
   })();
-  const postureLabel = SPIRITUAL_POSTURES.find((item) => item.id === posture)?.label ?? null;
   const notebookLabel = persisted
     ? (selectedNotebook?.name ?? DEFAULT_NOTEBOOK_NAME)
     : DEFAULT_NOTEBOOK_NAME;
@@ -823,32 +817,9 @@ function ReflectionPage() {
             />
           )}
 
-          <section aria-label="Reflection" className={`${CARD} relative flex flex-col gap-4 p-6`}>
-            <EditorStatus
-              status={status}
-              editing={editing || save.isPending}
-              words={wordCountLabel(countWords(body))}
-            />
-            <div className="flex flex-col gap-1">
-              <label
-                htmlFor="reflection-subtitle"
-                className="font-display text-xl font-medium leading-7 text-ch-on-surface"
-              >
-                What is God speaking to you today?
-              </label>
-              <input
-                id="reflection-subtitle"
-                type="text"
-                value={subtitle}
-                maxLength={120}
-                onChange={(event) => {
-                  setSubtitle(event.target.value);
-                  touch();
-                }}
-                placeholder="Add a subtitle or key impression..."
-                className="bg-transparent text-sm leading-5 text-ch-on-surface-variant placeholder:text-ch-outline/60 focus:outline-none"
-              />
-            </div>
+          <EditorStatus status={status} editing={editing || save.isPending} />
+
+          <section aria-label="Reflection" className={`${CARD} relative flex flex-col p-6`}>
             <div className="relative flex min-h-[160px] flex-col">
               <textarea
                 ref={bodyRef}
@@ -864,11 +835,6 @@ function ReflectionPage() {
                 className="min-h-[160px] w-full resize-none overflow-hidden bg-transparent text-base leading-relaxed text-ch-on-surface placeholder:text-ch-outline/60 selection:bg-brand-primary-soft focus:outline-none"
               />
             </div>
-            <PostureRow
-              label={postureLabel}
-              onChange={() => setPostureOpen(true)}
-              buttonRef={postureButtonRef}
-            />
           </section>
 
           <TagsSection
@@ -942,21 +908,6 @@ function ReflectionPage() {
         {...(toast?.action ? { action: toast.action } : {})}
       />
 
-      <ChoiceSheet
-        open={postureOpen}
-        onOpenChange={setPostureOpen}
-        title="Spiritual posture"
-        description="How are you coming to this verse?"
-        name="spiritual_posture"
-        options={SPIRITUAL_POSTURES}
-        value={posture}
-        onChange={(id) => {
-          setPosture(id);
-          setPostureOpen(false);
-          touch();
-        }}
-        returnFocusRef={postureButtonRef}
-      />
       <ChoiceSheet
         open={notebooksOpen}
         onOpenChange={(open) => {

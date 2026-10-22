@@ -91,7 +91,7 @@ export function ReferenceCard({
           </span>
         ) : null}
       </div>
-      <blockquote className="relative pl-2 font-display text-2xl italic leading-[38px] text-ch-on-surface">
+      <blockquote className="scripture-card relative pl-2 italic text-ch-on-surface">
         {verseText}
       </blockquote>
       <div className="flex items-center justify-between gap-3 pt-1 text-[11px] font-medium leading-[14px] text-ch-on-surface-variant">
@@ -117,75 +117,19 @@ export function ContextLinkLabel() {
   );
 }
 
-/** The editor card's top row: the draft status dot and text, and the live word count. */
-export function EditorStatus({
-  status,
-  editing,
-  words,
-}: {
-  status: string;
-  editing: boolean;
-  words: string;
-}) {
+/** The draft status above the note: a dot and "Saved · just now", "Unsaved changes" and so on. */
+export function EditorStatus({ status, editing }: { status: string; editing: boolean }) {
   return (
-    <div className="flex items-center justify-between pb-1">
-      <div
-        className="flex items-center gap-1 text-[11px] font-medium leading-[14px] text-ch-on-surface-variant"
-        role="status"
-        aria-live="polite"
-      >
-        <span
-          className={`h-2 w-2 rounded-full ${editing ? "animate-pulse bg-ch-primary-container" : "bg-ch-secondary"}`}
-          aria-hidden
-        />
-        <span data-testid="draft-status">{status}</span>
-      </div>
+    <div
+      className="flex items-center gap-1 px-1 text-[11px] font-medium leading-[14px] text-ch-on-surface-variant"
+      role="status"
+      aria-live="polite"
+    >
       <span
-        className="text-[11px] font-medium leading-[14px] text-ch-on-surface-variant"
-        aria-live="polite"
-        data-testid="word-count"
-      >
-        {words}
-      </span>
-    </div>
-  );
-}
-
-/** The "Spiritual Posture" row inside the editor card. */
-export function PostureRow({
-  label,
-  onChange,
-  buttonRef,
-}: {
-  label: string | null;
-  onChange: () => void;
-  buttonRef?: Ref<HTMLButtonElement>;
-}) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl bg-ch-container-low/60 p-3">
-      <div className="flex min-w-0 items-center gap-2">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ch-primary/10 text-ch-primary">
-          <HeartIcon className="h-[18px] w-[18px]" aria-hidden />
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <span className="text-[11px] font-medium leading-[14px] text-ch-on-surface">
-            Spiritual Posture
-          </span>
-          <span className="truncate text-xs leading-4 text-ch-on-surface-variant">
-            {label ?? "How are you coming to this verse?"}
-          </span>
-        </div>
-      </div>
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-haspopup="dialog"
-        aria-label={`Change spiritual posture${label ? ` (currently ${label})` : ""}`}
-        onClick={onChange}
-        className="shrink-0 rounded-full bg-ch-container-lowest px-3 py-1 text-[11px] font-medium leading-[14px] text-ch-on-surface shadow-sm transition-all hover:bg-ch-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary active:scale-95"
-      >
-        {label ? "Change" : "Choose"}
-      </button>
+        className={`h-2 w-2 rounded-full ${editing ? "animate-pulse bg-ch-primary-container" : "bg-ch-secondary"}`}
+        aria-hidden
+      />
+      <span data-testid="draft-status">{status}</span>
     </div>
   );
 }

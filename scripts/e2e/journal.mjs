@@ -15,7 +15,7 @@ const ready =
 const stored = () => ev(`JSON.parse(localStorage.getItem(${JSON.stringify(KEY)}) ?? '{}')`);
 const text = () => ev("document.body.innerText");
 const statusText = () =>
-  ev("document.querySelector('section[aria-label=Reflection]')?.innerText.split('\\n')[0] ?? ''");
+  ev("document.querySelector('[data-testid=draft-status]')?.innerText ?? ''");
 const toastSeen = (pattern) => waitFor(`${pattern}.test(document.body.innerText)`, 6000);
 const type = async (selector, value) => {
   await ev(`(() => {
@@ -72,7 +72,6 @@ check(
   "the reference card shows the verse's saved highlight",
   /Highlight: Clear Sky/.test(await text()),
 );
-await type("#reflection-subtitle", "Loved first");
 await type(
   "textarea[aria-label=Reflection]",
   "God gave his Son. I want to live from that love today.",
@@ -107,10 +106,9 @@ await go(EDITOR, ready);
 await sleep(600);
 check(
   "reopening the verse loads the saved reflection",
-  (await ev("document.querySelector('#reflection-subtitle').value")) === "Loved first" &&
-    /live from that love/.test(
-      await ev("document.querySelector('textarea[aria-label=Reflection]').value"),
-    ) &&
+  /live from that love/.test(
+    await ev("document.querySelector('textarea[aria-label=Reflection]').value"),
+  ) &&
     (await ev(
       "[...document.querySelectorAll('button[aria-pressed=true]')].some((x) => x.innerText.includes('#Faith'))",
     )),

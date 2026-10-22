@@ -15,7 +15,7 @@ const SCREENS = [
   ["/saved", "Saved", "Saved"],
   ["/history", "History", "History"],
   ["/settings", "Settings", "Settings"],
-  ["/reflect/KJAV/john/3/16", "Reflection", "What is God speaking"],
+  ["/reflect/KJAV/john/3/16", "Reflection", "Save Note"],
 ];
 const TABS = "Home,Read,Saved,History,Settings";
 

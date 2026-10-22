@@ -8,7 +8,6 @@ import {
   FormatToolbar,
   JournalHeader,
   OrganizationCard,
-  PostureRow,
   ReferenceCard,
   TagsSection,
 } from "@/components/reflection-parts";
@@ -124,18 +123,13 @@ describe("reflection journal pieces (server-rendered markup)", () => {
       createElement(EditorStatus, {
         status: "Preview · not saved",
         editing: false,
-        words: "0 words",
       }),
     );
     expect(status).toContain("Preview · not saved");
-    expect(status).toContain("0 words");
+    expect(status).not.toMatch(/word/);
   });
 
-  it("renders the posture row, tags and organisation card", () => {
-    expect(html(createElement(PostureRow, { label: null, onChange: noop }))).toContain("Choose");
-    expect(html(createElement(PostureRow, { label: "Grateful", onChange: noop }))).toContain(
-      "Change",
-    );
+  it("renders tags and the organisation card", () => {
     const tags = html(
       createElement(TagsSection, {
         tags: ["#Faith", "#Prayer"],

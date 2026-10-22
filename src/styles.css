@@ -598,6 +598,19 @@
   overflow-wrap: break-word;
 }
 
+/*
+ * The verse in a card (the Reflection page's reference card): the reader's typeface, text size and
+ * line spacing from Settings -> Text Size, a little smaller than the full-size single-verse view.
+ * At the default (medium, serif) it is the same 24px and about 38px line height as before.
+ */
+@utility scripture-card {
+  font-family: var(--scripture-font);
+  font-size: calc(var(--verse-focus-size) * 0.857);
+  font-weight: 400;
+  line-height: calc(var(--focus-leading) * 1.07);
+  overflow-wrap: break-word;
+}
+
 @utility scripture {
   font-family: var(--font-serif);
   font-size: var(--verse-size);

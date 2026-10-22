@@ -569,3 +569,45 @@ export function HighlighterIcon(props: IconProps) {
     </Outline>
   );
 }
+
+/** Equaliser bars (Stitch "graphic_eq"). */
+export function GraphicEqIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={2} {...props}>
+      <path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4" />
+    </Outline>
+  );
+}
+
+/** A speaking head with sound waves (Stitch "record_voice_over"). */
+export function RecordVoiceIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={1.8} {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+      <path d="M16.5 5.5a4 4 0 010 5M19 3a7.5 7.5 0 010 10" />
+    </Outline>
+  );
+}
+
+/** A tree in a quiet landscape (Stitch "nature_people"). */
+export function NatureIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={1.8} {...props}>
+      <path d="M12 21v-6" />
+      <path d="M12 15c-3.9 0-6.5-2.6-6.5-5.8C5.5 6.1 8.2 3 12 3s6.5 3.1 6.5 6.2c0 3.2-2.6 5.8-6.5 5.8z" />
+      <path d="M12 12l-2-2M12 9l2-2" />
+    </Outline>
+  );
+}
+
+/** A cloud with a sync arrow (Stitch "cloud_sync"). */
+export function CloudSyncIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={1.8} {...props}>
+      <path d="M7 18a4.5 4.5 0 01-.6-8.96A6 6 0 0117.9 8.6 4.7 4.7 0 0117 18" />
+      <path d="M9.5 15.5a3 3 0 015-1.8l.8.8M14.5 17.5a3 3 0 01-5-1.8l-.8-.8" />
+      <path d="M15.3 12v2.5h-2.5M8.7 19.5V17h2.5" />
+    </Outline>
+  );
+}
