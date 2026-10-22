@@ -15,7 +15,7 @@ import {
   TONES,
   toneInfo,
 } from "@/components/verse-annotation-parts";
-import { getSampleCrossReferences } from "@/lib/bible/verse-annotation-sample";
+import { toChips, type CrossPassage } from "@/lib/bible/cross-references";
 
 const html = (element: Parameters<typeof renderToStaticMarkup>[0]) => renderToStaticMarkup(element);
 const noop = () => undefined;
@@ -93,28 +93,42 @@ describe("verse annotation pieces (server-rendered markup)", () => {
       html(createElement(SpokenCard, { speaking: true, onToggle: noop, subtitle: "x" })),
     ).toContain("Stop");
 
-    const refs = getSampleCrossReferences("romans", 12, 2);
+    const passages: CrossPassage[] = [
+      { book: "ephesians", bookName: "Ephesians", chapter: 4, from: 22, to: 24, score: 510 },
+      { book: "isaiah", bookName: "Isaiah", chapter: 26, from: 3, to: 3, score: 90 },
+    ];
     const section = html(
       createElement(CrossReferenceSection, {
-        total: refs.total,
-        chips: refs.chips,
+        total: 57,
+        chips: toChips(passages),
         onExploreAll: noop,
         chipNode: (chip) => createElement("span", { key: chip.label }, chip.label),
       }),
     );
-    expect(section).toContain("Thematic Cross References");
-    expect(section).toContain("Explore all (7)");
-    expect(section).toContain("Sample content");
-    expect(section).toContain("Ephesians 4:23");
+    expect(section).toContain("Cross References");
+    expect(section).not.toContain("Thematic");
+    expect(section).not.toContain("Sample content");
+    expect(section).toContain("Explore all (57)");
+    expect(section).toContain("Ephesians 4:22–24");
+    expect(section).toContain("Isaiah 26:3");
 
     const footer = html(createElement(SelectionFooter, { verse: 2, highlightText: "preview" }));
     expect(footer).toContain("Active selection: v.2");
   });
 
-  it("never invents cross references for other verses", () => {
-    const other = getSampleCrossReferences("genesis", 1, 1);
-    expect(other.chips.every((chip) => chip.target === undefined)).toBe(true);
-    expect(other.chips.every((chip) => /sample/i.test(chip.hint))).toBe(true);
+  it("the cross-reference section shows loading, error and empty states without chips", () => {
+    const base = { total: 0, chips: [], onExploreAll: noop, chipNode: () => null };
+    const loading = html(createElement(CrossReferenceSection, { ...base, status: "loading" }));
+    expect(loading).toContain("Loading cross references");
+    expect(loading).not.toContain("Explore all");
+    const failed = html(
+      createElement(CrossReferenceSection, { ...base, status: "error", onRetry: noop }),
+    );
+    expect(failed).toContain("Couldn’t load cross-references");
+    expect(failed).toContain("Try again");
+    const empty = html(createElement(CrossReferenceSection, { ...base, status: "empty" }));
+    expect(empty).toContain("No cross-references for this verse");
+    expect(empty).not.toContain("Explore all");
   });
 
   it("selected verse block shows toolbar and footer, unselected dimmed block is inert", () => {

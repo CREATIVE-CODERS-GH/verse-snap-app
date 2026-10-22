@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
 import { SheetFrame } from "@/components/chapter-sheets";
 import { ChoiceSheet } from "@/components/reflection-parts";
+import { CrossRefAttribution } from "@/components/cross-reference-parts";
 import { SettingsRow } from "@/components/settings-parts";
 import {
   BookOpenIcon,
@@ -332,6 +333,7 @@ function InfoBody({
       <img src="/icons/icon-192.png" alt="" className="mx-auto h-16 w-16 rounded-[22%]" />
       <p className="font-display text-xl font-semibold text-brand-text">Verse Snap</p>
       <p className={p}>Find your verse. Instantly.</p>
+      <CrossRefAttribution className="text-left" />
       <p className="text-[12.5px] text-brand-text-faint">Version {APP_VERSION.slice(1)}</p>
     </div>
   );

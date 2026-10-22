@@ -31,9 +31,12 @@ import {
   StopSquareIcon,
   VolumeIcon,
 } from "@/components/stitch-icons";
+import { CrossReferenceSheet } from "@/components/cross-reference-parts";
 import { ShareSheet } from "@/components/share-sheet";
 import { TranslationSheet } from "@/components/translation-sheet";
 import { findBook } from "@/lib/bible/books";
+import { rankPassages, SHEET_LIMIT } from "@/lib/bible/cross-references";
+import { useVerseCrossRefs } from "@/lib/bible/use-cross-references";
 import { BibleServiceError, type Verse } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
 import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
@@ -86,6 +89,9 @@ function VersePage() {
   const queryClient = useQueryClient();
   const [speaking, setSpeaking] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [relatedOpen, setRelatedOpen] = useState(false);
+  const xrefs = useVerseCrossRefs(params.book, Number(params.chapter), Number(params.verse));
+  const related = rankPassages(xrefs.passages, SHEET_LIMIT);
   const recorded = useRef<string | null>(null);
   const book = findBook(params.book);
   const chapter = Number(params.chapter);
@@ -354,6 +360,16 @@ function VersePage() {
                   disabled={!verse}
                 />
               </div>
+              {xrefs.isError || xrefs.isLoading || related.total > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setRelatedOpen(true)}
+                  aria-haspopup="dialog"
+                  className="mt-3 flex min-h-11 items-center justify-center rounded-full px-4 text-[13px] font-semibold text-vs-primary transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vs-primary"
+                >
+                  {related.total > 0 ? `Related passages (${related.total})` : "Related passages"}
+                </button>
+              ) : null}
             </article>
           ) : networkProblem ? (
             <StateMessage
@@ -391,6 +407,22 @@ function VersePage() {
         ) : null}
       </AppShell>
 
+      <CrossReferenceSheet
+        open={relatedOpen}
+        onOpenChange={setRelatedOpen}
+        anchor={{
+          bookId: params.book,
+          chapter: Number(params.chapter),
+          verse: Number(params.verse),
+          label: `${findBook(params.book)?.name ?? params.book} ${params.chapter}:${params.verse}`,
+        }}
+        translation={params.translation}
+        passages={related.items}
+        total={related.total}
+        loading={xrefs.isLoading}
+        failed={xrefs.isError}
+        onRetry={() => void xrefs.refetch()}
+      />
       {verse ? (
         <ShareSheet
           open={shareOpen}

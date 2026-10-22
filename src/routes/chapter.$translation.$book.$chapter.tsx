@@ -49,7 +49,8 @@ import { shortBookName } from "@/lib/bible/book-labels";
 import { BibleServiceError, type Verse } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
 import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
-import { getSampleCrossReferences } from "@/lib/bible/verse-annotation-sample";
+import { toChips } from "@/lib/bible/cross-references";
+import { useVerseCrossRefs } from "@/lib/bible/use-cross-references";
 import { trackEvent } from "@/lib/analytics";
 import { useAuth } from "@/lib/auth";
 import { copyText } from "@/lib/copy-text";
@@ -529,9 +530,13 @@ function ChapterPage() {
       : null;
   })();
   const activeTone: Tone = chosenTone ?? "amber";
-  const crossRefs = selected
-    ? getSampleCrossReferences(params.book, chapterNumber, selected.verse)
-    : null;
+  // Real cross-references for the verse that is open (one small file per chapter, cached).
+  const xrefs = useVerseCrossRefs(
+    params.book,
+    chapterNumber,
+    selected?.verse ?? 0,
+    Boolean(selected),
+  );
 
   const floatingLink = (
     target: { bookId: string; chapter: number; label: string; full: string } | null,
@@ -822,46 +827,41 @@ function ChapterPage() {
               onToggle={() => speech.toggle(speakText)}
               subtitle="Reads this verse aloud · browser voice"
             />
-            {crossRefs ? (
-              <CrossReferenceSection
-                total={crossRefs.total}
-                chips={crossRefs.chips}
-                onExploreAll={() =>
-                  navigate({
-                    to: "/references/$translation/$book/$chapter/$verse",
-                    params: { ...params, verse: String(selected.verse) },
-                  })
-                }
-                chipNode={(chip, index) =>
-                  chip.target ? (
-                    <Link
-                      key={`${chip.label}-${index}`}
-                      to="/verse/$translation/$book/$chapter/$verse"
-                      params={{
-                        translation: params.translation,
-                        book: chip.target.book,
-                        chapter: String(chip.target.chapter),
-                        verse: String(chip.target.verse),
-                      }}
-                      className={CROSS_REF_CHIP_CLASS}
-                    >
-                      <CrossRefChipContent chip={chip} />
-                    </Link>
-                  ) : (
-                    <button
-                      key={`${chip.label}-${index}`}
-                      type="button"
-                      className={CROSS_REF_CHIP_CLASS}
-                      onClick={() =>
-                        showToast("Cross-references aren't connected yet — sample content")
-                      }
-                    >
-                      <CrossRefChipContent chip={chip} />
-                    </button>
-                  )
-                }
-              />
-            ) : null}
+            <CrossReferenceSection
+              total={xrefs.passages.length}
+              chips={toChips(xrefs.passages)}
+              status={
+                xrefs.isLoading
+                  ? "loading"
+                  : xrefs.isError
+                    ? "error"
+                    : xrefs.passages.length === 0
+                      ? "empty"
+                      : "ready"
+              }
+              onRetry={() => void xrefs.refetch()}
+              onExploreAll={() =>
+                navigate({
+                  to: "/references/$translation/$book/$chapter/$verse",
+                  params: { ...params, verse: String(selected.verse) },
+                })
+              }
+              chipNode={(chip, index) => (
+                <Link
+                  key={`${chip.label}-${index}`}
+                  to="/verse/$translation/$book/$chapter/$verse"
+                  params={{
+                    translation: params.translation,
+                    book: chip.target.book,
+                    chapter: String(chip.target.chapter),
+                    verse: String(chip.target.verse),
+                  }}
+                  className={CROSS_REF_CHIP_CLASS}
+                >
+                  <CrossRefChipContent chip={chip} />
+                </Link>
+              )}
+            />
           </AnnotationSheet>
         </>
       ) : multi !== null ? (

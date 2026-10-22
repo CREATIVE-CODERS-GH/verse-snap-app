@@ -1,39 +1,64 @@
 # Project status
 
-*Updated 2026-10-21. Branch `testing/vercel-mobile-preview` (last pushed: `a13e4ad`). Earlier phase
-checklist: `roadmap.md` (its "Offline support" item is outdated — see Known issues).*
+*Updated 2026-10-22. Branch `testing/vercel-mobile-preview`. Earlier phase checklist: `roadmap.md` (its
+"Offline support" item is outdated — see Known issues).*
 
 ## Done
-- **Screens (Stitch designs):** onboarding, Home, Voice, Camera scan, Search, Books (13 Pauline /
-  8 General incl. Hebrews; rest of a group reveals on scroll), chapter reader (verse sheet, highlights,
-  share, compare, verse card, cross references), Saved, History, Settings (+ text size, voice & audio),
-  Reflection Journal, loading/network-error states, light/dark theme, Vercel Analytics.
+- **Screens (Stitch designs):** onboarding, Home, Voice, Camera scan, Search, Books, chapter reader (verse
+  sheet, highlights, share, compare, verse card), single-verse reader, Saved (three hubs), History,
+  Settings (+ text size, Voice & Audio rebuilt from Stitch 18), Reflection Journal, Cross References
+  Explorer, loading/network-error states, light/dark theme, Vercel Analytics.
 - **Batch 1A:** guest→account merge of Saved/History (consent, idempotent); chapter reading in History.
-  History migration `20261020000000` applied (`ACCOUNT_HISTORY_V2 = true`).
+  Migration `20261020000000` applied (`ACCOUNT_HISTORY_V2 = true`).
 - **Batch 1B:** persistent highlights, per translation, guest + account. Migration `20261021000000`
-  applied (`ACCOUNT_HIGHLIGHTS_ENABLED = true`). Preview-accepted (Batch 1A is in Production).
-- **Batch 1C (built, not reviewed/pushed):** reflections + notebooks (create/edit/delete, per verse and
-  translation, guest + account, merge, Saved → "Reflections" view). Migration
-  `20261022000000_reflection_journal.sql` prepared, **not applied**; `ACCOUNT_JOURNAL_ENABLED = false`.
-- Tests: ~630 unit, DB harnesses (history, highlights, journal), browser suites (`scripts/e2e`).
+  applied (`ACCOUNT_HIGHLIGHTS_ENABLED = true`).
+- **Free Bible Search:** WEB, BSB, ASV keyword/phrase search (KJAV pending, BBE/FBV excluded). Migrations
+  `20261023000000` and `20261023000100` applied; editions imported (31,098 / 31,086 / 31,086 verses).
+  Controlled only by `FREE_SEARCH_ENABLED`; rate-limited; AI Smart Search stays off.
+- **Batch 1C — Reflection Journal:** notebooks and reflections for guests (device) and accounts (RLS).
+  Migration `20261022000000` applied and verified (07 and 01 pass); `ACCOUNT_JOURNAL_ENABLED = true`.
+  Live on Production (deployed by the owner). The note card holds only the note; no posture, title field
+  or word count (existing titles and postures are kept when a note is saved).
+- **Batch 1D — Reader improvements:** multi-verse highlighting (long press / Ctrl-click, existing
+  highlight storage), saved-reflection note icons at the end of a verse with a dialog, Reflect action in
+  the single-verse reader, Saved rebuilt as Verses / Notes / Highlights hubs (Stitch 31/33/34), the
+  reflection verse card follows the Text Size settings. Deployed to Production by the owner.
+- **Batch 1E — Scripture cross-references (built, tested, on Preview for acceptance):** real data from
+  HelloAO `open-cross-ref` (OpenBible.info, CC BY 4.0) fetched per chapter and cached; Explorer in Old /
+  New Testament groups; chapter verse sheet chips and "Explore all (N)"; "Related passages (N)" link and
+  reusable sheet in the single-verse reader; credit in the Explorer, the sheet and Settings → About. No
+  database change. The two sample-data files are gone.
+- Tests: unit suite (~840), DB harnesses (history, highlights, journal, Bible search/import), browser
+  suites in `scripts/e2e` (library, merge, smoke, highlights, journal, saved-hubs, reader-batch1d,
+  free-search, reader-spacing, cross-references).
 
 ## In progress
-- Batch 1C awaiting review. Local only (uncommitted): journal code, migration, rollback, verification 07,
-  tests, e2e scripts.
-- "Verse not found" recovery buttons (see `docs/NEXT_TASK.md`): inspected, no code written.
+- Batch 1E Preview acceptance (see `docs/NEXT_TASK.md`).
 
 ## Pending / needs approval
-- Apply journal migration → run verification 01/02/05/06/07 → regenerate types → enable switch → deploy.
+- Production deploy of Batch 1E (owner).
+- Reflect screen: recovery actions for an invalid reference ("Search Manually" first).
+- Cross-reference out-of-range targets: proposed small fix (see `docs/NEXT_TASK.md`), not built.
 - Phase B search-index migration (`docs/audit/PHASE_B_PLAN.md`); AI search stays off.
-- BBE/FBV licensing and UK KJV patent review.
+- KJAV for free search (UK rights); BBE/FBV licensing and UK KJV patent review.
+- Offline support (service worker disabled) — plan not approved.
 
 ## Known issues / risks
 - Offline service worker is **disabled** (`OFFLINE_ENABLED = false` in `pwa-register.ts`) after the
-  `/sw.js` 404; the roadmap's offline item is stale. Step 2 offline plan not approved.
-- Real signed-in Supabase flows are only tested against a mock in CI; check on a Vercel preview.
+  `/sw.js` 404; the roadmap's offline item is stale.
+- Real signed-in Supabase flows are mostly tested against a mock in CI; check on a Preview with test
+  accounts (the account journal/highlights paths have not had a live two-account browser test).
 - Cross-device sync is on page open/refocus, not realtime. Timestamps use the device clock.
-- Merging this branch to `main` may make Lovable apply migrations to the old project — avoid.
-- `history` (checked live) gives signed-in roles Supabase's default TRUNCATE/TRIGGER grants; not
-  reachable via the API. Other older tables not checked. Highlights/journal tables are tighter.
-- `reference parser` golden test can time out under full-suite load (passes alone).
-- Preview deployments are behind Vercel sign-in; verify with a local production build.
+- `main` has diverged from this branch (12 commits, 5 conflicting files, including Search and Home);
+  Production has been deployed from this branch, not `main`. Merging may also make Lovable apply
+  migrations to the old project — avoid.
+- Env vars `SUPABASE_*`, `RATE_LIMIT_SALT`, `AI_SEARCH_ENABLED`, `FREE_SEARCH_ENABLED`, `FREE_LIMIT_*` are
+  shared by Production and Preview in Vercel; changing them affects both.
+- A Vercel deployment-protection bypass token was created by `vercel curl`; delete it in the project
+  settings if not wanted.
+- Cross-references and Bible text depend on the HelloAO host at view time. About 0.03% of cross-reference
+  targets run past a chapter's end in our editions; they show partial text or a message.
+- `history` gives signed-in roles Supabase's default TRUNCATE/TRIGGER grants; not reachable via the API.
+- `reference parser` golden test can time out under full-suite load (passes alone). guest-merge and
+  mobile-smoke browser suites occasionally fail once under load and pass on rerun.
+- Preview deployments are behind Vercel sign-in; verify with a local production build or `vercel curl`.

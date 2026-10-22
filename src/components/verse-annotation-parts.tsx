@@ -5,7 +5,6 @@ import {
   type ReactNode,
   type Ref,
 } from "react";
-import { SampleBadge } from "@/components/chapter-reader-parts";
 import {
   BookmarkIcon,
   BookOpenIcon,
@@ -22,7 +21,7 @@ import {
   StopSquareIcon,
   VolumeIcon,
 } from "@/components/stitch-icons";
-import type { SampleCrossReference } from "@/lib/bible/verse-annotation-sample";
+import type { CrossRefChip } from "@/lib/bible/cross-references";
 
 /*
  * Presentational pieces of the verse selection and annotation experience (Stitch
@@ -534,7 +533,7 @@ export function SpokenCard({
   );
 }
 
-const DOT: Record<SampleCrossReference["dot"], string> = {
+const DOT: Record<CrossRefChip["dot"], string> = {
   primary: "bg-ch-primary",
   secondary: "bg-ch-secondary",
   tertiary: "bg-ch-tertiary",
@@ -545,7 +544,7 @@ const CHIP =
 
 export const CROSS_REF_CHIP_CLASS = CHIP;
 
-export function CrossRefChipContent({ chip }: { chip: SampleCrossReference }) {
+export function CrossRefChipContent({ chip }: { chip: CrossRefChip }) {
   return (
     <>
       <span className={`h-2 w-2 rounded-full ${DOT[chip.dot]}`} aria-hidden />
@@ -557,37 +556,76 @@ export function CrossRefChipContent({ chip }: { chip: SampleCrossReference }) {
   );
 }
 
-/** "Thematic Cross References" with the chip row. `chipNode` lets the page render real links. */
+/** "Cross References" with the chip row. `chipNode` lets the page render real links. */
 export function CrossReferenceSection({
   total,
   chips,
+  status = "ready",
+  onRetry,
   onExploreAll,
   chipNode,
 }: {
+  /** The "(7)" in "Explore all (7)". */
   total: number;
-  chips: readonly SampleCrossReference[];
+  chips: readonly CrossRefChip[];
+  status?: "loading" | "error" | "empty" | "ready";
+  onRetry?: () => void;
   onExploreAll: () => void;
-  chipNode: (chip: SampleCrossReference, index: number) => ReactNode;
+  chipNode: (chip: CrossRefChip, index: number) => ReactNode;
 }) {
   return (
-    <section aria-label="Thematic cross references" className="flex flex-col gap-2 pb-4">
+    <section aria-label="Cross references" className="flex flex-col gap-2 pb-4">
       <div className="flex items-center justify-between gap-2">
         <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase leading-[14px] tracking-wider text-ch-on-surface-variant">
           <HubIcon className="h-4 w-4 text-ch-primary" aria-hidden />
-          Thematic Cross References
-          <SampleBadge />
+          Cross References
         </span>
-        <button
-          type="button"
-          onClick={onExploreAll}
-          className="shrink-0 text-[11px] font-semibold leading-[14px] text-ch-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
+        {status === "ready" ? (
+          <button
+            type="button"
+            onClick={onExploreAll}
+            className="shrink-0 text-[11px] font-semibold leading-[14px] text-ch-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
+          >
+            Explore all ({total})
+          </button>
+        ) : null}
+      </div>
+      {status === "loading" ? (
+        <div
+          className="flex items-center gap-2 py-1"
+          aria-label="Loading cross references"
+          role="status"
         >
-          Explore all ({total})
-        </button>
-      </div>
-      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
-        {chips.map((chip, index) => chipNode(chip, index))}
-      </div>
+          {[0, 1, 2].map((item) => (
+            <span
+              key={item}
+              className="h-8 w-28 animate-pulse rounded-full bg-ch-container"
+              aria-hidden
+            />
+          ))}
+        </div>
+      ) : status === "error" ? (
+        <p className="flex items-center gap-2 text-[12px] text-ch-on-surface-variant" role="status">
+          Couldn’t load cross-references.
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="font-semibold text-ch-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
+            >
+              Try again
+            </button>
+          ) : null}
+        </p>
+      ) : status === "empty" ? (
+        <p className="text-[12px] text-ch-on-surface-variant" role="status">
+          No cross-references for this verse.
+        </p>
+      ) : (
+        <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
+          {chips.map((chip, index) => chipNode(chip, index))}
+        </div>
+      )}
     </section>
   );
 }
