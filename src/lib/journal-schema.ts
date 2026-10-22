@@ -9,4 +9,4 @@
  * account and the guest-to-account merge offers the device's journal.
  * To roll back, set it to false and deploy BEFORE running the rollback SQL.
  */
-export const ACCOUNT_JOURNAL_ENABLED = false;
+export const ACCOUNT_JOURNAL_ENABLED = true;
