@@ -195,17 +195,25 @@ check(
 );
 
 // ---------- browse in Saved ----------
-await go("/saved", "document.body.innerText.includes('Saved')");
-await tap("button[aria-label='Sort and organize']");
-await waitFor("!!document.querySelector('[role=menu]')", 5000);
-await menuItem("Reflections");
-await waitFor("!!document.querySelector('ul[aria-label=Reflections]')", 5000);
+await go("/saved?tab=notes", "!!document.querySelector('ul[aria-label=Reflections]')");
+check(
+  "the Notes tab is selected and shows its count",
+  await ev(
+    "document.querySelector('nav[aria-label=\"Saved sections\"] a[aria-current=page]')?.innerText.replace(/\\s+/g, ' ').trim() === 'Notes 1'",
+  ),
+);
+check(
+  "the search bar sits under the toggle with the Notes placeholder",
+  await ev(
+    "document.querySelector('#saved-search')?.placeholder === 'Search thoughts, tags, or scriptures...'",
+  ),
+);
 const row = await ev(
-  "document.querySelector('ul[aria-label=Reflections] a')?.innerText.replace(/\\s+/g, ' ')",
+  "document.querySelector('ul[aria-label=Reflections] > li')?.innerText.replace(/\\s+/g, ' ')",
 );
 check(
   "Saved lists the reflection with its notebook and translation",
-  /John 3:16/.test(row) && /KJAV · Prayers/.test(row),
+  /John 3:16/.test(row) && /KJAV/.test(row) && /Prayers/.test(row) && /Open Note/.test(row),
   row,
 );
 await shot("journal-saved-reflections.png");

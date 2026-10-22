@@ -558,3 +558,25 @@ export function DownloadIcon(props: IconProps) {
     </Outline>
   );
 }
+
+/** A highlighter marker (Stitch "ink_highlighter"). */
+export function HighlighterIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={1.8} {...props}>
+      <path d="M15.5 3.5l5 5-9.5 9.5-5-5 9.5-9.5z" />
+      <path d="M6 13l5 5-3.2.7L4 20l.7-3.8L6 13z" />
+      <path d="M13 21h8" />
+    </Outline>
+  );
+}
+
+/** A sticky note with a folded corner (Stitch "sticky_note_2"). */
+export function StickyNoteIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={1.8} {...props}>
+      <path d="M5 4h14a1 1 0 011 1v9l-6 6H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
+      <path d="M14 20v-5a1 1 0 011-1h5" />
+      <path d="M8 9h8M8 13h3" />
+    </Outline>
+  );
+}

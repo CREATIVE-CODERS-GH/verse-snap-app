@@ -30,6 +30,13 @@ export interface GuestHighlight extends HighlightRef {
   at: string;
 }
 
+/** One highlighted verse, as listed in Saved → Highlights. */
+export interface SavedHighlight extends HighlightRef {
+  color: HighlightColor;
+  /** When it was last set (ISO). */
+  at: string;
+}
+
 /** Verse number to colour, for one chapter of one translation. */
 export type ChapterHighlights = Record<number, HighlightColor>;
 
@@ -85,6 +92,42 @@ export const highlights = {
   /** Whether highlights are kept for this person: always for guests; accounts once enabled. */
   persists(userId?: string): boolean {
     return !userId || ACCOUNT_HIGHLIGHTS_ENABLED;
+  },
+
+  /** Every highlight this person has, newest first (the Saved → Highlights hub). */
+  async list(userId?: string): Promise<SavedHighlight[]> {
+    if (!userId) {
+      return readGuest()
+        .map(({ translation, bookId, chapter, verse, color, at }) => ({
+          translation,
+          bookId,
+          chapter,
+          verse,
+          color,
+          at,
+        }))
+        .sort((a, b) => (a.at < b.at ? 1 : a.at > b.at ? -1 : 0));
+    }
+    if (!ACCOUNT_HIGHLIGHTS_ENABLED) return [];
+    const { data, error } = await supabase
+      .from("highlights")
+      .select("translation, book_id, chapter, verse, color, updated_at")
+      .order("updated_at", { ascending: false })
+      .limit(1000);
+    if (error) throw error;
+    const result: SavedHighlight[] = [];
+    for (const row of data ?? []) {
+      if (!isHighlightColor(row.color)) continue;
+      result.push({
+        translation: row.translation,
+        bookId: row.book_id,
+        chapter: row.chapter,
+        verse: row.verse,
+        color: row.color,
+        at: row.updated_at,
+      });
+    }
+    return result;
   },
 
   async forChapter(

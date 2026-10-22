@@ -1,29 +1,41 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/app-shell";
+import { BookmarkIcon, CheckIcon, SearchIcon, TuneIcon } from "@/components/stitch-icons";
 import {
-  BookmarkIcon,
-  CheckIcon,
-  ChevronRightIcon,
-  CloseIcon,
-  SearchIcon,
-  TuneIcon,
-} from "@/components/stitch-icons";
-import { BIBLE_BOOKS, findBook } from "@/lib/bible/books";
+  SavedHighlightsHub,
+  SavedNotesHub,
+  SavedSearchBar,
+  SavedTabs,
+  SavedVersesHub,
+  type ChipOption,
+} from "@/components/saved-hubs";
+import { toneInfo } from "@/components/verse-annotation-parts";
+import { BIBLE_BOOKS } from "@/lib/bible/books";
 import { useAuth } from "@/lib/auth";
+import { HIGHLIGHT_COLORS, highlights, type SavedHighlight } from "@/lib/highlights";
 import { journal, type Reflection } from "@/lib/journal";
 import { plainNote } from "@/lib/reflection-format";
 import { library, type LibraryEntry } from "@/lib/library";
-import { cn } from "@/lib/utils";
+import {
+  matchesShelf,
+  SEARCH_PLACEHOLDERS,
+  SHELF_LABELS,
+  tagCounts,
+  verseReference,
+  type SavedTab,
+  type ShelfFilter,
+} from "@/lib/saved-hubs";
 
 /*
- * Saved — Stitch "09 Saved Verses" (list) and "14 Saved Empty State". Uses the same saved-verse
- * library as the verse screens (account when signed in, this device otherwise). The sort menu's
- * "Show" choice also lists the Reflection Journal (same rows; a notebook filter), which opens each
- * note in the reflection editor.
+ * Saved — the header (title, search, sort menu) is Stitch "09 Saved Verses"; below it three hubs:
+ * Verses (33), Highlights (34) and Notes (31), chosen by the tabs (?tab=). "14 Saved Empty State"
+ * shows when there is nothing in any of them. Verses use the same saved-verse library as the verse
+ * screens, highlights the same store as the chapter reader, notes the Reflection Journal (account
+ * when signed in, this device otherwise).
  */
 
 export const Route = createFileRoute("/saved")({
@@ -37,6 +49,10 @@ export const Route = createFileRoute("/saved")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: SavedTab } => {
+    const tab = search["tab"];
+    return tab === "verses" || tab === "highlights" || tab === "notes" ? { tab } : {};
+  },
   component: SavedPage,
 });
 
@@ -59,10 +75,8 @@ function reference(entry: LibraryEntry): string {
   return `${entry.bookName} ${entry.chapter}:${entry.verse}`;
 }
 
-type View = "verses" | "reflections";
-
 function reflectionReference(item: Reflection): string {
-  return `${findBook(item.bookId)?.name ?? item.bookId} ${item.chapter}:${item.verse}`;
+  return verseReference(item);
 }
 
 function sortReflections(items: Reflection[], order: SortOrder): Reflection[] {
@@ -79,7 +93,10 @@ function sortReflections(items: Reflection[], order: SortOrder): Reflection[] {
   return order === "oldest" ? list.reverse() : list;
 }
 
-function sortEntries(entries: LibraryEntry[], order: SortOrder): LibraryEntry[] {
+function sortEntries<T extends { bookId: string; chapter: number; verse: number; at: string }>(
+  entries: T[],
+  order: SortOrder,
+): T[] {
   const list = [...entries];
   if (order === "bible") {
     return list.sort(
@@ -96,15 +113,22 @@ function sortEntries(entries: LibraryEntry[], order: SortOrder): LibraryEntry[] 
 function SavedPage() {
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
-  const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState("");
   const [order, setOrder] = useState<SortOrder>("newest");
   const [editing, setEditing] = useState(false);
-  const [view, setView] = useState<View>("verses");
   const [notebookFilter, setNotebookFilter] = useState("all");
+  const [shelf, setShelf] = useState<ShelfFilter>("all");
+  const [colour, setColour] = useState("all");
+  const [tag, setTag] = useState("all");
   const searchRef = useRef<HTMLInputElement | null>(null);
   const owner = user?.id ?? "guest";
   const journalOn = journal.persists(user?.id);
+  const highlightsOn = highlights.persists(user?.id);
+  const tabs: readonly SavedTab[] = journalOn
+    ? ["verses", "highlights", "notes"]
+    : ["verses", "highlights"];
+  const requested = Route.useSearch().tab ?? "verses";
+  const tab: SavedTab = tabs.includes(requested) ? requested : "verses";
 
   const { data, isLoading } = useQuery({
     queryKey: ["saved", user?.id],
@@ -125,13 +149,49 @@ function SavedPage() {
     const needle = query.trim().toLowerCase();
     const filtered = (data ?? []).filter(
       (entry) =>
-        !needle ||
-        reference(entry).toLowerCase().includes(needle) ||
-        entry.verseText.toLowerCase().includes(needle) ||
-        entry.translation.toLowerCase().includes(needle),
+        matchesShelf(entry.bookId, shelf) &&
+        (!needle ||
+          reference(entry).toLowerCase().includes(needle) ||
+          entry.verseText.toLowerCase().includes(needle) ||
+          entry.translation.toLowerCase().includes(needle)),
     );
     return sortEntries(filtered, order);
-  }, [data, order, query]);
+  }, [data, order, query, shelf]);
+  const shelves: ChipOption[] = (Object.keys(SHELF_LABELS) as ShelfFilter[])
+    .map((id) => ({
+      id,
+      label: SHELF_LABELS[id],
+      count: (data ?? []).filter((entry) => matchesShelf(entry.bookId, id)).length,
+    }))
+    .filter((option) => option.id === "all" || option.count > 0);
+
+  // Highlights (the chapter reader's store).
+  const highlightsQuery = useQuery({
+    queryKey: ["highlights", "all", owner],
+    queryFn: () => highlights.list(user?.id),
+    enabled: !loading && highlightsOn,
+  });
+  const highlightItems = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const filtered = (highlightsQuery.data ?? []).filter(
+      (item: SavedHighlight) =>
+        (colour === "all" || item.color === colour) &&
+        (!needle ||
+          verseReference(item).toLowerCase().includes(needle) ||
+          item.translation.toLowerCase().includes(needle) ||
+          toneInfo(item.color).name.toLowerCase().includes(needle)),
+    );
+    return sortEntries(filtered, order);
+  }, [highlightsQuery.data, colour, order, query]);
+  const colours: ChipOption[] = [
+    { id: "all", label: "All", count: highlightsQuery.data?.length ?? 0 },
+    ...HIGHLIGHT_COLORS.map((id) => ({
+      id: id as string,
+      label: toneInfo(id).label,
+      count: (highlightsQuery.data ?? []).filter((item) => item.color === id).length,
+      dot: toneInfo(id).swatch,
+    })).filter((option) => option.count > 0),
+  ];
 
   // The Reflection Journal (same keys as the reflection editor).
   const reflectionsQuery = useQuery({
@@ -153,6 +213,7 @@ function SavedPage() {
     const filtered = (reflectionsQuery.data ?? []).filter(
       (item) =>
         (notebookFilter === "all" || item.notebookId === notebookFilter) &&
+        (tag === "all" || item.tags.includes(tag)) &&
         (!needle ||
           reflectionReference(item).toLowerCase().includes(needle) ||
           item.title.toLowerCase().includes(needle) ||
@@ -161,70 +222,28 @@ function SavedPage() {
           item.translation.toLowerCase().includes(needle)),
     );
     return sortReflections(filtered, order);
-  }, [reflectionsQuery.data, notebookFilter, order, query]);
+  }, [reflectionsQuery.data, notebookFilter, tag, order, query]);
   const hasReflections = (reflectionsQuery.data?.length ?? 0) > 0;
-  const showingReflections = view === "reflections" && journalOn;
+  const tagOptions: ChipOption[] = [
+    { id: "all", label: "All", count: reflectionsQuery.data?.length ?? 0 },
+    ...tagCounts(reflectionsQuery.data ?? []).map((item) => ({
+      id: item.tag,
+      label: `#${item.tag}`,
+      count: item.count,
+    })),
+  ];
 
   const busy = loading || isLoading;
+  const hasHighlights = (highlightsQuery.data?.length ?? 0) > 0;
   const empty =
-    !busy && (!data || data.length === 0) && !hasReflections && !reflectionsQuery.isLoading;
-
-  const reflectionList = reflectionsQuery.isLoading ? (
-    <ul aria-label="Loading reflections" className="divide-y divide-brand-border">
-      {[0, 1, 2].map((item) => (
-        <li key={item} className="space-y-2 py-4" aria-hidden>
-          <span className="block h-4 w-32 animate-pulse rounded bg-brand-surface-strong" />
-          <span className="block h-3 w-full animate-pulse rounded bg-brand-surface-muted" />
-        </li>
-      ))}
-    </ul>
-  ) : reflectionsQuery.isError ? (
-    <p className="py-10 text-center text-[15px] text-brand-text-muted" role="status">
-      Couldn’t load your reflections. Check your connection and try again.
-    </p>
-  ) : reflections.length === 0 ? (
-    <p className="py-10 text-center text-[15px] text-brand-text-muted" role="status">
-      {query.trim()
-        ? `No reflections match “${query.trim()}”.`
-        : hasReflections
-          ? "No reflections in this notebook yet."
-          : "No reflections yet. Open a verse and choose Add Reflection."}
-    </p>
-  ) : (
-    <ul aria-label="Reflections" className="divide-y divide-brand-border">
-      {reflections.map((item) => (
-        <li key={item.id}>
-          <Link
-            to="/reflect/$translation/$book/$chapter/$verse"
-            params={{
-              translation: item.translation,
-              book: item.bookId,
-              chapter: String(item.chapter),
-              verse: String(item.verse),
-            }}
-            className="group flex min-w-0 items-start justify-between py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
-          >
-            <span className="min-w-0 space-y-1 pr-4">
-              <span className="block text-base font-bold text-brand-text transition-colors group-hover:text-brand-primary">
-                {reflectionReference(item)}
-              </span>
-              <span className="line-clamp-2 block text-sm leading-relaxed text-brand-text-muted">
-                {item.title.trim() || plainNote(item.body).trim()}
-              </span>
-              <span className="block pt-0.5 text-xs font-semibold tracking-wider text-brand-text-faint">
-                {item.translation}
-                {notebookName(item.notebookId) ? ` · ${notebookName(item.notebookId)}` : ""}
-              </span>
-            </span>
-            <ChevronRightIcon
-              className="mt-1 h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
-              aria-hidden
-            />
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
+    !busy &&
+    (!data || data.length === 0) &&
+    !hasReflections &&
+    !hasHighlights &&
+    !reflectionsQuery.isLoading &&
+    !highlightsQuery.isLoading;
+  const isEditing = editing && tab === "verses";
+  useEffect(() => setQuery(""), [tab]);
 
   return (
     <AppShell variant="stitch">
@@ -256,21 +275,14 @@ function SavedPage() {
             <div className="-mr-2 flex items-center gap-2">
               <button
                 type="button"
-                aria-label={searching ? "Close search" : "Search saved verses"}
-                aria-expanded={searching}
+                aria-label="Search saved"
                 onClick={() => {
-                  const next = !searching;
-                  setSearching(next);
-                  if (!next) setQuery("");
-                  else window.requestAnimationFrame(() => searchRef.current?.focus());
+                  searchRef.current?.scrollIntoView({ block: "nearest" });
+                  searchRef.current?.focus();
                 }}
                 className={ICON_BUTTON}
               >
-                {searching ? (
-                  <CloseIcon className="h-[22px] w-[22px]" strokeWidth={2} />
-                ) : (
-                  <SearchIcon className="h-[22px] w-[22px]" strokeWidth={2} />
-                )}
+                <SearchIcon className="h-[22px] w-[22px]" strokeWidth={2} />
               </button>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
@@ -284,35 +296,6 @@ function SavedPage() {
                     sideOffset={6}
                     className="z-[70] min-w-52 rounded-2xl border border-brand-border bg-brand-surface p-1.5 font-stitch text-brand-text shadow-xl"
                   >
-                    {journalOn ? (
-                      <>
-                        <DropdownMenu.Label className="px-3 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand-text-muted">
-                          Show
-                        </DropdownMenu.Label>
-                        <DropdownMenu.RadioGroup
-                          value={view}
-                          onValueChange={(value) => {
-                            setView(value as View);
-                            setEditing(false);
-                          }}
-                        >
-                          {(
-                            [
-                              ["verses", "Saved verses"],
-                              ["reflections", "Reflections"],
-                            ] as const
-                          ).map(([key, label]) => (
-                            <DropdownMenu.RadioItem key={key} value={key} className={MENU_ITEM}>
-                              {label}
-                              <DropdownMenu.ItemIndicator>
-                                <CheckIcon className="h-4 w-4 text-brand-primary" />
-                              </DropdownMenu.ItemIndicator>
-                            </DropdownMenu.RadioItem>
-                          ))}
-                        </DropdownMenu.RadioGroup>
-                        <DropdownMenu.Separator className="my-1 h-px bg-brand-border" />
-                      </>
-                    ) : null}
                     <DropdownMenu.Label className="px-3 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand-text-muted">
                       Sort by
                     </DropdownMenu.Label>
@@ -329,8 +312,10 @@ function SavedPage() {
                         </DropdownMenu.RadioItem>
                       ))}
                     </DropdownMenu.RadioGroup>
-                    <DropdownMenu.Separator className="my-1 h-px bg-brand-border" />
-                    {showingReflections ? (
+                    {tab === "highlights" ? null : (
+                      <DropdownMenu.Separator className="my-1 h-px bg-brand-border" />
+                    )}
+                    {tab === "notes" ? (
                       <>
                         <DropdownMenu.Label className="px-3 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand-text-muted">
                           Notebook
@@ -353,38 +338,38 @@ function SavedPage() {
                           ))}
                         </DropdownMenu.RadioGroup>
                       </>
-                    ) : (
+                    ) : tab === "verses" ? (
                       <DropdownMenu.Item
                         className={MENU_ITEM}
                         onSelect={() => setEditing((v) => !v)}
                       >
-                        {editing ? "Done editing" : "Edit list"}
+                        {isEditing ? "Done editing" : "Edit list"}
                       </DropdownMenu.Item>
-                    )}
+                    ) : null}
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
               </DropdownMenu.Root>
             </div>
           </header>
 
-          {searching ? (
-            <div className="mb-2">
-              <label htmlFor="saved-search" className="sr-only">
-                Search saved verses
-              </label>
-              <input
-                ref={searchRef}
-                id="saved-search"
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search by reference or words"
-                className="h-11 w-full rounded-full border border-brand-border bg-brand-surface px-4 text-[15px] text-brand-text placeholder:text-brand-text-faint focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
-              />
-            </div>
-          ) : null}
+          <SavedTabs
+            active={tab}
+            tabs={tabs}
+            counts={{
+              verses: data?.length,
+              highlights: highlightsOn ? highlightsQuery.data?.length : undefined,
+              notes: journalOn ? reflectionsQuery.data?.length : undefined,
+            }}
+          />
 
-          {editing ? (
+          <SavedSearchBar
+            value={query}
+            onChange={setQuery}
+            placeholder={SEARCH_PLACEHOLDERS[tab]}
+            inputRef={searchRef}
+          />
+
+          {isEditing ? (
             <div className="mb-1 flex items-center justify-between rounded-xl bg-brand-surface-muted px-3 py-2 text-[13px] text-brand-text-muted">
               Tap ✕ to remove a verse.
               <button
@@ -397,72 +382,47 @@ function SavedPage() {
             </div>
           ) : null}
 
-          {showingReflections ? (
-            reflectionList
-          ) : busy ? (
-            <ul aria-label="Loading saved verses" className="divide-y divide-brand-border">
-              {[0, 1, 2, 3].map((item) => (
-                <li key={item} className="space-y-2 py-4" aria-hidden>
-                  <span className="block h-4 w-32 animate-pulse rounded bg-brand-surface-strong" />
-                  <span className="block h-3 w-full animate-pulse rounded bg-brand-surface-muted" />
-                  <span className="block h-3 w-2/3 animate-pulse rounded bg-brand-surface-muted" />
-                </li>
-              ))}
-            </ul>
-          ) : entries.length === 0 ? (
-            <p className="py-10 text-center text-[15px] text-brand-text-muted" role="status">
-              {query.trim() ? `No saved verses match “${query.trim()}”.` : "No saved verses yet."}
-            </p>
+          {tab === "highlights" ? (
+            <SavedHighlightsHub
+              items={highlightItems}
+              total={highlightsQuery.data?.length ?? 0}
+              query={query}
+              colour={colour}
+              colours={colours}
+              onColour={setColour}
+              notes={reflectionsQuery.data ?? []}
+              loading={highlightsQuery.isLoading}
+              failed={highlightsQuery.isError}
+              sortLabel={SORT_LABELS[order]}
+            />
+          ) : tab === "notes" ? (
+            <SavedNotesHub
+              items={reflections}
+              total={reflectionsQuery.data?.length ?? 0}
+              query={query}
+              tag={tag}
+              tags={tagOptions}
+              onTag={setTag}
+              notebookName={notebookName}
+              loading={reflectionsQuery.isLoading}
+              failed={reflectionsQuery.isError}
+              sortLabel={SORT_LABELS[order]}
+            />
           ) : (
-            <ul className="divide-y divide-brand-border">
-              {entries.map((entry) => (
-                <li key={entry.id} className="flex items-start">
-                  <Link
-                    to="/verse/$translation/$book/$chapter/$verse"
-                    params={{
-                      translation: entry.translation,
-                      book: entry.bookId,
-                      chapter: String(entry.chapter),
-                      verse: String(entry.verse),
-                    }}
-                    className="group flex min-w-0 flex-1 items-start justify-between py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
-                  >
-                    <span className="min-w-0 space-y-1 pr-4">
-                      <span className="block text-base font-bold text-brand-text transition-colors group-hover:text-brand-primary">
-                        {reference(entry)}
-                      </span>
-                      {entry.verseText ? (
-                        <span className="line-clamp-2 block text-sm leading-relaxed text-brand-text-muted">
-                          {entry.verseText}
-                        </span>
-                      ) : null}
-                      <span className="block pt-0.5 text-xs font-semibold tracking-wider text-brand-text-faint">
-                        {entry.translation}
-                      </span>
-                    </span>
-                    {editing ? null : (
-                      <ChevronRightIcon
-                        className="mt-1 h-5 w-5 shrink-0 text-brand-text-faint transition-all group-hover:translate-x-0.5 group-hover:text-brand-text-muted"
-                        aria-hidden
-                      />
-                    )}
-                  </Link>
-                  {editing ? (
-                    <button
-                      type="button"
-                      aria-label={`Remove ${reference(entry)}`}
-                      onClick={() => remove.mutate(entry.id)}
-                      disabled={remove.isPending}
-                      className={cn(
-                        "mt-3 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-brand-text-muted transition-colors hover:bg-brand-danger-soft hover:text-brand-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus disabled:opacity-50",
-                      )}
-                    >
-                      <CloseIcon className="h-4 w-4" strokeWidth={2.2} />
-                    </button>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
+            <SavedVersesHub
+              entries={entries}
+              total={data?.length ?? 0}
+              query={query}
+              shelf={shelf}
+              shelves={shelves}
+              onShelf={setShelf}
+              notes={reflectionsQuery.data ?? []}
+              loading={busy}
+              editing={isEditing}
+              onRemove={(id) => remove.mutate(id)}
+              removing={remove.isPending}
+              sortLabel={SORT_LABELS[order]}
+            />
           )}
         </main>
       )}

@@ -290,13 +290,9 @@ check(
 );
 
 // ---------- browse in Saved ----------
-await go("/saved", "document.body.innerText.includes('Saved')");
-await tap("button[aria-label='Sort and organize']");
-await waitFor("!!document.querySelector('[role=menu]')", 5000);
-await menuItem("Reflections");
-await waitFor("!!document.querySelector('ul[aria-label=Reflections]')", 8000);
+await go("/saved?tab=notes", "!!document.querySelector('ul[aria-label=Reflections]')");
 const rows = await ev(
-  "[...document.querySelectorAll('ul[aria-label=Reflections] a')].map((a) => a.innerText.replace(/\\s+/g, ' '))",
+  "[...document.querySelectorAll('ul[aria-label=Reflections] > li')].map((a) => a.innerText.replace(/\\s+/g, ' '))",
 );
 check(
   "Saved lists the account's reflections",
