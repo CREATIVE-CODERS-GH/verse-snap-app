@@ -22,8 +22,11 @@
     "test:e2e:smoke": "node scripts/e2e/mobile-smoke.mjs",
     "test:e2e:highlights": "node scripts/e2e/highlights.mjs",
     "test:e2e:highlights-account": "node scripts/e2e/highlights-account.mjs",
+    "test:e2e:journal": "node scripts/e2e/journal.mjs",
+    "test:e2e:journal-account": "node scripts/e2e/journal-account.mjs",
     "test:db:history": "node scripts/db/history-migration-test.mjs",
     "test:db:highlights": "node scripts/db/highlights-migration-test.mjs",
+    "test:db:journal": "node scripts/db/journal-migration-test.mjs",
     "format": "prettier --write ."
   },
   "overrides": {

@@ -42,9 +42,12 @@ with checks(sort, check_name, pass) as (
   from pg_policies where schemaname = 'public'
 
   union all
-  -- 4, plus 1 once 20261021000000_verse_highlights adds public.highlights (checked in detail by 06).
-  select 41, 'exactly 4 policies in public (5 with highlights)',
-         (select count(*) = 4 + case when to_regclass('public.highlights') is null then 0 else 1 end
+  -- 4, plus 1 for each later table that exists: highlights (checked in detail by 06), and
+  -- notebooks and reflections (checked in detail by 07).
+  select 41, 'exactly one policy per table in public (4 base, plus highlights/notebooks/reflections)',
+         (select count(*) = 4 + (select count(*) from unnest(array['public.highlights', 'public.notebooks',
+                                                                   'public.reflections']) t
+                                  where to_regclass(t) is not null)
             from pg_policies where schemaname = 'public')
 
   union all

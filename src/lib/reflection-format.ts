@@ -24,6 +24,14 @@ export function countWords(text: string): number {
   return plain ? plain.split(/\s+/).length : 0;
 }
 
+/** A note as plain text for previews and search: the bold and italic markers removed. */
+export function plainNote(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/(^|[\s(“"])_([^_\n]+)_(?=$|[\s.,;:!?)”"])/g, "$1$2")
+    .replace(/\*\*/g, "");
+}
+
 export function wordCountLabel(count: number): string {
   return `${count} word${count === 1 ? "" : "s"}`;
 }

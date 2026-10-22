@@ -305,7 +305,7 @@ export function OrganizationCard({
               Keep Note Private
             </span>
             <span id="private-hint" className="text-xs leading-4 text-ch-on-surface-variant">
-              {isPrivate ? "Only visible to you" : "You may share it once notes can be saved"}
+              {isPrivate ? "Only visible to you" : "Sharing isn’t available yet"}
             </span>
           </div>
         </div>
@@ -427,6 +427,7 @@ export function ChoiceSheet({
   value,
   onChange,
   returnFocusRef,
+  footer,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -437,6 +438,8 @@ export function ChoiceSheet({
   value: string | null;
   onChange: (id: string) => void;
   returnFocusRef?: RefObject<HTMLElement | null>;
+  /** Optional controls under the choices (the notebook sheet's New / Rename / Delete). */
+  footer?: ReactNode;
 }) {
   return (
     <SheetFrame
@@ -468,6 +471,132 @@ export function ChoiceSheet({
           </label>
         ))}
       </fieldset>
+      {footer}
     </SheetFrame>
+  );
+}
+
+const NOTEBOOK_TEXT_BUTTON =
+  "rounded-full px-3 py-1.5 text-[13px] font-semibold leading-[18px] transition-colors hover:bg-ch-container focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary disabled:opacity-50";
+
+/**
+ * Notebook management under the notebook choices: New notebook, and Rename / Delete for the
+ * selected one (General Reflections can be renamed but not deleted). Shown inside ChoiceSheet.
+ */
+export function NotebookActions({
+  mode,
+  name,
+  onNameChange,
+  onSubmit,
+  onCancel,
+  onStartCreate,
+  onStartRename,
+  onDelete,
+  selectedName,
+  canDelete,
+  error,
+  busy,
+}: {
+  mode: "idle" | "create" | "rename";
+  name: string;
+  onNameChange: (name: string) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  onStartCreate: () => void;
+  onStartRename: () => void;
+  onDelete: () => void;
+  selectedName: string | null;
+  canDelete: boolean;
+  error: string | null;
+  busy: boolean;
+}) {
+  if (mode !== "idle") {
+    return (
+      <form
+        className="flex flex-col gap-2 border-t border-ch-container-high pb-2 pt-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit();
+        }}
+      >
+        <label htmlFor="notebook-name-input" className={SECTION_LABEL}>
+          {mode === "create" ? "New notebook" : `Rename “${selectedName ?? ""}”`}
+        </label>
+        <input
+          id="notebook-name-input"
+          value={name}
+          maxLength={60}
+          autoFocus
+          onChange={(event) => onNameChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              event.stopPropagation();
+              onCancel();
+            }
+          }}
+          placeholder="Notebook name"
+          className="w-full rounded-full bg-ch-container px-4 py-2 text-[14px] font-medium leading-5 text-ch-on-surface placeholder:text-ch-outline/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
+        />
+        {error ? (
+          <p role="alert" className="px-1 text-xs leading-4 text-ch-error">
+            {error}
+          </p>
+        ) : null}
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            className={`${NOTEBOOK_TEXT_BUTTON} text-ch-primary`}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={busy}
+            className={`${TAG_BASE} bg-ch-primary text-ch-on-primary disabled:opacity-60`}
+          >
+            {mode === "create" ? "Create" : "Save"}
+          </button>
+        </div>
+      </form>
+    );
+  }
+  return (
+    <div className="flex flex-col gap-2 border-t border-ch-container-high pb-2 pt-3">
+      {error ? (
+        <p role="alert" className="px-1 text-xs leading-4 text-ch-error">
+          {error}
+        </p>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={onStartCreate} disabled={busy} className={ADD_TAG_CLASS}>
+          <PlusIcon className="h-4 w-4" aria-hidden />
+          <span>New notebook</span>
+        </button>
+        {selectedName ? (
+          <>
+            <button
+              type="button"
+              onClick={onStartRename}
+              disabled={busy}
+              className={`${NOTEBOOK_TEXT_BUTTON} text-ch-primary`}
+            >
+              Rename
+            </button>
+            {canDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={busy}
+                className={`${NOTEBOOK_TEXT_BUTTON} text-ch-error`}
+              >
+                Delete
+              </button>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+    </div>
   );
 }

@@ -110,6 +110,33 @@ export type Database = {
         }
         Relationships: []
       }
+      notebooks: {
+        Row: {
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -139,6 +166,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      reflections: {
+        Row: {
+          body: string
+          book_id: string
+          chapter: number
+          created_at: string
+          id: string
+          is_private: boolean
+          notebook_id: string
+          posture: string | null
+          tags: string[]
+          title: string
+          translation: string
+          updated_at: string
+          user_id: string
+          verse: number
+        }
+        Insert: {
+          body?: string
+          book_id: string
+          chapter: number
+          created_at?: string
+          id?: string
+          is_private?: boolean
+          notebook_id: string
+          posture?: string | null
+          tags?: string[]
+          title?: string
+          translation: string
+          updated_at?: string
+          user_id: string
+          verse: number
+        }
+        Update: {
+          body?: string
+          book_id?: string
+          chapter?: number
+          created_at?: string
+          id?: string
+          is_private?: boolean
+          notebook_id?: string
+          posture?: string | null
+          tags?: string[]
+          title?: string
+          translation?: string
+          updated_at?: string
+          user_id?: string
+          verse?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflections_notebook_fkey"
+            columns: ["notebook_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "notebooks"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
       }
       saved_verses: {
         Row: {

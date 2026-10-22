@@ -136,7 +136,8 @@ export async function openBrowser({ init = "", args = [], timeoutMs = 300000 } =
   let nextId = 1;
   const pending = new Map();
   const listeners = new Map();
-  const state = { errors: [] };
+  // dialogs: messages of confirm/alert dialogs; acceptDialogs: how the next ones are answered.
+  const state = { errors: [], dialogs: [], acceptDialogs: true };
 
   const send = (method, params = {}) =>
     new Promise((resolve, reject) => {
@@ -170,6 +171,10 @@ export async function openBrowser({ init = "", args = [], timeoutMs = 300000 } =
             .join(" ")
             .slice(0, 240),
       );
+    }
+    if (message.method === "Page.javascriptDialogOpening") {
+      state.dialogs.push(params.message);
+      send("Page.handleJavaScriptDialog", { accept: state.acceptDialogs }).catch(() => {});
     }
     listeners.get(message.method)?.(params);
   };

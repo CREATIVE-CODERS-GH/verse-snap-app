@@ -15,6 +15,7 @@ import {
   mergeableCounts,
   mergeableHighlights,
   mergeableHistory,
+  mergeableReflections,
   runGuestMerge,
 } from "@/lib/guest-merge";
 
@@ -45,12 +46,22 @@ function dismiss(userId: string) {
   }
 }
 
-function describe(saved: number, history: number, chapters = 0, highlights = 0): string {
+interface Counts {
+  saved: number;
+  history: number;
+  chapters: number;
+  highlights: number;
+  reflections: number;
+  total: number;
+}
+
+function describe({ saved, history, chapters, highlights, reflections }: Counts): string {
   const parts = [
     saved ? `${saved} saved verse${saved === 1 ? "" : "s"}` : "",
     history ? `${history} verse${history === 1 ? "" : "s"} from your history` : "",
     chapters ? `${chapters} chapter${chapters === 1 ? "" : "s"} you read` : "",
     highlights ? `${highlights} highlight${highlights === 1 ? "" : "s"}` : "",
+    reflections ? `${reflections} reflection${reflections === 1 ? "" : "s"}` : "",
   ].filter(Boolean);
   return parts.length > 2
     ? `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
@@ -61,11 +72,12 @@ export function GuestMergePrompt() {
   const { user, loading } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
-  const [counts, setCounts] = useState({
+  const [counts, setCounts] = useState<Counts>({
     saved: 0,
     history: 0,
     chapters: 0,
     highlights: 0,
+    reflections: 0,
     total: 0,
   });
   const [busy, setBusy] = useState(false);
@@ -76,7 +88,7 @@ export function GuestMergePrompt() {
       setOpen(false);
       return;
     }
-    const next = mergeableCounts();
+    const next = mergeableCounts(guestDevice, { userId: user.id });
     setCounts(next);
     setConfirmRemove(false);
     setOpen(next.total > 0 && !dismissed(user.id));
@@ -88,6 +100,9 @@ export function GuestMergePrompt() {
     void queryClient.invalidateQueries({ queryKey: ["saved"] });
     void queryClient.invalidateQueries({ queryKey: ["history"] });
     void queryClient.invalidateQueries({ queryKey: ["highlights"] });
+    void queryClient.invalidateQueries({ queryKey: ["notebooks"] });
+    void queryClient.invalidateQueries({ queryKey: ["reflections"] });
+    void queryClient.invalidateQueries({ queryKey: ["reflection"] });
   };
 
   const add = async () => {
@@ -98,12 +113,23 @@ export function GuestMergePrompt() {
     if (result.status === "done" || result.status === "nothing") {
       setOpen(false);
       const added =
-        result.savedAdded + result.historyAdded + result.chaptersAdded + result.highlightsAdded;
+        result.savedAdded +
+        result.historyAdded +
+        result.chaptersAdded +
+        result.highlightsAdded +
+        result.reflectionsAdded;
+      const kept = result.reflectionsKept;
+      if (kept > 0) {
+        toast(
+          `Added to your account. ${kept} reflection${kept === 1 ? "" : "s"} stayed on this device — your account already has a note for ${kept === 1 ? "that verse" : "those verses"}.`,
+        );
+        return;
+      }
       toast(added > 0 ? "Added to your account" : "Already in your account");
       return;
     }
     if (result.status === "partial") {
-      const next = mergeableCounts();
+      const next = mergeableCounts(guestDevice, { userId: user.id });
       setCounts(next);
       toast("Some items couldn’t be added yet. They’re still on this device — try again.");
       return;
@@ -112,10 +138,22 @@ export function GuestMergePrompt() {
   };
 
   const removeFromDevice = () => {
-    // Removes only what this prompt offered (chapter visits and highlights once accounts hold them).
+    // Removes only what this prompt offered (chapter visits, highlights and reflections once
+    // accounts hold them), and notebooks left empty by that.
     guestDevice.removeSaved(guestDevice.saved().map((entry) => entry.id));
     guestDevice.removeHistory(mergeableHistory().map((entry) => entry.id));
     guestDevice.removeHighlights(mergeableHighlights().map((entry) => entry.id));
+    const reflections = mergeableReflections(guestDevice, undefined, user.id);
+    if (reflections.length > 0) {
+      guestDevice.removeReflections(reflections.map((entry) => entry.id));
+      const journal = guestDevice.journal();
+      const inUse = new Set(journal.reflections.map((entry) => entry.notebookId));
+      guestDevice.removeNotebooks(
+        journal.notebooks
+          .filter((notebook) => !notebook.isDefault && !inUse.has(notebook.id))
+          .map((notebook) => notebook.id),
+      );
+    }
     setOpen(false);
     refresh();
     toast("Removed from this device");
@@ -130,8 +168,8 @@ export function GuestMergePrompt() {
           </AlertDialogTitle>
           <AlertDialogDescription className="text-brand-text-muted">
             {confirmRemove
-              ? `This deletes ${describe(counts.saved, counts.history, counts.chapters, counts.highlights)} kept on this device. Your account isn’t affected.`
-              : `This device has ${describe(counts.saved, counts.history, counts.chapters, counts.highlights)} from before you signed in. Add them to your account so they’re available on all your devices?`}
+              ? `This deletes ${describe(counts)} kept on this device. Your account isn’t affected.`
+              : `This device has ${describe(counts)} from before you signed in. Add them to your account so they’re available on all your devices?`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-col">

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { GuestHighlight } from "./highlights";
+import type { Notebook, Reflection } from "./journal";
 import type { HistoryEntry, LibraryEntry } from "./library";
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
@@ -9,6 +10,8 @@ type Backend = import("./guest-merge").MergeBackend;
 type SavedRow = import("./guest-merge").SavedRow;
 type HistoryRow = import("./guest-merge").HistoryRow;
 type HighlightRow = import("./guest-merge").HighlightRow;
+type NotebookRow = import("./guest-merge").NotebookRow;
+type ReflectionRow = import("./guest-merge").ReflectionRow;
 
 const USER = "user-a";
 
@@ -46,16 +49,70 @@ function highlight(verse: number, color: GuestHighlight["color"] = "amber", tran
   } satisfies GuestHighlight;
 }
 
+const GENERAL: Notebook = {
+  id: "general",
+  name: "General Reflections",
+  isDefault: true,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: "2026-01-01T00:00:00.000Z",
+};
+
+function notebook(id: string, name: string): Notebook {
+  return { ...GENERAL, id, name, isDefault: false };
+}
+
+function reflection(
+  id: string,
+  verse: number,
+  notebookId = "general",
+  body = "A note",
+): Reflection {
+  return {
+    id,
+    notebookId,
+    translation: "KJAV",
+    bookId: "john",
+    chapter: 3,
+    verse,
+    title: "",
+    body,
+    tags: ["#Faith"],
+    posture: "grateful",
+    isPrivate: true,
+    createdAt: "2026-03-01T10:00:00.000Z",
+    updatedAt: "2026-03-02T10:00:00.000Z",
+  };
+}
+
 /** The device's guest lists, with the same remove-by-id behaviour as the real store. */
 function fakeStore(initial: {
   saved?: LibraryEntry[];
   history?: HistoryEntry[];
   highlights?: GuestHighlight[];
+  notebooks?: Notebook[];
+  reflections?: Reflection[];
 }) {
   let savedList = [...(initial.saved ?? [])];
   let historyList = [...(initial.history ?? [])];
   let highlightList = [...(initial.highlights ?? [])];
+  let notebookList = [GENERAL, ...(initial.notebooks ?? [])];
+  let reflectionList = [...(initial.reflections ?? [])];
+  const kept = new Map<string, string[]>();
   return {
+    journal: () => ({ notebooks: [...notebookList], reflections: [...reflectionList] }),
+    removeReflections(ids: readonly string[]) {
+      reflectionList = reflectionList.filter((entry) => !ids.includes(entry.id));
+    },
+    removeNotebooks(ids: readonly string[]) {
+      notebookList = notebookList.filter((entry) => entry.isDefault || !ids.includes(entry.id));
+      reflectionList = reflectionList.map((entry) =>
+        ids.includes(entry.notebookId) ? { ...entry, notebookId: "general" } : entry,
+      );
+    },
+    keptReflections: (userId: string) => kept.get(userId) ?? [],
+    markKeptReflections(userId: string, ids: readonly string[]) {
+      kept.set(userId, [...(kept.get(userId) ?? []), ...ids]);
+    },
     highlights: () => [...highlightList],
     removeHighlights(ids: readonly string[]) {
       highlightList = highlightList.filter((entry) => !ids.includes(entry.id));
@@ -73,8 +130,26 @@ function fakeStore(initial: {
 
 /** An account on a fake server, enforcing the saved_verses unique key like the real table. */
 function fakeServer(
-  options: { user?: string | null; existingHistory?: string[]; highlights?: HighlightRow[] } = {},
+  options: {
+    user?: string | null;
+    existingHistory?: string[];
+    highlights?: HighlightRow[];
+    notebooks?: { id: string; name: string; isDefault: boolean }[];
+    reflections?: ReflectionRow[];
+  } = {},
 ) {
+  const accountNotebooks = [
+    ...(options.notebooks ?? [
+      { id: "acct-general", name: "General Reflections", isDefault: true },
+    ]),
+  ];
+  const insertedNotebooks: NotebookRow[] = [];
+  const reflectionRows = new Map<string, ReflectionRow>();
+  const reflectionKey = (row: ReflectionRow) =>
+    `${row.user_id}/${row.translation}/${row.book_id}/${row.chapter}/${row.verse}`;
+  for (const row of options.reflections ?? []) reflectionRows.set(reflectionKey(row), row);
+  let failReflectionsOnCall: number | null = null;
+  let reflectionCalls = 0;
   const savedRows = new Map<string, SavedRow>();
   const highlightRows = new Map<string, HighlightRow>();
   const highlightKey = (row: HighlightRow) =>
@@ -120,6 +195,30 @@ function fakeServer(
       for (const row of rows)
         if (!highlightRows.has(highlightKey(row))) highlightRows.set(highlightKey(row), row);
     }),
+    accountNotebooks: vi.fn(async () => [...accountNotebooks]),
+    insertNotebooks: vi.fn(async (rows: NotebookRow[]) => {
+      for (const row of rows) {
+        if (accountNotebooks.some((item) => item.id === row.id)) continue; // a retry
+        if (accountNotebooks.some((item) => item.name.toLowerCase() === row.name.toLowerCase()))
+          throw { code: "23505", message: "duplicate notebook name" };
+        accountNotebooks.push({ id: row.id, name: row.name, isDefault: false });
+        insertedNotebooks.push(row);
+      }
+    }),
+    insertReflections: vi.fn(async (rows: ReflectionRow[]) => {
+      reflectionCalls += 1;
+      if (reflectionCalls === failReflectionsOnCall) throw new Error("journal down");
+      // Insert-or-ignore on the one-per-verse key: the account's own note wins.
+      for (const row of rows) {
+        if (!accountNotebooks.some((item) => item.id === row.notebook_id))
+          throw new Error("foreign key: unknown notebook");
+        if (!reflectionRows.has(reflectionKey(row))) reflectionRows.set(reflectionKey(row), row);
+      }
+    }),
+    reflectionIds: vi.fn(
+      async (ids: string[]) =>
+        new Set([...reflectionRows.values()].map((row) => row.id).filter((id) => ids.includes(id))),
+    ),
   };
 
   return {
@@ -127,6 +226,13 @@ function fakeServer(
     savedRows,
     historyRows,
     highlightRows,
+    reflectionRows,
+    accountNotebooks,
+    insertedNotebooks,
+    failReflections(call: number | null) {
+      failReflectionsOnCall = call;
+      reflectionCalls = 0;
+    },
     failHighlights(call: number | null) {
       failHighlightsOnCall = call;
       highlightCalls = 0;
@@ -282,11 +388,12 @@ describe("mergeGuestLibrary", () => {
     const store = fakeStore({ history: [chapterVisit(2), viewed(5), chapterVisit(3)] });
     const server = fakeServer();
 
-    expect(mergeableCounts(store, false)).toEqual({
+    expect(mergeableCounts(store, { accountHistoryV2: false })).toEqual({
       saved: 0,
       history: 1,
       chapters: 0,
       highlights: 0,
+      reflections: 0,
       total: 1,
     });
     const result = await mergeGuestLibrary(USER, server.backend, store, {
@@ -315,11 +422,12 @@ describe("mergeGuestLibrary once account History holds chapters", () => {
     const store = fakeStore({ history: [chapterVisit(2), viewed(5), chapterVisit(3)] });
     const server = fakeServer();
 
-    expect(mergeableCounts(store, true)).toEqual({
+    expect(mergeableCounts(store, { accountHistoryV2: true })).toEqual({
       saved: 0,
       history: 1,
       chapters: 2,
       highlights: 0,
+      reflections: 0,
       total: 3,
     });
     const result = await mergeGuestLibrary(USER, server.backend, store, V2);
@@ -392,7 +500,9 @@ describe("mergeGuestLibrary with highlights", () => {
     const store = fakeStore({ highlights: [highlight(1, "sage"), highlight(2, "rose", "KJAV")] });
     const server = fakeServer();
 
-    expect(mergeableCounts(store, true, true)).toMatchObject({ highlights: 2, total: 2 });
+    expect(
+      mergeableCounts(store, { accountHistoryV2: true, accountHighlights: true }),
+    ).toMatchObject({ highlights: 2, total: 2 });
     const result = await mergeGuestLibrary(USER, server.backend, store, ON);
 
     expect(result).toMatchObject({ status: "done", highlightsAdded: 2, remaining: 0 });
@@ -476,12 +586,165 @@ describe("mergeGuestLibrary with highlights", () => {
   it("before the highlights table exists: doesn't offer or send highlights", async () => {
     const store = fakeStore({ highlights: [highlight(1)] });
     const server = fakeServer();
-    expect(mergeableCounts(store, true, false)).toMatchObject({ highlights: 0, total: 0 });
+    expect(
+      mergeableCounts(store, { accountHistoryV2: true, accountHighlights: false }),
+    ).toMatchObject({ highlights: 0, total: 0 });
     const result = await mergeGuestLibrary(USER, server.backend, store, {
       accountHighlights: false,
     });
     expect(result.status).toBe("nothing");
     expect(server.backend.insertHighlights).not.toHaveBeenCalled();
     expect(store.highlights()).toHaveLength(1);
+  });
+});
+
+describe("mergeGuestLibrary with the reflection journal", () => {
+  const ON = { accountJournal: true };
+  const R1 = "11111111-1111-4111-8111-111111111111";
+  const R2 = "22222222-2222-4222-8222-222222222222";
+  const R3 = "33333333-3333-4333-8333-333333333333";
+  const NB_PRAYER = "44444444-4444-4444-8444-444444444444";
+  const NB_SERMON = "55555555-5555-4555-8555-555555555555";
+
+  it("adds reflections with consent, joining General to General and keeping their dates", async () => {
+    const store = fakeStore({ reflections: [reflection(R1, 16), reflection(R2, 17)] });
+    const server = fakeServer();
+
+    expect(mergeableCounts(store, ON)).toMatchObject({ reflections: 2, total: 2 });
+    const result = await mergeGuestLibrary(USER, server.backend, store, ON);
+
+    expect(result).toMatchObject({ status: "done", reflectionsAdded: 2, reflectionsKept: 0 });
+    const rows = [...server.reflectionRows.values()];
+    expect(rows.map((row) => [row.id, row.user_id, row.notebook_id, row.verse])).toEqual([
+      [R1, USER, "acct-general", 16],
+      [R2, USER, "acct-general", 17],
+    ]);
+    expect(rows[0]).toMatchObject({
+      tags: ["#Faith"],
+      posture: "grateful",
+      created_at: "2026-03-01T10:00:00.000Z",
+      updated_at: "2026-03-02T10:00:00.000Z",
+    });
+    expect(store.journal().reflections).toEqual([]);
+  });
+
+  it("joins a device notebook to the account's notebook of the same name, and adds new ones by id", async () => {
+    const store = fakeStore({
+      notebooks: [notebook(NB_PRAYER, "prayer journal"), notebook(NB_SERMON, "Sermon Notes")],
+      reflections: [reflection(R1, 16, NB_PRAYER), reflection(R2, 17, NB_SERMON)],
+    });
+    const server = fakeServer({
+      notebooks: [
+        { id: "acct-general", name: "General Reflections", isDefault: true },
+        { id: "acct-prayer", name: "Prayer Journal", isDefault: false },
+      ],
+    });
+
+    await mergeGuestLibrary(USER, server.backend, store, ON);
+
+    expect(server.insertedNotebooks.map((row) => [row.id, row.name, row.user_id])).toEqual([
+      [NB_SERMON, "Sermon Notes", USER],
+    ]);
+    const byId = new Map([...server.reflectionRows.values()].map((row) => [row.id, row]));
+    expect(byId.get(R1)?.notebook_id).toBe("acct-prayer");
+    expect(byId.get(R2)?.notebook_id).toBe(NB_SERMON);
+    expect(store.journal().notebooks.map((item) => item.id)).toEqual(["general"]);
+  });
+
+  it("never overwrites an account note: the device's copy stays and isn't offered again", async () => {
+    const accountNote: ReflectionRow = {
+      id: "acct-note",
+      user_id: USER,
+      notebook_id: "acct-general",
+      translation: "KJAV",
+      book_id: "john",
+      chapter: 3,
+      verse: 16,
+      title: "",
+      body: "The account's own note",
+      tags: [],
+      posture: null,
+      is_private: true,
+      created_at: "2025-01-01T00:00:00.000Z",
+      updated_at: "2025-01-01T00:00:00.000Z",
+    };
+    const store = fakeStore({ reflections: [reflection(R1, 16), reflection(R2, 18)] });
+    const server = fakeServer({ reflections: [accountNote] });
+
+    const result = await mergeGuestLibrary(USER, server.backend, store, ON);
+
+    expect(result).toMatchObject({ status: "done", reflectionsAdded: 1, reflectionsKept: 1 });
+    expect([...server.reflectionRows.values()].find((row) => row.verse === 16)).toEqual(
+      accountNote,
+    );
+    expect(store.journal().reflections.map((item) => item.id)).toEqual([R1]);
+    // Not offered to this account again; still offered to someone else signing in on the device.
+    expect(mergeableCounts(store, { ...ON, userId: USER }).reflections).toBe(0);
+    expect(mergeableCounts(store, { ...ON, userId: "user-c" }).reflections).toBe(1);
+    expect(await mergeGuestLibrary(USER, server.backend, store, ON)).toMatchObject({
+      status: "nothing",
+    });
+  });
+
+  it("is retry-safe: an interrupted import finishes without duplicates", async () => {
+    const store = fakeStore({
+      notebooks: [notebook(NB_SERMON, "Sermon Notes")],
+      reflections: [reflection(R1, 16, NB_SERMON), reflection(R2, 17)],
+    });
+    const server = fakeServer();
+    server.failReflections(1);
+
+    const first = await mergeGuestLibrary(USER, server.backend, store, ON);
+    expect(first).toMatchObject({ status: "partial", reflectionsAdded: 0, error: "journal down" });
+    expect(store.journal().reflections).toHaveLength(2);
+    expect(store.journal().notebooks).toHaveLength(2);
+
+    server.failReflections(null);
+    const retry = await mergeGuestLibrary(USER, server.backend, store, ON);
+    expect(retry).toMatchObject({ status: "done", reflectionsAdded: 2 });
+    expect(server.reflectionRows.size).toBe(2);
+    expect(server.insertedNotebooks).toHaveLength(1);
+    expect(store.journal().reflections).toEqual([]);
+  });
+
+  it("aborts before writing to a different account, and stops if the account changes", async () => {
+    const store = fakeStore({ reflections: [reflection(R1, 16)] });
+    const other = fakeServer({ user: "user-b" });
+    expect(await mergeGuestLibrary(USER, other.backend, store, ON)).toMatchObject({
+      status: "aborted",
+    });
+    expect(other.backend.insertReflections).not.toHaveBeenCalled();
+
+    const switching = fakeServer();
+    vi.mocked(switching.backend.accountNotebooks).mockImplementationOnce(async () => {
+      switching.switchUser("user-b");
+      return [{ id: "acct-general", name: "General Reflections", isDefault: true }];
+    });
+    expect(await mergeGuestLibrary(USER, switching.backend, store, ON)).toMatchObject({
+      status: "partial",
+      error: "account changed",
+    });
+    expect(switching.backend.insertReflections).not.toHaveBeenCalled();
+    expect(store.journal().reflections).toHaveLength(1);
+  });
+
+  it("doesn't offer empty or oversized notes the account can't store", () => {
+    const empty = { ...reflection(R1, 16), title: " ", body: "  " };
+    const tooManyTags = {
+      ...reflection(R2, 17),
+      tags: Array.from({ length: 21 }, (_, i) => `#t${i}`),
+    };
+    const store = fakeStore({ reflections: [empty, tooManyTags, reflection(R3, 18)] });
+    expect(mergeableCounts(store, ON).reflections).toBe(1);
+  });
+
+  it("before the journal tables exist: doesn't offer or send reflections", async () => {
+    const store = fakeStore({ reflections: [reflection(R1, 16)] });
+    const server = fakeServer();
+    expect(mergeableCounts(store, { accountJournal: false }).reflections).toBe(0);
+    const result = await mergeGuestLibrary(USER, server.backend, store, { accountJournal: false });
+    expect(result.status).toBe("nothing");
+    expect(server.backend.accountNotebooks).not.toHaveBeenCalled();
+    expect(store.journal().reflections).toHaveLength(1);
   });
 });

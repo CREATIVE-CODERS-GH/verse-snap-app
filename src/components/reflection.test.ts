@@ -12,11 +12,12 @@ import {
   ReferenceCard,
   TagsSection,
 } from "@/components/reflection-parts";
-import { getReflectionSuggestions, SAMPLE_NOTEBOOKS } from "@/lib/bible/reflection-sample";
+import { getReflectionSuggestions } from "@/lib/bible/reflection-sample";
 import {
   applyFormat,
   countWords,
   normaliseTag,
+  plainNote,
   scriptureCitation,
   wordCountLabel,
 } from "@/lib/reflection-format";
@@ -72,6 +73,17 @@ describe("reflection formatting", () => {
   });
 });
 
+describe("plain note text (previews and search)", () => {
+  it("removes bold and italic markers but keeps the words and other underscores", () => {
+    expect(plainNote("be **transformed** by the _renewing_ of your mind")).toBe(
+      "be transformed by the renewing of your mind",
+    );
+    expect(plainNote("_Start_ here, then **stop**.")).toBe("Start here, then stop.");
+    expect(plainNote("see snake_case_name and 2 ** 3")).toBe("see snake_case_name and 2  3");
+    expect(plainNote("• a list item")).toBe("• a list item");
+  });
+});
+
 describe("reflection suggestions (sample content)", () => {
   it("uses the design's Romans 12:2 copy only for that verse", () => {
     expect(getReflectionSuggestions("romans", 12, 2).theme).toBe("Transformation & Discernment");
@@ -81,8 +93,8 @@ describe("reflection suggestions (sample content)", () => {
     expect(other.tags).not.toContain("#MindRenewal");
   });
 
-  it("invents no counts for notebooks", () => {
-    expect(JSON.stringify(SAMPLE_NOTEBOOKS)).not.toMatch(/\d+ reflections/);
+  it("suggests no notebooks: notebooks are the person's own", () => {
+    expect(getReflectionSuggestions("romans", 12, 2)).not.toHaveProperty("notebookId");
   });
 });
 
@@ -175,12 +187,21 @@ describe("reflection journal pieces (server-rendered markup)", () => {
 describe("reflection journal page", () => {
   const page = read("src/routes/reflect.$translation.$book.$chapter.$verse.tsx");
 
-  it("never claims a note was saved and stores nothing", () => {
-    expect(page).not.toMatch(
-      /Auto-saved|"Saved!?"|localStorage|sessionStorage|supabase|\.insert\(/,
-    );
+  it("saves only through the journal module, never touching storage or the database itself", () => {
+    expect(page).not.toMatch(/Auto-saved|localStorage|sessionStorage|supabase|\.insert\(/);
+    expect(page).toContain("journal.saveReflection(verseKey, vars.draft, vars.base, vars.userId)");
+    expect(page).toContain("journal.deleteReflection(vars.id, vars.userId)");
+  });
+
+  it("stays an honest preview where the journal can't be saved yet (signed in, not enabled)", () => {
+    expect(page).toContain("const persisted = journal.persists(user?.id);");
     expect(page).toContain("Not saved — the journal isn’t connected yet");
     expect(page).toContain("Preview · notes aren’t saved yet");
+  });
+
+  it("keeps the person's text when a save fails or meets a newer copy", () => {
+    expect(page).toContain("Couldn’t save — your reflection is still here");
+    expect(page).toContain("This note changed on another device. Your text is still here");
   });
 
   it("reuses the verse query and the browser dictation hook", () => {

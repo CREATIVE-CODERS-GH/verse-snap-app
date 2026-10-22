@@ -5,9 +5,6 @@
 // The browser must be opened with --disable-web-security so CORS preflights never leave it.
 import { readPublicEnv } from "./lib.mjs";
 
-const KEY = ["user_id", "translation", "book_id", "chapter", "verse"];
-const sameKey = (a, b) => KEY.every((column) => (a[column] ?? null) === (b[column] ?? null));
-
 export function supabaseTarget() {
   const url = readPublicEnv("VITE_SUPABASE_URL");
   if (!url) {
@@ -74,18 +71,76 @@ export async function mockSupabase(b, { origin, user }) {
   const server = {
     authUser: user, // who /auth/v1/user says is signed in
     failNextWrite: {}, // table -> number of upcoming writes that fail with a 500
-    tables: { saved_verses: [], history: [], highlights: [] },
+    tables: { saved_verses: [], history: [], highlights: [], notebooks: [], reflections: [] },
     writes: [], // { table, method, prefer, onConflict, query, rows }
     blocked: [],
+  };
+
+  // Unique keys per table, as in the migrations. A conflict on the request's on_conflict target is
+  // ignored or merged (per Prefer); a conflict on any other key is a 409, as in PostgreSQL.
+  const verseKey = (row) =>
+    `verse:${row.user_id}/${row.translation}/${row.book_id}/${row.chapter}/${row.verse ?? null}`;
+  const KEYS = {
+    notebooks: {
+      id: (row) => (row.id ? `id:${row.id}` : null),
+      name: (row) => `name:${row.user_id}/${String(row.name).toLowerCase()}`,
+      default: (row) => (row.is_default ? `default:${row.user_id}` : null),
+    },
+    reflections: { id: (row) => (row.id ? `id:${row.id}` : null), verse: verseKey },
+  };
+  const keysFor = (table) => KEYS[table] ?? { verse: verseKey };
+  const targetFor = (table, onConflict) =>
+    onConflict === "id" ? "id" : table === "notebooks" ? "id" : "verse";
+  const nowStamp = () => new Date().toISOString().replace("Z", "123+00:00");
+  const DEFAULTS = {
+    notebooks: () => ({ is_default: false }),
+    reflections: () => ({ title: "", body: "", tags: [], posture: null, is_private: true }),
+  };
+  const representation = (headers, rows) => {
+    const accept = headers.Accept ?? headers.accept ?? "";
+    if (accept.includes("vnd.pgrst.object")) {
+      return rows.length === 1
+        ? { status: 200, json: rows[0] }
+        : {
+            status: 406,
+            json: {
+              code: "PGRST116",
+              message: "JSON object requested, multiple (or no) rows returned",
+            },
+          };
+    }
+    return { status: 200, json: rows };
+  };
+  const violates = (table, row) => {
+    if (table === "reflections") {
+      if (!String(row.title ?? "").trim() && !String(row.body ?? "").trim())
+        return {
+          status: 400,
+          json: { code: "23514", message: "violates check constraint reflections_not_empty" },
+        };
+      const notebook = server.tables.notebooks.find(
+        (item) => item.id === row.notebook_id && item.user_id === row.user_id,
+      );
+      if (!notebook)
+        return {
+          status: 409,
+          json: {
+            code: "23503",
+            message: "violates foreign key constraint reflections_notebook_fkey",
+          },
+        };
+    }
+    return null;
   };
 
   function rest(method, table, url, headers, body) {
     const rows = server.tables[table];
     if (!rows) return { status: 404, json: { message: `no table ${table}` } };
     const params = [...url.searchParams.entries()];
-    if (method === "GET") return { status: 200, json: filterRows(rows, params) };
+    if (method === "GET") return representation(headers, filterRows(rows, params));
 
     const prefer = headers.Prefer ?? headers.prefer ?? "";
+    const wantRows = prefer.includes("return=representation");
     const incoming = body ? [].concat(JSON.parse(body)) : [];
     server.writes.push({
       table,
@@ -100,23 +155,79 @@ export async function mockSupabase(b, { origin, user }) {
       return { status: 500, json: { message: "simulated outage", code: "XX000" } };
     }
     if (method === "POST") {
-      for (const row of incoming) {
-        const existing = rows.find((item) => sameKey(item, row));
-        if (existing) {
+      const keys = keysFor(table);
+      const target = targetFor(table, url.searchParams.get("on_conflict"));
+      const written = [];
+      for (const raw of incoming) {
+        const row = {
+          ...(DEFAULTS[table]?.() ?? {}),
+          created_at: nowStamp(),
+          updated_at: nowStamp(),
+          ...raw,
+        };
+        if (row.verse === undefined && table !== "notebooks") row.verse = null;
+        const existingOnTarget = rows.find(
+          (item) => keys[target]?.(item) && keys[target](item) === keys[target](row),
+        );
+        if (existingOnTarget) {
           if (prefer.includes("ignore-duplicates")) continue;
           if (prefer.includes("merge-duplicates")) {
-            Object.assign(existing, row);
+            Object.assign(existingOnTarget, raw);
+            written.push(existingOnTarget);
             continue;
           }
           return { status: 409, json: { message: "duplicate key", code: "23505" } };
         }
-        rows.push({ id: `row-${rows.length + 1}-${Math.random().toString(36).slice(2)}`, ...row });
+        const clash = Object.entries(keys).some(([, key]) =>
+          rows.some((item) => key(row) && key(item) === key(row)),
+        );
+        if (clash)
+          return {
+            status: 409,
+            json: { message: "duplicate key value violates unique constraint", code: "23505" },
+          };
+        const problem = violates(table, row);
+        if (problem) return problem;
+        row.id ??= `${table}-${rows.length + 1}-${Math.random().toString(36).slice(2)}`;
+        rows.push(row);
+        written.push(row);
       }
-      return { status: 201 };
+      return wantRows ? representation(headers, written) : { status: 201 };
+    }
+    if (method === "PATCH") {
+      const matched = filterRows(rows, params);
+      const changes = incoming[0] ?? {};
+      for (const row of matched) {
+        const next = { ...row, ...changes };
+        const problem = violates(table, next);
+        if (problem) return problem;
+        Object.assign(row, changes);
+      }
+      return wantRows ? representation(headers, matched) : { status: 204 };
     }
     if (method === "DELETE") {
-      const doomed = new Set(filterRows(rows, params));
-      server.tables[table] = rows.filter((row) => !doomed.has(row));
+      const doomed = filterRows(rows, params);
+      if (table === "notebooks") {
+        // The migration's trigger: the default notebook can't be deleted; others hand their
+        // reflections to the owner's default notebook.
+        if (doomed.some((item) => item.is_default))
+          return {
+            status: 400,
+            json: { code: "P0001", message: "The default notebook can't be deleted" },
+          };
+        for (const notebook of doomed) {
+          const fallback = rows.find(
+            (item) => item.user_id === notebook.user_id && item.is_default,
+          );
+          for (const reflection of server.tables.reflections)
+            if (reflection.notebook_id === notebook.id) {
+              reflection.notebook_id = fallback.id;
+              reflection.updated_at = nowStamp();
+            }
+        }
+      }
+      const drop = new Set(doomed);
+      server.tables[table] = rows.filter((row) => !drop.has(row));
       return { status: 204 };
     }
     return { status: 200, json: [] };

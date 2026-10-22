@@ -179,6 +179,9 @@ function AuthSync() {
         queryClient.removeQueries({ queryKey: ["saved"] });
         queryClient.removeQueries({ queryKey: ["history"] });
         queryClient.removeQueries({ queryKey: ["highlights"] });
+        queryClient.removeQueries({ queryKey: ["notebooks"] });
+        queryClient.removeQueries({ queryKey: ["reflections"] });
+        queryClient.removeQueries({ queryKey: ["reflection"] });
       }
     });
     return () => data.subscription.unsubscribe();

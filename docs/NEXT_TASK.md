@@ -3,38 +3,24 @@
 *Update this file at the end of every milestone; it is the first thing a new session reads.*
 
 ## Current objective
-Add recovery actions to the **"Verse not found"** screen. Spec (from the user): keep illustration,
-type, colours, header; add under the description
+Turn on **account saving for the Reflection Journal** (Batch 1C, committed, `ACCOUNT_JOURNAL_ENABLED = false`).
+Each step needs explicit approval:
 
-1. Primary **"Speak Again"** (green brand button, microphone icon) → reopen the existing Say a Verse
-   voice screen (`/voice`); reuse it, no new mic code.
-2. Secondary **"Search Manually"** (outlined, search icon) → the existing reference search (`/search`).
-3. Description: "We couldn't find that Bible reference. Try speaking again or search for a different verse."
-4. Good mobile touch targets (≥44 px). Make the primary action context-aware where entry points differ.
-5. Focused tests for the actions and navigation. No commit/push/deploy until the user reviews.
+1. Isolated Supabase folder (`C:/vs-search-deploy`, linked to `shoztcflucpnfenohgcr`): add
+   `20261022000000_reflection_journal.sql`, `supabase db push --dry-run --include-all` must list exactly
+   that one file (it sorts before the applied `20261023…` search migrations).
+2. Logical backup, then apply only that file; run `supabase/verification/07` and `01` (last row: all pass).
+3. In a separate commit set `ACCOUNT_JOURNAL_ENABLED = true`; deploy to Preview; test with a signed-in
+   account (save, edit, delete, reload, second account cannot see it, guest merge, Reader row at 320px).
+4. Only then Production.
 
-## Findings so far (no code written yet)
-- "Verse not found" is rendered in two places: `src/routes/verse.$translation.$book.$chapter.$verse.tsx`
-  (~line 363, `StateMessage` with `NoResultsIllustration`, `action` slot already exists) and
-  `src/routes/reflect.$translation.$book.$chapter.$verse.tsx` (~line 768, `ErrorIllustration`).
-- `StateMessage`, `PILL_OUTLINE`, illustrations: `src/components/search-states.tsx`.
-- Voice is `src/routes/voice.tsx` (`autoListen`, `speechLanguage` preferences); it navigates to
-  `/verse/...` or `/search?q=`. Manual search is `src/routes/search.tsx`.
-- Decide: the reflect screen is entered from the reader, not by speaking — likely keep "Search Manually"
-  as primary there, or show both; confirm with the user if unclear.
+## Done and live
+- Free Bible Search (WEB/ASV/BSB) is on Production, controlled only by `FREE_SEARCH_ENABLED`.
+- "Verse not found" recovery actions and the Reader "Reflect" action (5 Reader actions).
 
-## Files likely relevant
-`src/components/search-states.tsx`, the two routes above, `src/components/stitch-icons.tsx`
-(mic/search icons exist). No test file covers search-states yet; add one in `src/components/` in the
-style of `reflection.test.ts` (server-rendered markup + route source checks).
-
-## Acceptance criteria
-Both buttons render in the not-found state with the new copy; "Speak Again" reaches `/voice`; "Search
-Manually" reaches `/search`; layout unchanged otherwise; dark mode correct; tests + `tsc` + lint pass.
+## Pending follow-up: Reflect screen
+`reflect.$translation.$book.$chapter.$verse.tsx` (invalid reference, `ErrorIllustration`) has no recovery
+action. It is entered from the reader, so "Search Manually" should be primary there.
 
 ## After that
-1. Review Batch 1C → approve journal migration → verify → enable `ACCOUNT_JOURNAL_ENABLED` → preview.
-2. Then pending items in `docs/PROJECT_STATUS.md` (Phase B needs separate approval).
-
-## Housekeeping
-Uncommitted Batch 1C work is in the tree: when pushing anything else, stage only that change's files.
+Pending items in `docs/PROJECT_STATUS.md` (Phase B needs separate approval).

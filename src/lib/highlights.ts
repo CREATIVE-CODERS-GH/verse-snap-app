@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ACCOUNT_HIGHLIGHTS_ENABLED } from "./highlights-schema";
+import { assertStillSignedInAs } from "./session-guard";
 
 /*
  * Verse highlights: one colour per verse, per translation (a highlight belongs to the edition it
@@ -79,16 +80,6 @@ export const guestHighlights = {
     writeGuest(readGuest().filter((entry) => !drop.has(entry.id)));
   },
 };
-
-/**
- * A write chosen by one person can run after they sign out or someone else signs in (writes are
- * queued). RLS already rejects a row for anyone but the signed-in owner; this also skips the
- * request entirely when the session no longer belongs to the person who made the change.
- */
-async function assertStillSignedInAs(userId: string): Promise<void> {
-  const { data } = await supabase.auth.getSession();
-  if (data.session?.user.id !== userId) throw new Error("account changed");
-}
 
 export const highlights = {
   /** Whether highlights are kept for this person: always for guests; accounts once enabled. */
