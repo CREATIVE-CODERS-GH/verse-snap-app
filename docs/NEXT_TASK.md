@@ -3,13 +3,15 @@
 *Update this file at the end of every milestone; it is the first thing a new session reads.*
 
 ## Current objective
-**Batch 1F — Offline Bible reading: inspected, awaiting approval to implement.** Findings and the
-recommended first version were reported to the owner; nothing is built. Summary: no service worker and no
-IndexedDB today (`OFFLINE_ENABLED = false`, `/sw.js` 404s); the reader keeps only the last 24 chapters in
-localStorage as a network-failure fallback. Recommended v1: IndexedDB store of whole translations
-(WEB, BSB, ASV; KJAV only if the owner clears the UK question) downloaded from HelloAO `complete.json`
-from Settings, read first by the reader, plus a minimal hand-written service worker for the app shell,
-behind `OFFLINE_ENABLED` with the existing kill switch, tested on a Preview first.
+**Batch 1F Stage 2 — offline app shell: pushed to the Preview branch, awaiting owner acceptance.** Stage 1 (IndexedDB
+downloads of WEB/ASV, popup controls, Reader fallback) is `708f502`/`acb866b`. Stage 2 adds a generated service
+worker (`scripts/sw/`, written into the build by `build-sw.mjs`; shipped only when `scripts/sw/flag.mjs` says so:
+Preview builds yes, Production no until `OFFLINE_IN_PRODUCTION` is flipped), a content-free `/offline-shell` route
+as the cached document, an offline note on Home, and the iPhone install guide (`install-guide.ts`: iOS Safari
+only, not standalone, not native via `VITE_NATIVE_APP`/Capacitor, remembered dismissal; independent of downloads
+and of the worker). Tests: `NITRO_PRESET=node-server OFFLINE_SW=1 npm run build` then `npm run test:e2e:offline-sw`
+(38 checks, cold offline with the server stopped). Next: real iPhone/Android check on the Preview, then decide
+whether to flip `OFFLINE_IN_PRODUCTION`.
 
 ## Done and live
 - Free Bible Search (WEB/ASV/BSB), Reflection Journal with account saving (Batch 1C), Reader improvements

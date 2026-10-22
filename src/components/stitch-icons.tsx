@@ -202,6 +202,23 @@ export function WifiIcon(props: IconProps) {
   );
 }
 
+export function WifiOffIcon(props: IconProps) {
+  return (
+    <Outline strokeWidth={2} {...props}>
+      <path d="M3 3l18 18M8.288 15.038a5.25 5.25 0 013.9-1.04M5.106 11.856a9.5 9.5 0 013.2-2.1M1.924 8.674a14.2 14.2 0 015.2-3.1M12.53 18.22l-.53.53-.53-.53a.75.75 0 011.06 0zM16.7 10.6a9.5 9.5 0 012.2 1.256M19.4 6.9a14.2 14.2 0 012.7 1.774" />
+    </Outline>
+  );
+}
+
+/** The Share button in Safari: a square with an arrow leaving it (Heroicons "arrow-up-on-square"). */
+export function ShareIosIcon(props: IconProps) {
+  return (
+    <Outline {...props}>
+      <path d="M9 8.25H7.5a2.25 2.25 0 00-2.25 2.25v9a2.25 2.25 0 002.25 2.25h9a2.25 2.25 0 002.25-2.25v-9A2.25 2.25 0 0016.5 8.25H15M12 3v12.75M8.25 6.75L12 3l3.75 3.75" />
+    </Outline>
+  );
+}
+
 export function ExclamationIcon(props: IconProps) {
   return (
     <Outline strokeWidth={3} {...props}>

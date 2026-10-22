@@ -8,6 +8,7 @@ import {
   Onboarding,
   resetOnboardingFromUrl,
 } from "@/components/onboarding";
+import { HomeNotices } from "@/components/home-notices";
 import { CameraIcon, GearIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
 import { trackEvent } from "@/lib/analytics";
 
@@ -79,6 +80,8 @@ function HomePage() {
           Instantly.
         </h2>
       </section>
+
+      <HomeNotices />
 
       <section className="mt-4 flex flex-1 flex-col gap-3.5 pb-2" aria-label="Ways to find a verse">
         <ActionCard

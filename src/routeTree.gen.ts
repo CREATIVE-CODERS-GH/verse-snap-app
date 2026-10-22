@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as BooksRouteImport } from './routes/books'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as OfflineShellRouteImport } from './routes/offline-shell'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as ScanRouteImport } from './routes/scan'
@@ -46,6 +47,11 @@ const BooksRoute = BooksRouteImport.update({
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfflineShellRoute = OfflineShellRouteImport.update({
+  id: '/offline-shell',
+  path: '/offline-shell',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
+  '/offline-shell': typeof OfflineShellRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/scan': typeof ScanRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
+  '/offline-shell': typeof OfflineShellRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/scan': typeof ScanRoute
@@ -171,6 +179,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/books': typeof BooksRoute
   '/history': typeof HistoryRoute
+  '/offline-shell': typeof OfflineShellRoute
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/scan': typeof ScanRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/books'
     | '/history'
+    | '/offline-shell'
     | '/reset-password'
     | '/saved'
     | '/scan'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/books'
     | '/history'
+    | '/offline-shell'
     | '/reset-password'
     | '/saved'
     | '/scan'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/books'
     | '/history'
+    | '/offline-shell'
     | '/reset-password'
     | '/saved'
     | '/scan'
@@ -254,6 +266,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BooksRoute: typeof BooksRoute
   HistoryRoute: typeof HistoryRoute
+  OfflineShellRoute: typeof OfflineShellRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
   ScanRoute: typeof ScanRoute
@@ -298,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offline-shell': {
+      id: '/offline-shell'
+      path: '/offline-shell'
+      fullPath: '/offline-shell'
+      preLoaderRoute: typeof OfflineShellRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -406,6 +426,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BooksRoute: BooksRoute,
   HistoryRoute: HistoryRoute,
+  OfflineShellRoute: OfflineShellRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
   ScanRoute: ScanRoute,

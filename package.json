@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/sw/build-sw.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -27,6 +27,7 @@
     "test:e2e:saved-hubs": "node scripts/e2e/saved-hubs.mjs",
     "test:e2e:cross-references": "node scripts/e2e/cross-references.mjs",
     "test:e2e:offline": "node scripts/e2e/offline.mjs",
+    "test:e2e:offline-sw": "node scripts/e2e/offline-sw.mjs",
     "test:e2e:journal-account": "node scripts/e2e/journal-account.mjs",
     "test:db:history": "node scripts/db/history-migration-test.mjs",
     "test:db:highlights": "node scripts/db/highlights-migration-test.mjs",
