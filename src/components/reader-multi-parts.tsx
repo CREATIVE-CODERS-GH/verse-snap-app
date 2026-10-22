@@ -60,7 +60,7 @@ export function NoteIconButton({ verse, onOpen }: { verse: number; onOpen: () =>
         onOpen();
       }}
       onKeyDown={(event) => event.stopPropagation()}
-      className="relative mx-1 inline-flex h-4 w-4 items-center justify-center align-[-0.2em] rounded-full text-ch-secondary after:absolute after:-inset-3.5 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
+      className="relative ml-1.5 inline-flex h-4 w-4 items-center justify-center align-[-0.2em] rounded-full text-ch-secondary after:absolute after:-inset-3.5 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ch-primary"
     >
       <EditNoteIcon className="h-3.5 w-3.5" aria-hidden />
     </button>

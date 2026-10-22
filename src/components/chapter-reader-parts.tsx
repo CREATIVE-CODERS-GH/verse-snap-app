@@ -235,7 +235,7 @@ interface VerseBlockProps {
   toolbar?: ReactNode;
   /** The row under the selected verse ("Active selection: v.2 …"). */
   selectionFooter?: ReactNode;
-  /** The saved-reflection icon, shown after the verse number. */
+  /** The saved-reflection icon, shown at the end of the verse. */
   noteNode?: ReactNode;
   /**
    * Choosing several verses: a long press (touch) or Ctrl/Cmd-click or Shift+Enter starts it; once
@@ -274,9 +274,9 @@ export function VerseBlock({
   const body = (
     <p className="relative">
       {dropCapNode ?? numberNode}
-      {noteNode}
       {chosen ? <span className="sr-only">(selected) </span> : null}
       {text}
+      {noteNode}
     </p>
   );
 
