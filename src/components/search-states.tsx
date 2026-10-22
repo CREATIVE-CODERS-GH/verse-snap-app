@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
   BookOpenIcon,
@@ -5,6 +6,8 @@ import {
   ExclamationIcon,
   HeartIcon,
   LightbulbIcon,
+  MicIcon,
+  SearchIcon,
   SearchOffIcon,
   SproutIcon,
   SunIcon,
@@ -167,6 +170,30 @@ export const PILL_PRIMARY =
   "inline-flex h-12 items-center justify-center gap-2 rounded-full bg-vs-primary px-6 text-sm font-semibold text-vs-on-primary shadow-sm transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95";
 export const PILL_OUTLINE =
   "inline-flex h-12 w-full max-w-[260px] items-center justify-center rounded-full border border-vs-border-strong text-sm font-medium text-vs-text transition-all hover:bg-vs-text/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95";
+
+export const NOT_FOUND_MESSAGE =
+  "We couldn't find that Bible reference. Try speaking again or search for a different verse.";
+
+/** Recovery actions for "Verse not found": reopen Say a Verse, or search by hand. */
+export function NotFoundActions({ onRetry }: { onRetry?: (() => void) | undefined }) {
+  return (
+    <div className="flex w-full max-w-[260px] flex-col items-stretch gap-3">
+      {onRetry ? (
+        <button type="button" className={PILL_OUTLINE} onClick={onRetry}>
+          Try again
+        </button>
+      ) : null}
+      <Link to="/voice" className={`${PILL_PRIMARY} w-full`}>
+        <MicIcon className="h-5 w-5" />
+        Speak Again
+      </Link>
+      <Link to="/search" className={`${PILL_OUTLINE} gap-2`}>
+        <SearchIcon className="h-5 w-5" />
+        Search Manually
+      </Link>
+    </div>
+  );
+}
 
 const SUGGESTION_ICONS: Record<SuggestionIcon, { icon: ReactNode; className: string }> = {
   droplet: { icon: <DropletIcon className="h-[15px] w-[15px]" />, className: "text-vs-primary" },

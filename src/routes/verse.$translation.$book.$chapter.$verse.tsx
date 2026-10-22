@@ -15,13 +15,16 @@ import {
   ERROR_TITLE_CLASS,
   ErrorIllustration,
   LoadingState,
+  NOT_FOUND_MESSAGE,
   NoResultsIllustration,
+  NotFoundActions,
   PILL_OUTLINE,
   StateMessage,
 } from "@/components/search-states";
 import {
   ArrowRightIcon,
   CopyDocIcon,
+  EditNoteIcon,
   PagesIcon,
   SaveBookmarkIcon,
   ShareNodesIcon,
@@ -342,6 +345,14 @@ function VersePage() {
                   onClick={handleListen}
                   disabled={!verse}
                 />
+                <ReaderAction
+                  label="Reflect"
+                  icon={<EditNoteIcon className="h-[19px] w-[19px]" />}
+                  onClick={() =>
+                    navigate({ to: "/reflect/$translation/$book/$chapter/$verse", params })
+                  }
+                  disabled={!verse}
+                />
               </div>
             </article>
           ) : networkProblem ? (
@@ -362,18 +373,12 @@ function VersePage() {
               illustration={<NoResultsIllustration />}
               title="Verse not found"
               action={
-                verseQuery.isError ? (
-                  <button
-                    type="button"
-                    className={PILL_OUTLINE}
-                    onClick={() => verseQuery.refetch()}
-                  >
-                    Try again
-                  </button>
-                ) : null
+                <NotFoundActions
+                  onRetry={verseQuery.isError ? () => verseQuery.refetch() : undefined}
+                />
               }
             >
-              {errorMessage}
+              {providerError?.kind === "translation" ? errorMessage : NOT_FOUND_MESSAGE}
             </StateMessage>
           )}
         </main>

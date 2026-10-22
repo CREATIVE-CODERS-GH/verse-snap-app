@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeftIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
-import { bibleService, type VerseRef } from "@/lib/bible/service";
+import { bibleService } from "@/lib/bible/service";
+import { referenceExists } from "@/lib/bible/reference-exists";
 import { classifyQuery } from "@/lib/bible/classify-query";
 import { routeQuery } from "@/lib/bible/search-router";
 import type { ParsedReference } from "@/lib/bible/parse-reference";
@@ -101,7 +102,7 @@ function VoicePage() {
   const [options, setOptions] = useState<VoiceOption[]>([]);
 
   const openReference = useCallback(
-    (reference: ParsedReference) => {
+    async (reference: ParsedReference) => {
       setState("processing");
       if (reference.verse === undefined) {
         navigate({
@@ -110,19 +111,23 @@ function VoicePage() {
         });
         return;
       }
-      const verseReference: VerseRef = {
-        bookId: reference.bookId,
-        bookName: reference.bookName,
-        chapter: reference.chapter,
-        verse: reference.verse,
-      };
+      // A verse number past the end of the chapter (Hebrews 5:25) stays here, so every
+      // unrecognised reference ends on this one recovery screen.
+      if (!(await referenceExists(reference, translation, bibleService.getVerse))) {
+        if (!mountedRef.current) return;
+        trackEvent("voice_search_failed", { reason: "verse_missing" });
+        setOptions([]);
+        setState("error");
+        setMessage(`${referenceLabel(reference)} doesn't exist in this translation.`);
+        return;
+      }
       navigate({
         to: "/verse/$translation/$book/$chapter/$verse",
         params: {
           translation,
-          book: verseReference.bookId,
-          chapter: String(verseReference.chapter),
-          verse: String(verseReference.verse),
+          book: reference.bookId,
+          chapter: String(reference.chapter),
+          verse: String(reference.verse),
         },
       });
     },
@@ -227,7 +232,7 @@ function VoicePage() {
       }
       if (valid.length === 1 && best.confidence >= 0.65) {
         trackEvent("voice_search_success", { kind: "reference" });
-        openReference(best.reference);
+        void openReference(best.reference);
         return;
       }
       setOptions(valid.slice(0, 3));
@@ -422,7 +427,7 @@ function VoicePage() {
               <li key={referenceLabel(option.reference)}>
                 <button
                   type="button"
-                  onClick={() => openReference(option.reference)}
+                  onClick={() => void openReference(option.reference)}
                   className="flex min-h-12 w-full items-center justify-between px-4 text-left text-[15px] font-medium transition-colors hover:bg-brand-surface-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-focus"
                 >
                   <span>{referenceLabel(option.reference)}</span>
@@ -453,16 +458,18 @@ function VoicePage() {
             </Link>
           </>
         ) : null}
-        <button
-          type="button"
-          onClick={() => {
-            stopRecognition(true);
-            goBack();
-          }}
-          className="w-full rounded-full bg-brand-surface-sunken py-3.5 text-[15px] font-semibold text-brand-text transition-colors hover:bg-brand-surface-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
-        >
-          Cancel
-        </button>
+        {failed || state === "ambiguous" ? null : (
+          <button
+            type="button"
+            onClick={() => {
+              stopRecognition(true);
+              goBack();
+            }}
+            className="w-full rounded-full bg-brand-surface-sunken py-3.5 text-[15px] font-semibold text-brand-text transition-colors hover:bg-brand-surface-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+          >
+            Cancel
+          </button>
+        )}
       </footer>
     </div>
   );
