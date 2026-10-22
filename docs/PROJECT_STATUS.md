@@ -1,6 +1,6 @@
 # Project status
 
-*Updated 2026-10-22. Branch `testing/vercel-mobile-preview`. Earlier phase checklist: `roadmap.md` (its
+*Updated 2026-10-22 (Batch 1E complete). Branch `testing/vercel-mobile-preview`. Earlier phase checklist: `roadmap.md` (its
 "Offline support" item is outdated — see Known issues).*
 
 ## Done
@@ -23,7 +23,7 @@
   highlight storage), saved-reflection note icons at the end of a verse with a dialog, Reflect action in
   the single-verse reader, Saved rebuilt as Verses / Notes / Highlights hubs (Stitch 31/33/34), the
   reflection verse card follows the Text Size settings. Deployed to Production by the owner.
-- **Batch 1E — Scripture cross-references (built, tested, on Preview for acceptance):** real data from
+- **Batch 1E — Scripture cross-references (complete; confirmed working on Production by the owner):** real data from
   HelloAO `open-cross-ref` (OpenBible.info, CC BY 4.0) fetched per chapter and cached; Explorer in Old /
   New Testament groups; chapter verse sheet chips and "Explore all (N)"; "Related passages (N)" link and
   reusable sheet in the single-verse reader; credit in the Explorer, the sheet and Settings → About. No
@@ -33,10 +33,10 @@
   free-search, reader-spacing, cross-references).
 
 ## In progress
-- Batch 1E Preview acceptance (see `docs/NEXT_TASK.md`).
+- Batch 1F (offline Bible reading): inspected, awaiting approval (see `docs/NEXT_TASK.md`).
 
 ## Pending / needs approval
-- Production deploy of Batch 1E (owner).
+- Production deploy of `115b59e` (out-of-range cross-reference handling) if not yet live — the last Production build checked was `994264a`.
 - Reflect screen: recovery actions for an invalid reference ("Search Manually" first).
 - Phase B search-index migration (`docs/audit/PHASE_B_PLAN.md`); AI search stays off.
 - KJAV for free search (UK rights); BBE/FBV licensing and UK KJV patent review.

@@ -97,6 +97,20 @@ async function fetchChapter(
   if (!Array.isArray(content))
     throw new BibleServiceError("provider", "The chapter text is unavailable.");
 
+  return chapterFromApiContent(ref, content, edition.code);
+}
+
+/**
+ * One chapter in the app's shape, from the API's chapter content. Shared by the chapter fetch and the
+ * offline download (which reads a whole translation file), so both give identical text.
+ */
+export function chapterFromApiContent(
+  ref: Omit<VerseRef, "verse">,
+  content: unknown[],
+  translationCode: string,
+): Chapter | null {
+  const localBook = findBook(ref.bookId);
+  if (!localBook) return null;
   const verses = content.flatMap((block): Verse[] => {
     if (!block || typeof block !== "object") return [];
     const item = block as { type?: unknown; number?: unknown; content?: unknown };
@@ -104,12 +118,12 @@ async function fetchChapter(
     const verseRef: VerseRef = { ...ref, bookName: localBook.name, verse: item.number };
     const text = assembleVerseText(item.content);
     return text
-      ? [{ ...verseRef, translation: edition.code, text, reference: formatReference(verseRef) }]
+      ? [{ ...verseRef, translation: translationCode, text, reference: formatReference(verseRef) }]
       : [];
   });
 
   return {
-    translation: edition.code,
+    translation: translationCode,
     bookId: localBook.id,
     bookName: localBook.name,
     chapter: ref.chapter,

@@ -32,6 +32,7 @@ import {
   VolumeIcon,
 } from "@/components/stitch-icons";
 import { CrossReferenceSheet } from "@/components/cross-reference-parts";
+import { OfflineSwitch } from "@/components/offline-switch";
 import { ShareSheet } from "@/components/share-sheet";
 import { TranslationSheet } from "@/components/translation-sheet";
 import { findBook } from "@/lib/bible/books";
@@ -377,9 +378,24 @@ function VersePage() {
               title="Connection problem"
               titleClassName={ERROR_TITLE_CLASS}
               action={
-                <button type="button" className={PILL_OUTLINE} onClick={() => verseQuery.refetch()}>
-                  Try again
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className={PILL_OUTLINE}
+                    onClick={() => verseQuery.refetch()}
+                  >
+                    Try again
+                  </button>
+                  <OfflineSwitch
+                    current={params.translation}
+                    onSwitch={(code) =>
+                      navigate({
+                        to: "/verse/$translation/$book/$chapter/$verse",
+                        params: { ...params, translation: code },
+                      })
+                    }
+                  />
+                </>
               }
             >
               {errorMessage}

@@ -28,6 +28,7 @@ import {
   StateMessage,
 } from "@/components/search-states";
 import { BookmarkIcon, EditNoteIcon, PaletteIcon, TuneIcon } from "@/components/stitch-icons";
+import { OfflineSwitch } from "@/components/offline-switch";
 import { ShareSheet } from "@/components/share-sheet";
 import { TranslationSheet } from "@/components/translation-sheet";
 import {
@@ -694,9 +695,20 @@ function ChapterPage() {
                 title="Connection problem"
                 titleClassName={ERROR_TITLE_CLASS}
                 action={
-                  <button type="button" className={PILL_OUTLINE} onClick={() => query.refetch()}>
-                    Try again
-                  </button>
+                  <>
+                    <button type="button" className={PILL_OUTLINE} onClick={() => query.refetch()}>
+                      Try again
+                    </button>
+                    <OfflineSwitch
+                      current={params.translation}
+                      onSwitch={(code) =>
+                        navigate({
+                          to: "/chapter/$translation/$book/$chapter",
+                          params: { ...params, translation: code },
+                        })
+                      }
+                    />
+                  </>
                 }
               >
                 {message}
