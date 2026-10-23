@@ -12,7 +12,6 @@ import {
 import { lazy, useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { GuestMergePrompt } from "@/components/guest-merge-prompt";
 import { OAuthReturnNotice } from "@/components/oauth-return-notice";
@@ -44,12 +43,6 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   const connection = isConnectionError(error);
-  useEffect(() => {
-    if (connection) return; // a lost connection is not a bug worth reporting
-    reportLovableError(error instanceof Error ? error : new Error(String(error)), {
-      boundary: "tanstack_root_error_component",
-    });
-  }, [error, connection]);
 
   const retry = () => {
     router.invalidate();

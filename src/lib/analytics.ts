@@ -24,11 +24,5 @@ export type AnalyticsEvent =
 
 type Metadata = Record<string, string | number | boolean>;
 
-export function trackEvent(event: AnalyticsEvent, metadata?: Metadata): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.__lovableEvents?.track?.(event, metadata);
-  } catch {
-    // Analytics must never interrupt the product.
-  }
-}
+// Events are intentionally not sent anywhere yet. Call sites stay so a privacy-reviewed sink can be added here.
+export function trackEvent(_event: AnalyticsEvent, _metadata?: Metadata): void {}
