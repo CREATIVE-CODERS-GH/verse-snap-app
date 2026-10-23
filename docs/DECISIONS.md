@@ -18,7 +18,12 @@ Short records of choices worth not re-litigating. Newest last. Longer write-ups:
   `updated_at` so an older copy never overwrites a newer one.
 - **Hebrews** is grouped with the General Epistles. Books page reveals a group's remaining books on
   scroll (no "more below" button).
-- **Service worker off** until offline support is designed (VitePWA removed).
+- **Offline:** service worker and IndexedDB downloads shipped in Batch 1F (Production on by `OFFLINE_IN_PRODUCTION`).
 - **Theme:** monochrome light/dark with brand accents; drop-cap chapter number on verse 1.
 - **Workflow:** commit/push only on request and only the relevant files; previews are not promoted;
   `docs/` carries session state to keep context small.
+- **Lovable retired (2026-10-23):** `testing/vercel-mobile-preview` is authoritative. Old `origin/main` (`c6caa12`) is
+  preserved as `archive/lovable-main` and tag `legacy/lovable-main-c6caa12` and is never merged. `main` will become
+  Production by a keep-our-tree merge (`-s ours`) then a plain fast-forward (no force-push); the testing branch stays
+  the Preview branch. `@lovable.dev/vite-tanstack-config` is kept for now; replacing it is a separate task. The old
+  Supabase project guard (`scripts/check-free-search-env.mjs`) stays.

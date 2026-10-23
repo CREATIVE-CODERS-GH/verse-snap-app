@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Lovable Dependencies
 
 Every coupling found, ordered by risk. "Safe replacement" assumes the Supabase migration in `SUPABASE_MIGRATION_PLAN.md`.

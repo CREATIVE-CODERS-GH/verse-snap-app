@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Supabase Migration Plan (revised)
 
 **Revision 2 — 2026-10-19.** Supersedes the original plan. *Proposal only; nothing has been executed.*

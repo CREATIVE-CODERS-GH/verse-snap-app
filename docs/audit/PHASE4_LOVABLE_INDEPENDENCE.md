@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Phase 4: Removing Lovable Dependencies
 
 *Read-only audit and plan, 2026-10-19. **No code, dependencies, database or Git state was changed.** Findings come from a repo-wide search (`lovable`, `gptengineer`, `~oauth`, `ai.gateway`), reading each file, and reading the installed `@lovable.dev/vite-tanstack-config@2.26.5` source in `node_modules`. Nothing below has been run.*

@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Phase 1: Data Migration Discovery
 
 *Date: 2026-10-19 · Status: discovery only. No production connection, no export, no SQL executed, no code or packages changed. Repo facts come from `supabase/migrations/*.sql` and `src/`. Lovable and Supabase process claims come from web research and are marked **[verify]** where I could not confirm them against Lovable's own documentation.*

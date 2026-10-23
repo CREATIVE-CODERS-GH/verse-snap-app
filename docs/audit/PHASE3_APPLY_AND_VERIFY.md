@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Phase 3: Apply and Verify the Schema on `verse-snap-dev`
 
 *Prepared 2026-10-19. **Nothing in this document has been executed.** No SQL has run against Supabase, Lovable Cloud was not touched, nothing was committed or pushed. SQL syntax has not been machine-validated (no `psql`, Docker or Supabase CLI on this machine); the first real run on the dev project is the validation, which is why the dev project is used as the rehearsal.*

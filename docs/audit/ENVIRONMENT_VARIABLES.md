@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Environment Variables, Runtime and Deployment Audit
 
 **No secret values were read.** Only variable *names* referenced in code are listed. No `.env` file exists in the working tree (`.gitignore` ignores `.env` and `*.local`), so how values reach the app today (Lovable-injected) is **unverified**.

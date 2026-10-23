@@ -1,7 +1,7 @@
 # Project status
 
-*Updated 2026-10-22 (Batch 1E complete). Branch `testing/vercel-mobile-preview`. Earlier phase checklist: `roadmap.md` (its
-"Offline support" item is outdated — see Known issues).*
+*Updated 2026-10-23 (Batch 1F complete; Lovable retirement in progress). Branch `testing/vercel-mobile-preview`. Earlier phase
+checklist: `roadmap.md` (historical).*
 
 ## Done
 - **Screens (Stitch designs):** onboarding, Home, Voice, Camera scan, Search, Books, chapter reader (verse
@@ -32,25 +32,23 @@
   suites in `scripts/e2e` (library, merge, smoke, highlights, journal, saved-hubs, reader-batch1d,
   free-search, reader-spacing, cross-references).
 
+- **Batch 1F — Offline Bible reading (complete; Production-tested by the owner):** IndexedDB downloads of WEB/ASV,
+  Reader fallback, offline app shell service worker, `/offline-shell`, iPhone install guide.
+
 ## In progress
-- Batch 1F (offline Bible reading): inspected, awaiting approval (see `docs/NEXT_TASK.md`).
+- Lovable retirement and `main` cutover (see `docs/NEXT_TASK.md`, `docs/DECISIONS.md`).
 
 ## Pending / needs approval
-- Production deploy of `115b59e` (out-of-range cross-reference handling) if not yet live — the last Production build checked was `994264a`.
 - Reflect screen: recovery actions for an invalid reference ("Search Manually" first).
-- Phase B search-index migration (`docs/audit/PHASE_B_PLAN.md`); AI search stays off.
+- Phase B remainder (`docs/audit/PHASE_B_PLAN.md`): router calibration, KJAV, credits, Romans verse map; AI search stays off.
 - KJAV for free search (UK rights); BBE/FBV licensing and UK KJV patent review.
-- Offline support (service worker disabled) — plan not approved.
 
 ## Known issues / risks
-- Offline service worker is **disabled** (`OFFLINE_ENABLED = false` in `pwa-register.ts`) after the
-  `/sw.js` 404; the roadmap's offline item is stale.
 - Signed-in Supabase flows are tested against a mock in CI; the owner has tested the account journal and
   privacy live on Production and Preview.
 - Cross-device sync is on page open/refocus, not realtime. Timestamps use the device clock.
-- `main` has diverged from this branch (12 commits, 5 conflicting files, including Search and Home);
-  Production has been deployed from this branch, not `main`. Merging may also make Lovable apply
-  migrations to the old project — avoid.
+- `origin/main` is the retired Lovable implementation (12 commits, 5 conflicting files); it is never merged.
+  Production is still built from this branch until the approved cutover (keep-our-tree merge + fast-forward).
 - Env vars `SUPABASE_*`, `RATE_LIMIT_SALT`, `AI_SEARCH_ENABLED`, `FREE_SEARCH_ENABLED`, `FREE_LIMIT_*` are
   shared by Production and Preview in Vercel; changing them affects both.
 - A Vercel deployment-protection bypass token was created by `vercel curl`; delete it in the project

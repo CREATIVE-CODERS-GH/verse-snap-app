@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — New Supabase Dev Project: Setup Instructions
 
 *Phase 2 preparation · nothing here has been run. Do the dashboard steps yourself; tell me when done and I'll take the next steps after you approve.*

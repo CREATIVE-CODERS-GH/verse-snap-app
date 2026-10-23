@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Feature Audit
 
 **Legend.** *Code-inspected* = read the code and believe it works. `tsc --noEmit` passed (exit 0). **No feature was run or exercised in a browser during this audit**, so nothing below is "tested". `src/lib/bible/helloao-provider.test.js` (a `bun:test` file) exists but was not run: there is no `test` script and bun was not invoked.

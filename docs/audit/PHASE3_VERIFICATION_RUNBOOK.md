@@ -1,3 +1,5 @@
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
+
 # Verse Snap — Phase 3 Verification Runbook (`shoztcflucpnfenohgcr`)
 
 *Prepared after `supabase db push` reported all four migrations applied. **Nothing here has been run by Claude.** No remote SQL executed, Lovable untouched, nothing committed or pushed.*
