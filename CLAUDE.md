@@ -1,7 +1,7 @@
 # Verse Snap — project instructions
 
 Mobile-first Bible utility: say, scan or type a reference and open the verse fast. Not an AI chatbot.
-Read `AGENTS.md` too (Lovable history rule, translation catalogue rule). Session state lives in
+Read `AGENTS.md` too (translation catalogue rule). Lovable is retired (`docs/DECISIONS.md`). Session state lives in
 `docs/` — read `docs/NEXT_TASK.md` first, `docs/PROJECT_STATUS.md` / `docs/DECISIONS.md` only if needed.
 
 ## Stack
@@ -29,13 +29,15 @@ when `VERCEL=1`; `vercel.json` uses `npm ci`). `routeTree.gen.ts` is generated �
 - Working copy is CRLF, repo is LF (`.gitattributes`). Use Edit/scripts that tolerate CRLF.
 
 ## Restrictions (permanent)
-- Supabase project is **`shoztcflucpnfenohgcr`**. Never touch the old Lovable project `pnugxqkdelknprbhejur`.
+- Supabase project is **`shoztcflucpnfenohgcr`**. The old Lovable project `pnugxqkdelknprbhejur` is retired: never use or touch it.
 - Never apply a migration, change RLS, or use the service-role key without explicit approval. Apply only
   the approved file (`supabase db push --dry-run` first); verify with `supabase/verification`.
 - Never print or commit secrets or `.env*`; don't edit `.env.local`. Keep `AI_SEARCH_ENABLED=false`;
   no live OpenAI calls or paid services.
-- Never force-push or rewrite pushed history; never touch `main` (Lovable syncs it); don't touch
-  `stash@{0}`. Work on `testing/vercel-mobile-preview`.
+- Never force-push or rewrite pushed history; never change or push to `main` without explicit approval;
+  don't touch `stash@{0}`. `main` becomes the official Production branch only after the approved cutover;
+  `testing/vercel-mobile-preview` stays the development and Preview branch. The old Lovable `main`
+  (`archive/lovable-main`, tag `legacy/lovable-main-c6caa12`) must never be merged into the app.
 - Commit / push / deploy **only when asked** ("push to github"). Stage only the files for that change.
 - Don't promote Vercel previews to Production. Don't restore intentionally removed UI sections.
 - Open items needing approval: Phase B search-index migration; BBE/FBV licensing and UK KJV review.
