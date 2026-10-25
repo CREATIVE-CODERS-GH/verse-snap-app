@@ -16,6 +16,8 @@ import { BottomNav } from "@/components/bottom-nav";
 import { ChapterToast } from "@/components/chapter-reader-parts";
 import { NoResultsIllustration, StateMessage } from "@/components/search-states";
 import {
+  ALL_GROUP_ID,
+  allGroupOf,
   BOOK_GROUPS,
   booksOfGroup,
   booksOfTestament,
@@ -65,7 +67,10 @@ function BooksPage() {
 
   const startBook = search.book ?? DEFAULT_BOOK;
   const [testament, setTestament] = useState<Testament>(groupOfBook(startBook)?.testament ?? "nt");
-  const [category, setCategory] = useState(groupOfBook(startBook)?.id ?? "gospels-acts");
+  // "All" is the default; a group is only preselected when the page opens on a book.
+  const [category, setCategory] = useState(
+    search.book ? (groupOfBook(search.book)?.id ?? ALL_GROUP_ID) : ALL_GROUP_ID,
+  );
   const [expandedId, setExpandedId] = useState<string | null>(search.book ?? null);
   const [selectedChapter, setSelectedChapter] = useState<number | null>(null);
   const [showAll, setShowAll] = useState(false);
@@ -107,7 +112,7 @@ function BooksPage() {
     const group = groupOfBook(bookId ?? DEFAULT_BOOK);
     if (group) {
       setTestament(group.testament);
-      setCategory(group.id);
+      setCategory(bookId ? group.id : ALL_GROUP_ID);
     }
     setExpandedId(bookId);
     setSelectedChapter(bookId && stored && stored.bookId === bookId ? stored.chapter : null);
@@ -115,8 +120,13 @@ function BooksPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const activeGroups = groupsOf(testament);
-  const activeGroup = BOOK_GROUPS.find((group) => group.id === category) ?? activeGroups[0]!;
+  const allGroup = useMemo(() => allGroupOf(testament), [testament]);
+  const activeGroups = useMemo(() => [allGroup, ...groupsOf(testament)], [allGroup, testament]);
+  const activeGroup =
+    category === ALL_GROUP_ID
+      ? allGroup
+      : (BOOK_GROUPS.find((group) => group.id === category && group.testament === testament) ??
+        allGroup);
   const searching = query.trim().length > 0;
   const books = useMemo(
     () => (searching ? searchBooks(query) : booksOfGroup(activeGroup)),
@@ -168,7 +178,10 @@ function BooksPage() {
   };
 
   const enterGroup = (testamentValue: Testament, groupId: string) => {
-    const group = BOOK_GROUPS.find((item) => item.id === groupId);
+    const group =
+      groupId === ALL_GROUP_ID
+        ? allGroupOf(testamentValue)
+        : BOOK_GROUPS.find((item) => item.id === groupId);
     if (!group) return;
     setTestament(testamentValue);
     setCategory(group.id);
@@ -216,8 +229,7 @@ function BooksPage() {
               value={testament}
               counts={counts}
               onChange={(next) => {
-                const first = groupsOf(next)[0];
-                if (first) enterGroup(next, first.id);
+                enterGroup(next, ALL_GROUP_ID);
                 setQuery("");
               }}
             />
