@@ -31,6 +31,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
+!.env.example
 
 # Supabase CLI local link state
 supabase/.temp/
@@ -41,3 +43,10 @@ evals/ai-search/results-*.json
 
 # Vercel build output and local project link
 .vercel
+
+# Design exports (Google Stitch HTML/CSS/screenshots, Figma exports) are reference material, not
+# app code. Keep them outside the repo; only the images the app actually uses live in public/.
+stitch-export/
+stitch-exports/
+design-exports/
+*.stitch.html

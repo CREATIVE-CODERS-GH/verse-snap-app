@@ -329,15 +329,6 @@ export function PersonIcon(props: IconProps) {
   );
 }
 
-export function QuillIcon(props: IconProps) {
-  return (
-    <Outline strokeWidth={1.8} {...props}>
-      <path d="M20 4c-6 0-11 3-13 9l-1.5 4.5L10 16c6-2 9-7 10-12z" />
-      <path d="M6.5 17.5L3 21M9 13l4 4" />
-    </Outline>
-  );
-}
-
 export function HubIcon(props: IconProps) {
   return (
     <Outline strokeWidth={1.8} {...props}>
@@ -366,14 +357,6 @@ export function PlayIcon(props: IconProps) {
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
       <path d="M8 5.5v13a1 1 0 001.5.86l10.4-6.5a1 1 0 000-1.72L9.5 4.64A1 1 0 008 5.5z" />
     </svg>
-  );
-}
-
-export function InfinityIcon(props: IconProps) {
-  return (
-    <Outline strokeWidth={2} {...props}>
-      <path d="M18.2 8.2c-2.6 0-4.1 2.2-6.2 3.8-2.1 1.6-3.6 3.8-6.2 3.8a3.8 3.8 0 010-7.6c2.6 0 4.1 2.2 6.2 3.8 2.1 1.6 3.6 3.8 6.2 3.8a3.8 3.8 0 000-7.6z" />
-    </Outline>
   );
 }
 

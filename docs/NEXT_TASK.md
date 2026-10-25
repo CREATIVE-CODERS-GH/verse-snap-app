@@ -13,8 +13,9 @@
   deployment from `main` succeeded and the app works in Production.
 - **Pending:** `main` branch protection (not configured). After the docs PR merges, sync
   `testing/vercel-mobile-preview` with `main`.
-- **Next development priority:** focused repository cleanup (unused Stitch references and the remaining
-  `@lovable.dev/vite-tanstack-config` dependency).
+- **Next development priority:** repository cleanup. Phase 1 (unused asset/icon/component removal, ignore rules) is on
+  `chore/repo-cleanup-phase1`; remaining: unused shadcn `ui/` files and their dependencies, then replacing
+  `@lovable.dev/vite-tanstack-config` (needs `vite.config.ts` + lockfile changes, separate approval).
 - **Housekeeping:** `prod/pre-main-cutover-306bf67` backup tag was never created; skip unless wanted.
 
 ## Done and live
