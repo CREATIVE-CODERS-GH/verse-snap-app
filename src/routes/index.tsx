@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ActionCard } from "@/components/action-card";
 import { AppShell } from "@/components/app-shell";
@@ -9,7 +9,7 @@ import {
   resetOnboardingFromUrl,
 } from "@/components/onboarding";
 import { HomeNotices } from "@/components/home-notices";
-import { CameraIcon, GearIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
+import { CameraIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
 import { trackEvent } from "@/lib/analytics";
 
 export const Route = createFileRoute("/")({
@@ -64,13 +64,6 @@ function HomePage() {
           <BrandMark className="h-7 w-7" />
           <h1 className="text-base font-semibold tracking-tight text-vs-text">Verse Snap</h1>
         </div>
-        <Link
-          to="/settings"
-          aria-label="Settings"
-          className="flex h-10 w-10 items-center justify-center rounded-md text-vs-text transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <GearIcon className="h-5 w-5" />
-        </Link>
       </header>
 
       <section className="pb-1 pt-4 text-center">
