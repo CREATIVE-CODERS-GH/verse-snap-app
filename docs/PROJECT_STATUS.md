@@ -1,6 +1,6 @@
 # Project status
 
-*Updated 2026-10-23 (Batch 1F complete; Lovable retirement in progress). Branch `testing/vercel-mobile-preview`. Earlier phase
+*Updated 2026-10-25 (Batch 1F complete; `main` cutover merged). `main` is Production; development continues on `testing/vercel-mobile-preview`. Earlier phase
 checklist: `roadmap.md` (historical).*
 
 ## Done
@@ -36,7 +36,11 @@ checklist: `roadmap.md` (historical).*
   Reader fallback, offline app shell service worker, `/offline-shell`, iPhone install guide.
 
 ## In progress
-- Lovable retirement and `main` cutover (see `docs/NEXT_TASK.md`, `docs/DECISIONS.md`).
+- Nothing in flight. Next: repository cleanup (Stitch references, `@lovable.dev/vite-tanstack-config`); `main` branch protection is pending (see `docs/NEXT_TASK.md`).
+
+## Recently completed
+- Lovable retired and `main` replaced by the Verse Snap app (PR #2, 2026-10-25); `main` is the GitHub default branch and the Vercel Production Branch; the first Production deployment succeeded.
+- Books page: "All" chip first in each testament, selected by default (PR #1).
 
 ## Pending / needs approval
 - Reflect screen: recovery actions for an invalid reference ("Search Manually" first).
@@ -47,8 +51,8 @@ checklist: `roadmap.md` (historical).*
 - Signed-in Supabase flows are tested against a mock in CI; the owner has tested the account journal and
   privacy live on Production and Preview.
 - Cross-device sync is on page open/refocus, not realtime. Timestamps use the device clock.
-- `origin/main` is the retired Lovable implementation (12 commits, 5 conflicting files); it is never merged.
-  Production is still built from this branch until the approved cutover (keep-our-tree merge + fast-forward).
+- The old Lovable `main` (`c6caa12`) is kept only as `archive/lovable-main` and tag `legacy/lovable-main-c6caa12`;
+  it is never merged into the app. `main` is the Production branch (GitHub default and Vercel Production Branch).
 - Env vars `SUPABASE_*`, `RATE_LIMIT_SALT`, `AI_SEARCH_ENABLED`, `FREE_SEARCH_ENABLED`, `FREE_LIMIT_*` are
   shared by Production and Preview in Vercel; changing them affects both.
 - A Vercel deployment-protection bypass token was created by `vercel curl`; delete it in the project

@@ -3,16 +3,19 @@
 *Update this file at the end of every milestone; it is the first thing a new session reads.*
 
 ## Current objective
-**Retire Lovable and make `main` the Production branch.** Approved plan (staged); the application on
-`testing/vercel-mobile-preview` is authoritative and the old Lovable `main` (`c6caa12`) is never merged.
-- **Stage A (done locally, awaiting owner review, not committed):** Lovable cleanup (`.lovable/`, Bun files,
-  Lovable notes in AGENTS/README, error-reporting hook, `supabase/config.toml` project id), docs updated.
-  `@lovable.dev/vite-tanstack-config` stays for now (replacing it is a separate task).
-- **Backups:** local branch `archive/lovable-main` and tag `legacy/lovable-main-c6caa12` exist at `c6caa12` and are pushed to origin;
-  `prod/pre-main-cutover-306bf67` waits until the live Production commit is confirmed.
-- **Next:** owner reviews Stage A -> push backups -> commit/push cleanup -> branch from tip with
-  `git merge -s ours origin/main` (tree must equal the tip) -> fast-forward `main` -> owner switches the GitHub
-  default branch and the Vercel Production Branch to `main`, then protects `main`.
+**Repository cleanup, then resume Phase B.** The Production cutover is complete: PR #2 merged
+2026-10-25 (`a9f8908`), so `main` now holds the Verse Snap application (tree identical to the former
+`testing/vercel-mobile-preview` tip `e76f824`) and keeps the old Lovable history as a parent.
+- **Branch ownership:** `main` = Production and the GitHub default branch. `testing/vercel-mobile-preview` =
+  development and Preview. Lovable is retired; its old `main` (`c6caa12`) lives only at `archive/lovable-main` and tag
+  `legacy/lovable-main-c6caa12` and is never merged into the app.
+- **Confirmed by the owner:** GitHub default branch is `main`; Vercel Production Branch is `main`; the first Production
+  deployment from `main` succeeded and the app works in Production.
+- **Pending:** `main` branch protection (not configured). After the docs PR merges, sync
+  `testing/vercel-mobile-preview` with `main`.
+- **Next development priority:** focused repository cleanup (unused Stitch references and the remaining
+  `@lovable.dev/vite-tanstack-config` dependency).
+- **Housekeeping:** `prod/pre-main-cutover-306bf67` backup tag was never created; skip unless wanted.
 
 ## Done and live
 - Free Bible Search (WEB/ASV/BSB), Reflection Journal (1C), Reader improvements and Saved hubs (1D),
