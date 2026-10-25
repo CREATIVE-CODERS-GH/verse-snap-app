@@ -1,9 +1,6 @@
-# Roadmap
+> **Historical (2026-10-23).** Written while the app was still connected to Lovable. Lovable is retired; the current workflow is in `CLAUDE.md` and `docs/DECISIONS.md`. Kept for the record; details may be outdated.
 
-## Smarter Bible search
-- [x] Build a full-text lookup index from the enabled AO Lab editions
-- [x] Combine typo-tolerant phrase matching with verified semantic candidates
-- [x] Test remembered wording, misspellings, topical searches, and direct references
+# Roadmap
 
 ## Additional Bible versions
 - [x] Enable complete public-domain English BSB, WEB, ASV, and BBE editions alongside KJAV

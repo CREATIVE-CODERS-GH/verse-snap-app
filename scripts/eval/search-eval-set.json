@@ -1,0 +1,715 @@
+{
+  "schema": 1,
+  "measurement": "Each query has author-written expectations (written from knowledge of the texts BEFORE the first run; any later change is recorded in 'revised'). A query PASSES when every stated expectation holds. hit@10 = share of queries with a 'verses' expectation whose expected verse(s) appear in the first 10 results (all of them when mode is 'all', one of them when 'any'). MRR@25 = mean over the same queries of 1/rank of the first expected verse among the first 25 results (0 if absent). These measure whether specific, known verses are found; they are NOT a general relevance score and the set is small (author-chosen, not sampled from real users).",
+  "queries": [
+    {
+      "id": "p01",
+      "category": "exact phrase",
+      "query": "for God so loved the world",
+      "expect": {
+        "verses": [
+          { "ref": "JHN 3:16", "editions": ["WEB"] },
+          { "ref": "JHN 3:16", "editions": ["BSB"] },
+          { "ref": "JHN 3:16", "editions": ["ASV"] }
+        ],
+        "mode": "all"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "p02",
+      "category": "exact phrase",
+      "query": "In the beginning God created the heavens and the earth",
+      "expect": {
+        "verses": [
+          { "ref": "GEN 1:1", "editions": ["WEB"] },
+          { "ref": "GEN 1:1", "editions": ["BSB"] },
+          { "ref": "GEN 1:1", "editions": ["ASV"] }
+        ],
+        "mode": "all"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "p03",
+      "category": "exact phrase",
+      "query": "Jesus wept",
+      "expect": {
+        "verses": [
+          { "ref": "JHN 11:35", "editions": ["WEB"] },
+          { "ref": "JHN 11:35", "editions": ["BSB"] },
+          { "ref": "JHN 11:35", "editions": ["ASV"] }
+        ],
+        "mode": "all"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "p04",
+      "category": "exact phrase",
+      "query": "The LORD is my shepherd",
+      "expect": { "verses": [{ "ref": "PSA 23:1", "editions": ["BSB", "WEB"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p05",
+      "category": "exact phrase",
+      "query": "be still and know that I am God",
+      "expect": { "verses": [{ "ref": "PSA 46:10" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p06",
+      "category": "exact phrase",
+      "query": "love is patient and kind",
+      "expect": { "verses": [{ "ref": "1CO 13:4", "editions": ["WEB", "BSB"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p07",
+      "category": "exact phrase",
+      "query": "I can do all things through Christ who strengthens me",
+      "expect": { "verses": [{ "ref": "PHP 4:13" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p08",
+      "category": "exact phrase",
+      "query": "Let there be light",
+      "expect": {
+        "verses": [
+          { "ref": "GEN 1:3", "editions": ["WEB"] },
+          { "ref": "GEN 1:3", "editions": ["BSB"] },
+          { "ref": "GEN 1:3", "editions": ["ASV"] }
+        ],
+        "mode": "all"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "p09",
+      "category": "exact phrase",
+      "query": "the LORD is my light and my salvation",
+      "expect": { "verses": [{ "ref": "PSA 27:1" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p10",
+      "category": "exact phrase",
+      "query": "faith, hope, and love",
+      "expect": { "verses": [{ "ref": "1CO 13:13" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p11",
+      "category": "exact phrase",
+      "query": "with God all things are possible",
+      "expect": { "verses": [{ "ref": "MAT 19:26" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p12",
+      "category": "exact phrase",
+      "query": "a time to be born and a time to die",
+      "expect": { "verses": [{ "ref": "ECC 3:2" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p13",
+      "category": "different translation wording",
+      "query": "Do not be anxious about anything",
+      "expect": { "verses": [{ "ref": "PHP 4:6" }], "mode": "any" },
+      "limitation": "NIV wording; BSB reads 'Be anxious for nothing', so no edition has these words together",
+      "baseline": "fail"
+    },
+    {
+      "id": "p14",
+      "category": "exact phrase",
+      "query": "Trust in the LORD with all your heart",
+      "expect": { "verses": [{ "ref": "PRO 3:5", "editions": ["WEB", "BSB"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p15",
+      "category": "exact phrase",
+      "query": "Ask and it will be given to you",
+      "expect": { "verses": [{ "ref": "MAT 7:7" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p16",
+      "category": "exact phrase",
+      "query": "The wages of sin is death",
+      "expect": { "verses": [{ "ref": "ROM 6:23" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p17",
+      "category": "exact phrase",
+      "query": "Seek first the kingdom of God",
+      "expect": { "verses": [{ "ref": "MAT 6:33" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "p18",
+      "category": "exact phrase",
+      "query": "I am the way, the truth, and the life",
+      "expect": { "verses": [{ "ref": "JHN 14:6" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "k01",
+      "category": "single keyword",
+      "query": "shepherd",
+      "expect": { "minTotal": 100, "minEditionsInTop10": 2 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k02",
+      "category": "single keyword",
+      "query": "grace",
+      "expect": { "minTotal": 300, "maxTotal": 600 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k03",
+      "category": "single keyword",
+      "query": "Selah",
+      "expect": { "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k04",
+      "category": "single keyword",
+      "query": "manna",
+      "expect": { "verses": [{ "ref": "EXO 16:31" }], "mode": "any", "topN": 25 },
+      "limitation": "Single-keyword results are ordered by length-normalised term frequency, not by prominence: a famous verse can sit beyond the first 25 of 48 matches",
+      "baseline": "fail"
+    },
+    {
+      "id": "k05",
+      "category": "single keyword",
+      "query": "covenant",
+      "expect": { "minTotal": 500 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k06",
+      "category": "single keyword",
+      "query": "forgiveness",
+      "expect": { "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k07",
+      "category": "single keyword",
+      "query": "wilderness",
+      "expect": { "minTotal": 300 },
+      "baseline": "pass"
+    },
+    {
+      "id": "k08",
+      "category": "single keyword",
+      "query": "hallelujah",
+      "expect": { "verses": [{ "ref": "REV 19:1" }], "mode": "any", "topN": 25 },
+      "limitation": "Same: 36 matches in three editions, ordered by verse length, not prominence",
+      "baseline": "fail"
+    },
+    {
+      "id": "m01",
+      "category": "multiple keywords",
+      "query": "peace understanding hearts",
+      "expect": {
+        "verses": [
+          { "ref": "PHP 4:7", "editions": ["WEB"] },
+          { "ref": "PHP 4:7", "editions": ["BSB"] },
+          { "ref": "PHP 4:7", "editions": ["ASV"] }
+        ],
+        "mode": "all"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "m02",
+      "category": "multiple keywords",
+      "query": "faith works dead",
+      "expect": { "verses": [{ "ref": "JAS 2:17" }, { "ref": "JAS 2:26" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "m03",
+      "category": "multiple keywords",
+      "query": "wise men east",
+      "expect": { "verses": [{ "ref": "MAT 2:1" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "m04",
+      "category": "multiple keywords",
+      "query": "water wine wedding",
+      "expect": {
+        "verses": [{ "ref": "JHN 2:1" }, { "ref": "JHN 2:2" }, { "ref": "JHN 2:9" }],
+        "mode": "any"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "m05",
+      "category": "multiple keywords",
+      "query": "camel needle eye",
+      "expect": { "verses": [{ "ref": "MAT 19:24" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "m06",
+      "category": "multiple keywords",
+      "query": "rich man kingdom heaven",
+      "expect": { "verses": [{ "ref": "MAT 19:23" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "n01",
+      "category": "biblical name",
+      "query": "Melchizedek",
+      "expect": { "verses": [{ "ref": "GEN 14:18" }], "mode": "any", "topN": 25 },
+      "baseline": "pass"
+    },
+    {
+      "id": "n02",
+      "category": "biblical name",
+      "query": "Nebuchadnezzar",
+      "expect": { "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "n03",
+      "category": "biblical name",
+      "query": "Zacchaeus",
+      "expect": {
+        "verses": [{ "ref": "LUK 19:2" }, { "ref": "LUK 19:5" }, { "ref": "LUK 19:8" }],
+        "mode": "any"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "n04",
+      "category": "biblical name",
+      "query": "Bartimaeus",
+      "expect": { "verses": [{ "ref": "MRK 10:46" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "n05",
+      "category": "biblical name",
+      "query": "Jehovah",
+      "expect": { "onlyEditions": ["ASV"], "minTotal": 1000 },
+      "baseline": "pass"
+    },
+    {
+      "id": "n06",
+      "category": "biblical name",
+      "query": "Beelzebub",
+      "expect": { "verses": [{ "ref": "MAT 12:24" }], "mode": "any", "topN": 25 },
+      "baseline": "pass"
+    },
+    {
+      "id": "n07",
+      "category": "biblical name",
+      "query": "Mephibosheth",
+      "expect": { "verses": [{ "ref": "2SA 9:6" }], "mode": "any", "topN": 25 },
+      "baseline": "pass"
+    },
+    {
+      "id": "a01",
+      "category": "archaic wording",
+      "query": "thou shalt not kill",
+      "expect": {
+        "verses": [{ "ref": "EXO 20:13", "editions": ["ASV"] }],
+        "mode": "any",
+        "onlyEditions": ["ASV"]
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "a02",
+      "category": "archaic wording",
+      "query": "Abraham begat Isaac",
+      "expect": { "verses": [{ "ref": "MAT 1:2", "editions": ["ASV"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "a03",
+      "category": "archaic wording",
+      "query": "whosoever believeth on him",
+      "expect": { "verses": [{ "ref": "JHN 3:16", "editions": ["ASV"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "a04",
+      "category": "archaic wording",
+      "query": "verily verily I say unto thee",
+      "expect": { "verses": [{ "ref": "JHN 3:3", "editions": ["ASV"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "a05",
+      "category": "archaic wording",
+      "query": "love suffereth long",
+      "expect": {
+        "verses": [{ "ref": "1CO 13:4", "editions": ["ASV"] }],
+        "mode": "any",
+        "onlyEditions": ["ASV"]
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "a06",
+      "category": "different translation wording",
+      "query": "charity suffereth long",
+      "expect": { "verses": [{ "ref": "1CO 13:4", "editions": ["ASV"] }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "a07",
+      "category": "archaic wording",
+      "query": "hearken",
+      "expect": { "minTotal": 50, "minEditionsInTop10": 1 },
+      "baseline": "pass"
+    },
+    {
+      "id": "a08",
+      "category": "archaic wording",
+      "query": "peradventure",
+      "expect": { "onlyEditions": ["ASV"], "minTotal": 20 },
+      "baseline": "pass"
+    },
+    {
+      "id": "a09",
+      "category": "archaic wording",
+      "query": "wherefore",
+      "expect": { "minTotal": 200 },
+      "baseline": "pass"
+    },
+    {
+      "id": "a10",
+      "category": "archaic wording",
+      "query": "Comforter",
+      "expect": {
+        "verses": [{ "ref": "JHN 14:26", "editions": ["ASV"] }],
+        "mode": "any",
+        "onlyEditions": ["ASV"]
+      },
+      "limitation": "The English stemmer maps Comforter, comfort and comforted to one word, so exact archaic forms are not preferred; ASV John 14:26 is among 267 matches",
+      "baseline": "fail"
+    },
+    {
+      "id": "t01",
+      "category": "misspelling",
+      "query": "sheperd",
+      "expect": { "corrected": "shepherd", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t02",
+      "category": "misspelling",
+      "query": "forgivness",
+      "expect": { "corrected": "forgiveness", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t03",
+      "category": "misspelling",
+      "query": "righteousnes",
+      "expect": { "corrected": "righteousness", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t04",
+      "category": "misspelling",
+      "query": "resurection",
+      "expect": { "corrected": "resurrection", "minTotal": 50 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t05",
+      "category": "misspelling",
+      "query": "Nebuchadnezer",
+      "expect": { "corrected": "nebuchadnezzar", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t06",
+      "category": "misspelling",
+      "query": "begoten Son",
+      "expect": {
+        "corrected": "begotten Son",
+        "verses": [{ "ref": "JHN 3:16", "editions": ["ASV"] }],
+        "mode": "any"
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "t07",
+      "category": "misspelling",
+      "query": "Jeruselem",
+      "expect": { "corrected": "jerusalem", "minTotal": 500 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t08",
+      "category": "misspelling",
+      "query": "Pharoah",
+      "expect": { "corrected": "pharaoh", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t09",
+      "category": "misspelling",
+      "query": "Isreal",
+      "expect": { "corrected": "israel", "minTotal": 500 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t10",
+      "category": "misspelling",
+      "query": "beleive",
+      "expect": { "corrected": "believe", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t11",
+      "category": "misspelling",
+      "query": "tounge",
+      "expect": { "corrected": "tongue", "minTotal": 50 },
+      "limitation": "Not repaired correctly: tounge to lounge (one edit) beats tongue (two edits). Weighing frequency against distance was tried and was worse (young, offer)",
+      "baseline": "fail"
+    },
+    {
+      "id": "t12",
+      "category": "misspelling",
+      "query": "salavation",
+      "expect": { "corrected": "salvation", "minTotal": 100 },
+      "baseline": "pass"
+    },
+    {
+      "id": "t13",
+      "category": "misspelling",
+      "query": "commandements",
+      "expect": { "corrected": "commandments", "minTotal": 50 },
+      "baseline": "pass"
+    },
+    {
+      "id": "w01",
+      "category": "modern wording",
+      "query": "smartphone",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w02",
+      "category": "modern wording",
+      "query": "computer",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w03",
+      "category": "modern wording",
+      "query": "internet",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w04",
+      "category": "modern wording",
+      "query": "coffee",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w05",
+      "category": "modern wording",
+      "query": "pizza",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w06",
+      "category": "modern wording",
+      "query": "electricity",
+      "expect": { "emptyOrCorrected": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "w07",
+      "category": "modern wording",
+      "query": "anxiety and worry",
+      "expect": { "minTotal": 5 },
+      "baseline": "pass"
+    },
+    {
+      "id": "z01",
+      "category": "no matches",
+      "query": "zeppelin submarine",
+      "expect": { "empty": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "z02",
+      "category": "no matches",
+      "query": "xqzvwk",
+      "expect": { "route": "nonsense" },
+      "baseline": "pass"
+    },
+    {
+      "id": "z03",
+      "category": "no matches",
+      "query": "qwerty asdf zxcv",
+      "expect": { "route": "nonsense" },
+      "baseline": "pass"
+    },
+    {
+      "id": "z04",
+      "category": "no matches",
+      "query": "the and of",
+      "expect": { "empty": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "z05",
+      "category": "no matches",
+      "query": "a",
+      "expect": { "route": "refine" },
+      "baseline": "pass"
+    },
+    {
+      "id": "x01",
+      "category": "many matches",
+      "query": "God",
+      "expect": { "minTotal": 1026, "limitReached": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "x02",
+      "category": "many matches",
+      "query": "the LORD said",
+      "expect": { "minTotal": 1026, "limitReached": true },
+      "baseline": "pass"
+    },
+    {
+      "id": "x03",
+      "category": "many matches",
+      "query": "love",
+      "expect": { "minTotal": 500 },
+      "baseline": "pass"
+    },
+    {
+      "id": "x04",
+      "category": "many matches",
+      "query": "Jesus",
+      "expect": { "minTotal": 1000 },
+      "baseline": "pass"
+    },
+    {
+      "id": "r01",
+      "category": "scripture reference",
+      "query": "John 3:16",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r02",
+      "category": "scripture reference",
+      "query": "Psalm 23",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r03",
+      "category": "scripture reference",
+      "query": "1 Cor 13:4",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r04",
+      "category": "scripture reference",
+      "query": "go to Ruth",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r05",
+      "category": "scripture reference",
+      "query": "Phillipians 4:13",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r06",
+      "category": "scripture reference",
+      "query": "John 3:16 BSB",
+      "expect": { "route": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "r07",
+      "category": "scripture reference",
+      "query": "Hezekiah 3:16",
+      "expect": { "notRoute": "reference" },
+      "baseline": "pass"
+    },
+    {
+      "id": "d01",
+      "category": "different translation wording",
+      "query": "you shall not murder",
+      "expect": {
+        "verses": [
+          { "ref": "EXO 20:13", "editions": ["WEB"] },
+          { "ref": "EXO 20:13", "editions": ["BSB"] }
+        ],
+        "mode": "all",
+        "notVerses": [{ "ref": "EXO 20:13", "editions": ["ASV"] }]
+      },
+      "baseline": "pass"
+    },
+    {
+      "id": "d02",
+      "category": "different translation wording",
+      "query": "he gave his only begotten Son",
+      "expect": {
+        "verses": [{ "ref": "JHN 3:16", "editions": ["ASV"] }],
+        "mode": "any",
+        "notVerses": [
+          { "ref": "JHN 3:16", "editions": ["WEB"] },
+          { "ref": "JHN 3:16", "editions": ["BSB"] }
+        ]
+      },
+      "revised": "Expectation corrected after inspecting the text: BSB John 3:16 reads \"one and only Son\", not \"only begotten Son\" (my memory was wrong). Only ASV has these words.",
+      "baseline": "pass"
+    },
+    {
+      "id": "d03",
+      "category": "different translation wording",
+      "query": "born of water and the Spirit",
+      "expect": { "verses": [{ "ref": "JHN 3:5" }], "mode": "any" },
+      "baseline": "pass"
+    },
+    {
+      "id": "f01",
+      "category": "edition filter",
+      "query": "shepherd",
+      "editions": ["BSB"],
+      "expect": { "onlyEditions": ["BSB"], "minTotal": 30 },
+      "baseline": "pass"
+    },
+    {
+      "id": "f02",
+      "category": "edition filter",
+      "query": "thou shalt not kill",
+      "editions": ["WEB"],
+      "expect": { "onlyEditions": ["WEB"] },
+      "baseline": "pass"
+    }
+  ]
+}

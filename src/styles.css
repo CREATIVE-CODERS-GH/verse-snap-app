@@ -17,6 +17,83 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: "Libre Franklin", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  /* Stitch design system: used only by screens already rebuilt from the approved designs. */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-stitch: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-vs-bg: var(--vs-bg);
+  --color-vs-surface: var(--vs-surface);
+  --color-vs-primary: var(--vs-primary);
+  --color-vs-text: var(--vs-text);
+  --color-vs-text-secondary: var(--vs-text-secondary);
+  --color-vs-border: var(--vs-border);
+  --color-vs-card-border: var(--vs-card-border);
+  --color-vs-ring: var(--vs-ring);
+  /* Chapter reader (Stitch 22) palette: cooler surfaces and a deeper green than the warm screens. */
+  --color-ch-surface: var(--ch-surface);
+  --color-ch-on-surface: var(--ch-on-surface);
+  --color-ch-on-surface-variant: var(--ch-on-surface-variant);
+  --color-ch-primary: var(--ch-primary);
+  --color-ch-on-primary: var(--ch-on-primary);
+  --color-ch-primary-container: var(--ch-primary-container);
+  --color-ch-on-primary-container: var(--ch-on-primary-container);
+  --color-ch-primary-fixed: var(--ch-primary-fixed);
+  --color-ch-secondary: var(--ch-secondary);
+  --color-ch-secondary-container: var(--ch-secondary-container);
+  --color-ch-on-secondary-container: var(--ch-on-secondary-container);
+  --color-ch-outline: var(--ch-outline);
+  --color-ch-container-lowest: var(--ch-container-lowest);
+  --color-ch-container-low: var(--ch-container-low);
+  --color-ch-container: var(--ch-container);
+  --color-ch-container-high: var(--ch-container-high);
+  --color-ch-container-highest: var(--ch-container-highest);
+  --color-ch-inverse-surface: var(--ch-inverse-surface);
+  --color-ch-inverse-on-surface: var(--ch-inverse-on-surface);
+  --color-ch-secondary-fixed: var(--ch-secondary-fixed);
+  --color-ch-tertiary: var(--ch-tertiary);
+  --color-ch-tertiary-fixed: var(--ch-tertiary-fixed);
+  --color-ch-error: var(--ch-error);
+  --color-ch-error-container: var(--ch-error-container);
+  --color-ch-on-secondary-fixed-variant: var(--ch-on-secondary-fixed-variant);
+  --color-vs-on-primary: var(--vs-on-primary);
+  --color-vs-icon-muted: var(--vs-icon-muted);
+  --color-vs-border-strong: var(--vs-border-strong);
+  --color-vs-container: var(--vs-container);
+  --color-vs-illus: var(--vs-illus);
+  --color-vs-tan: var(--vs-tan);
+  --color-vs-error: var(--vs-error);
+  --color-vs-badge-high-bg: var(--vs-badge-high-bg);
+  --color-vs-badge-high-text: var(--vs-badge-high-text);
+  --color-vs-badge-good-bg: var(--vs-badge-good-bg);
+  --color-vs-badge-good-text: var(--vs-badge-good-text);
+  --color-vs-badge-related-bg: var(--vs-badge-related-bg);
+  --color-vs-badge-related-text: var(--vs-badge-related-text);
+  --color-vs-cam-bg: var(--vs-cam-bg);
+  --color-vs-cam-text: var(--vs-cam-text);
+  --color-vs-cam-border: var(--vs-cam-border);
+  --color-vs-voice-from: var(--vs-voice-from);
+  --color-vs-voice-to: var(--vs-voice-to);
+  --color-vs-voice-glow: var(--vs-voice-glow);
+  --color-vs-voice-icon-from: var(--vs-voice-icon-from);
+  --color-vs-voice-icon-to: var(--vs-voice-icon-to);
+  --color-vs-voice-heading: var(--vs-voice-heading);
+  --color-vs-voice-text: var(--vs-voice-text);
+  --color-vs-voice-shadow: var(--vs-voice-shadow);
+  --color-vs-camera-from: var(--vs-camera-from);
+  --color-vs-camera-to: var(--vs-camera-to);
+  --color-vs-camera-glow: var(--vs-camera-glow);
+  --color-vs-camera-icon-from: var(--vs-camera-icon-from);
+  --color-vs-camera-icon-to: var(--vs-camera-icon-to);
+  --color-vs-camera-heading: var(--vs-camera-heading);
+  --color-vs-camera-text: var(--vs-camera-text);
+  --color-vs-camera-shadow: var(--vs-camera-shadow);
+  --color-vs-search-from: var(--vs-search-from);
+  --color-vs-search-to: var(--vs-search-to);
+  --color-vs-search-glow: var(--vs-search-glow);
+  --color-vs-search-icon-from: var(--vs-search-icon-from);
+  --color-vs-search-icon-to: var(--vs-search-icon-to);
+  --color-vs-search-heading: var(--vs-search-heading);
+  --color-vs-search-text: var(--vs-search-text);
+  --color-vs-search-shadow: var(--vs-search-shadow);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -53,8 +130,6 @@
   --color-action-blue-icon-deep: var(--action-blue-icon-deep);
   --color-action-blue-heading: var(--action-blue-heading);
   --color-action-blue-text: var(--action-blue-text);
-  --color-action-icon-foreground: var(--action-icon-foreground);
-  --color-action-icon-ring: var(--action-icon-ring);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -63,134 +138,477 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* Brand colour system (see the BRAND COLOUR SYSTEM block below) */
+  --color-brand-canvas: var(--brand-canvas);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-surface-muted: var(--brand-surface-muted);
+  --color-brand-surface-sunken: var(--brand-surface-sunken);
+  --color-brand-surface-strong: var(--brand-surface-strong);
+  --color-brand-surface-stronger: var(--brand-surface-stronger);
+  --color-brand-text: var(--brand-text);
+  --color-brand-text-muted: var(--brand-text-muted);
+  --color-brand-text-subtle: var(--brand-text-subtle);
+  --color-brand-text-faint: var(--brand-text-faint);
+  --color-brand-inverse: var(--brand-inverse);
+  --color-brand-on-inverse: var(--brand-on-inverse);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-active: var(--nav-active);
+  --color-nav-inactive: var(--nav-inactive);
+  --color-nav-border: var(--nav-border);
+  --color-brand-icon-muted: var(--brand-icon-muted);
+  --color-brand-border: var(--brand-border);
+  --color-brand-border-strong: var(--brand-border-strong);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-soft: var(--brand-primary-soft);
+  --color-brand-on-primary: var(--brand-on-primary);
+  --color-brand-primary-bright: var(--brand-primary-bright);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-teal-soft: var(--brand-teal-soft);
+  --color-brand-teal-text: var(--brand-teal-text);
+  --color-brand-teal-bright: var(--brand-teal-bright);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-soft: var(--brand-gold-soft);
+  --color-brand-gold-text: var(--brand-gold-text);
+  --color-brand-gold-bright: var(--brand-gold-bright);
+  --color-brand-info: var(--brand-info);
+  --color-brand-info-soft: var(--brand-info-soft);
+  --color-brand-success: var(--brand-success);
+  --color-brand-success-soft: var(--brand-success-soft);
+  --color-brand-warning: var(--brand-warning);
+  --color-brand-warning-soft: var(--brand-warning-soft);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-danger-soft: var(--brand-danger-soft);
+  --color-brand-on-danger: var(--brand-on-danger);
+  --color-brand-focus: var(--brand-focus);
+  --color-brand-scrim: var(--brand-scrim);
+  --color-brand-scrim-soft: var(--brand-scrim-soft);
+  --color-hl-amber: var(--hl-amber);
+  --color-hl-sage: var(--hl-sage);
+  --color-hl-sky: var(--hl-sky);
+  --color-hl-rose: var(--hl-rose);
+  --color-hl-lilac: var(--hl-lilac);
+  --color-hl-clear: var(--hl-clear);
+  --color-hl-amber-ink: var(--hl-amber-ink);
+  --color-hl-sage-ink: var(--hl-sage-ink);
+  --color-hl-sky-ink: var(--hl-sky-ink);
+  --color-hl-rose-ink: var(--hl-rose-ink);
+  --color-hl-lilac-ink: var(--hl-lilac-ink);
 }
 
+/*
+ * ============================================================================================
+ * VERSE SNAP THEME SYSTEM — the single source of truth for colour, in two themes.
+ *
+ * Light: bright, minimal white with strong near-black type and neutral grey controls.
+ * Dark: near-black canvas, charcoal surfaces, soft white type.
+ * Brand colours (Scripture Green #1F5F4A, Deep Teal #102F3A, Warm Gold #D4A373) are ACCENTS:
+ * primary actions, bookmarks and saved states, important selections and small brand details.
+ *
+ * Every other colour token in this file (shadcn/ui, warm `vs-*`, chapter `ch-*`) is an alias of
+ * these tokens, so every screen follows the same theme. Components use semantic utilities
+ * (bg-brand-surface, text-brand-text-muted, bg-nav-bg …) or the aliases, never raw hex values.
+ * ============================================================================================
+ */
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.985 0.006 85);
-  --foreground: oklch(0.24 0.014 60);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.014 60);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.014 60);
-  --primary: oklch(0.46 0.055 215);
-  --primary-foreground: oklch(0.99 0.004 85);
-  --secondary: oklch(0.955 0.008 85);
-  --secondary-foreground: oklch(0.28 0.014 60);
-  --muted: oklch(0.955 0.008 85);
-  --muted-foreground: oklch(0.52 0.014 70);
-  --accent: oklch(0.94 0.012 85);
-  --accent-foreground: oklch(0.28 0.014 60);
-  --destructive: oklch(0.52 0.16 27);
-  --destructive-foreground: oklch(0.99 0.004 85);
-  --border: oklch(0.9 0.009 80);
-  --input: oklch(0.9 0.009 80);
-  --ring: oklch(0.46 0.055 215);
-  /* Home action cards (light) */
-  --action-green-bg: oklch(0.965 0.022 155);
-  --action-green-bg-deep: oklch(0.945 0.03 155);
-  --action-green-icon: oklch(0.42 0.085 158);
-  --action-green-heading: oklch(0.28 0.045 158);
-  --action-green-text: oklch(0.46 0.04 158);
-  --action-peach-bg: oklch(0.975 0.017 70);
-  --action-peach-bg-deep: oklch(0.955 0.028 68);
-  --action-peach-icon: oklch(0.68 0.095 62);
-  --action-peach-icon-deep: oklch(0.61 0.095 60);
-  --action-peach-heading: oklch(0.32 0.055 58);
-  --action-peach-text: oklch(0.5 0.05 62);
-  --action-blue-bg: oklch(0.965 0.018 252);
-  --action-blue-bg-deep: oklch(0.945 0.028 252);
-  --action-blue-icon: oklch(0.55 0.17 258);
-  --action-blue-icon-deep: oklch(0.48 0.16 258);
-  --action-blue-heading: oklch(0.28 0.065 258);
-  --action-blue-text: oklch(0.45 0.06 258);
-  --action-icon-foreground: oklch(0.99 0.004 85);
-  --action-icon-ring: oklch(1 0 0 / 85%);
-  --home-green-highlight: oklch(0.93 0.047 168);
-  --home-peach-highlight: oklch(0.96 0.064 88);
-  --home-blue-highlight: oklch(0.92 0.043 250);
-  --home-nav-active: oklch(0.42 0.075 164);
-  --home-nav-background: oklch(1 0 0);
-  --home-card-shadow: 0 2px 3px oklch(0.24 0.014 60 / 4%);
-  --sidebar: oklch(0.985 0.006 85);
-  --sidebar-foreground: oklch(0.24 0.014 60);
-  --sidebar-primary: oklch(0.46 0.055 215);
-  --sidebar-primary-foreground: oklch(0.99 0.004 85);
-  --sidebar-accent: oklch(0.94 0.012 85);
-  --sidebar-accent-foreground: oklch(0.28 0.014 60);
-  --sidebar-border: oklch(0.9 0.009 80);
-  --sidebar-ring: oklch(0.46 0.055 215);
-  /* Reading size, changed from Settings */
-  --verse-size: 1.3125rem;
+  /* App background and surfaces */
+  --brand-canvas: #ffffff;
+  --brand-surface: #ffffff; /* cards, sheets, dialogs */
+  --brand-surface-muted: #f5f5f5; /* secondary surface: tiles, chips, inputs */
+  --brand-surface-sunken: #f0f0f0; /* elevated controls, hover and pressed fills */
+  --brand-surface-strong: #e8e8e8; /* tracks, inactive segmented controls */
+  --brand-surface-stronger: #dcdcdc; /* switch-off track, strongest neutral fill */
+
+  /* Text */
+  --brand-text: #111111;
+  --brand-text-muted: #666666; /* secondary text */
+  --brand-text-subtle: #666666; /* secondary text on tinted fills (AA on #F0F0F0) */
+  --brand-text-faint: #a3a3a3; /* verse numbers and other quiet, non-essential marks */
+  --brand-icon-muted: #a3a3a3;
+
+  /* Lines */
+  --brand-border: #e5e5e5;
+  --brand-border-strong: #d4d4d4;
+
+  /* Navigation */
+  --nav-bg: #ffffff;
+  --nav-active: #111111;
+  --nav-inactive: #737373;
+  --nav-border: #e5e5e5;
+
+  /* Brand accent: Scripture Green */
+  --brand-primary: #1f5f4a;
+  --brand-primary-hover: #184c3b;
+  --brand-primary-soft: #e8f0ec; /* saved / selected backgrounds */
+  --brand-on-primary: #ffffff;
+  --brand-primary-bright: #b9dfcd; /* light green for icons on the inverse surface */
+
+  /* Brand accent: Deep Teal */
+  --brand-teal: #102f3a;
+  --brand-teal-soft: #e3ebed;
+  --brand-teal-text: #1d4a5a;
+  --brand-teal-bright: #c3dbe2;
+
+  /* Brand accent: Warm Gold */
+  --brand-gold: #d4a373;
+  --brand-gold-soft: #f7efe5;
+  --brand-gold-text: #8a5a2b; /* gold that passes contrast as text on white */
+  --brand-gold-bright: #f0d2ad;
+
+  /* Inverse surface: toasts and the floating verse toolbar */
+  --brand-inverse: #111111;
+  --brand-on-inverse: #f5f5f5;
+
+  /* Semantic states */
+  --brand-info: #2f6fed;
+  --brand-info-soft: #eaf0fd;
+  --brand-success: #1f7a52;
+  --brand-success-soft: #e5f3eb;
+  --brand-warning: #b45309;
+  --brand-warning-soft: #fdf2df;
+  --brand-danger: #b42318;
+  --brand-danger-soft: #fde5e2;
+  --brand-on-danger: #ffffff;
+
+  /* Interaction */
+  --brand-focus: #111111;
+  --brand-scrim: rgb(0 0 0 / 0.4);
+  --brand-scrim-soft: rgb(0 0 0 / 0.18);
+
+  /* Verse highlight tones — functional colours, deliberately distinct */
+  --hl-amber: #f6dcb3;
+  --hl-sage: #d3e9d9;
+  --hl-sky: #d6e5f8;
+  --hl-rose: #f7d8d6;
+  --hl-lilac: #e5ddf3;
+  --hl-clear: #ededed;
+  /* Stronger "ink" of each tone, for the small colour dots */
+  --hl-amber-ink: #b7792f;
+  --hl-sage-ink: #3f8a68;
+  --hl-sky-ink: #4a7fd0;
+  --hl-rose-ink: #c25550;
+  --hl-lilac-ink: #7d68b5;
 }
 
 .dark {
-  --background: oklch(0.19 0.008 70);
-  --foreground: oklch(0.94 0.005 85);
-  --card: oklch(0.225 0.008 70);
-  --card-foreground: oklch(0.94 0.005 85);
-  --popover: oklch(0.225 0.008 70);
-  --popover-foreground: oklch(0.94 0.005 85);
-  --primary: oklch(0.74 0.06 210);
-  --primary-foreground: oklch(0.19 0.01 70);
-  --secondary: oklch(0.26 0.008 70);
-  --secondary-foreground: oklch(0.94 0.005 85);
-  --muted: oklch(0.26 0.008 70);
-  --muted-foreground: oklch(0.71 0.011 80);
-  --accent: oklch(0.28 0.009 70);
-  --accent-foreground: oklch(0.94 0.005 85);
-  --destructive: oklch(0.62 0.16 27);
-  --destructive-foreground: oklch(0.98 0.004 85);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.74 0.06 210);
-  /* Home action cards (dark) */
-  --action-green-bg: oklch(0.27 0.028 158);
-  --action-green-bg-deep: oklch(0.24 0.03 158);
-  --action-green-icon: oklch(0.74 0.09 158);
-  --action-green-heading: oklch(0.88 0.03 158);
-  --action-green-text: oklch(0.72 0.03 158);
-  --action-peach-bg: oklch(0.27 0.025 62);
-  --action-peach-bg-deep: oklch(0.24 0.028 62);
-  --action-peach-icon: oklch(0.72 0.09 62);
-  --action-peach-icon-deep: oklch(0.64 0.09 62);
-  --action-peach-heading: oklch(0.9 0.025 68);
-  --action-peach-text: oklch(0.75 0.03 66);
-  --action-blue-bg: oklch(0.27 0.035 258);
-  --action-blue-bg-deep: oklch(0.24 0.038 258);
-  --action-blue-icon: oklch(0.7 0.14 258);
-  --action-blue-icon-deep: oklch(0.6 0.14 258);
-  --action-blue-heading: oklch(0.9 0.02 258);
-  --action-blue-text: oklch(0.73 0.04 258);
-  --action-icon-foreground: oklch(0.19 0.008 70);
-  --action-icon-ring: oklch(1 0 0 / 14%);
-  --home-green-highlight: oklch(0.31 0.04 168);
-  --home-peach-highlight: oklch(0.31 0.045 88);
-  --home-blue-highlight: oklch(0.31 0.05 250);
-  --home-nav-active: oklch(0.74 0.09 158);
-  --home-nav-background: var(--background);
-  --home-card-shadow: none;
-  --sidebar: oklch(0.19 0.008 70);
-  --sidebar-foreground: oklch(0.94 0.005 85);
-  --sidebar-primary: oklch(0.74 0.06 210);
-  --sidebar-primary-foreground: oklch(0.19 0.01 70);
-  --sidebar-accent: oklch(0.28 0.009 70);
-  --sidebar-accent-foreground: oklch(0.94 0.005 85);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.74 0.06 210);
+  --brand-canvas: #121212;
+  --brand-surface: #242223;
+  --brand-surface-muted: #2c2a2b;
+  --brand-surface-sunken: #343233; /* elevated surface */
+  --brand-surface-strong: #3d3b3c;
+  --brand-surface-stronger: #4a4748;
+
+  --brand-text: #f5f5f5;
+  --brand-text-muted: #a8a8a8;
+  --brand-text-subtle: #a8a8a8;
+  --brand-text-faint: #858585;
+  --brand-icon-muted: #858585;
+
+  --brand-border: #3b3b3b;
+  --brand-border-strong: #4a4748;
+
+  --nav-bg: #121212;
+  --nav-active: #f5f5f5;
+  --nav-inactive: #a8a8a8;
+  --nav-border: #3b3b3b;
+
+  /* Primary accent in dark mode is a soft off-white (green looked out of place on near-black) */
+  --brand-primary: #ebe9e6;
+  --brand-primary-hover: #ffffff;
+  --brand-primary-soft: #343233;
+  --brand-on-primary: #121212;
+  --brand-primary-bright: #ebe9e6;
+
+  --brand-teal: #6f9fae;
+  --brand-teal-soft: #22303a;
+  --brand-teal-text: #9cc7d4;
+  --brand-teal-bright: #c3dbe2;
+
+  --brand-gold: #e0b98e;
+  --brand-gold-soft: #33291f;
+  --brand-gold-text: #e8c49b;
+  --brand-gold-bright: #f0d2ad;
+
+  --brand-inverse: #343233;
+  --brand-on-inverse: #f5f5f5;
+
+  --brand-info: #8fb3f7;
+  --brand-info-soft: #1e2636;
+  --brand-success: #7fd0a8;
+  --brand-success-soft: #1b2b23;
+  --brand-warning: #f0b46a;
+  --brand-warning-soft: #33281a;
+  --brand-danger: #f4a59b;
+  --brand-danger-soft: #3d2422;
+  --brand-on-danger: #3b0f0b;
+
+  --brand-focus: #f5f5f5;
+  --brand-scrim: rgb(0 0 0 / 0.6);
+  --brand-scrim-soft: rgb(0 0 0 / 0.45);
+
+  --hl-amber: #5e4423;
+  --hl-sage: #2b4536;
+  --hl-sky: #2a3c58;
+  --hl-rose: #522e30;
+  --hl-lilac: #3d3452;
+  --hl-clear: #343233;
+  --hl-amber-ink: #e3b278;
+  --hl-sage-ink: #86c9a7;
+  --hl-sky-ink: #93b6ef;
+  --hl-rose-ink: #ee9e98;
+  --hl-lilac-ink: #b9a8e6;
 }
 
+/* --- Aliases: existing token families mapped onto the brand system -------------------------- */
+:root {
+  --radius: 0.5rem;
+
+  /* shadcn/ui tokens (Saved, History, Settings, auth, shared UI primitives) */
+  --background: var(--brand-canvas);
+  --foreground: var(--brand-text);
+  --card: var(--brand-surface);
+  --card-foreground: var(--brand-text);
+  --popover: var(--brand-surface);
+  --popover-foreground: var(--brand-text);
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--brand-on-primary);
+  --secondary: var(--brand-surface-muted);
+  --secondary-foreground: var(--brand-text);
+  --muted: var(--brand-surface-muted);
+  --muted-foreground: var(--brand-text-muted);
+  --accent: var(--brand-surface-sunken);
+  --accent-foreground: var(--brand-text);
+  --destructive: var(--brand-danger);
+  --destructive-foreground: var(--brand-on-danger);
+  --border: var(--brand-border);
+  --input: var(--brand-border-strong);
+  --ring: var(--brand-focus);
+  --sidebar: var(--brand-canvas);
+  --sidebar-foreground: var(--brand-text);
+  --sidebar-primary: var(--brand-primary);
+  --sidebar-primary-foreground: var(--brand-on-primary);
+  --sidebar-accent: var(--brand-surface-sunken);
+  --sidebar-accent-foreground: var(--brand-text);
+  --sidebar-border: var(--brand-border);
+  --sidebar-ring: var(--brand-focus);
+
+  /* Older Home action-card tokens (green / gold / information blue) */
+  --action-green-bg: var(--brand-primary-soft);
+  --action-green-bg-deep: var(--brand-primary-soft);
+  --action-green-icon: var(--brand-primary);
+  --action-green-heading: var(--brand-text);
+  --action-green-text: var(--brand-text-muted);
+  --action-peach-bg: var(--brand-gold-soft);
+  --action-peach-bg-deep: var(--brand-gold-soft);
+  --action-peach-icon: var(--brand-gold);
+  --action-peach-icon-deep: var(--brand-gold-text);
+  --action-peach-heading: var(--brand-text);
+  --action-peach-text: var(--brand-text-muted);
+  --action-blue-bg: var(--brand-info-soft);
+  --action-blue-bg-deep: var(--brand-info-soft);
+  --action-blue-icon: var(--brand-info);
+  --action-blue-icon-deep: var(--brand-info);
+  --action-blue-heading: var(--brand-text);
+  --action-blue-text: var(--brand-text-muted);
+
+  --verse-size: 1.3125rem;
+
+  /* Warm Stitch tokens (Home, Search, Scripture Reading, Translation sheet) */
+  --vs-bg: var(--brand-canvas);
+  --vs-surface: var(--brand-surface);
+  --vs-primary: var(--brand-primary);
+  --vs-text: var(--brand-text);
+  --vs-text-secondary: var(--brand-text-muted);
+  --vs-border: var(--brand-border);
+  --vs-card-border: rgb(255 255 255 / 0.7);
+  --vs-ring: rgb(255 255 255 / 0.8);
+  --vs-on-primary: var(--brand-on-primary);
+  --vs-icon-muted: var(--brand-icon-muted);
+  --vs-border-strong: var(--brand-border-strong);
+  --vs-container: var(--brand-surface-muted);
+  --vs-illus: rgb(234 230 223 / 0.7);
+  --vs-tan: var(--brand-gold);
+  --vs-error: var(--brand-danger);
+  --vs-badge-high-bg: var(--brand-primary-soft);
+  --vs-badge-high-text: var(--brand-primary);
+  --vs-badge-good-bg: var(--brand-success-soft);
+  --vs-badge-good-text: var(--brand-success);
+  --vs-badge-related-bg: var(--brand-surface-muted);
+  --vs-badge-related-text: var(--brand-text-muted);
+  --vs-cam-bg: var(--brand-gold-soft);
+  --vs-cam-text: var(--brand-gold-text);
+  --vs-cam-border: rgb(212 163 115 / 0.3);
+  /* Home action cards (Stitch 04): neutral surfaces; the icon circles carry the brand accents
+     (green = voice, gold = camera, deep teal = search). Icon circles keep the same brand colours in
+     both themes because they sit behind white icons. */
+  --vs-voice-from: var(--brand-surface-muted);
+  --vs-voice-to: var(--brand-surface-muted);
+  --vs-voice-glow: transparent;
+  --vs-voice-icon-from: #2a7a5f;
+  --vs-voice-icon-to: #1f5f4a;
+  --vs-voice-heading: var(--brand-text);
+  --vs-voice-text: var(--brand-text-muted);
+  --vs-voice-shadow: rgb(0 0 0 / 0.12);
+  --vs-camera-from: var(--brand-surface-muted);
+  --vs-camera-to: var(--brand-surface-muted);
+  --vs-camera-glow: transparent;
+  --vs-camera-icon-from: #d4a373;
+  --vs-camera-icon-to: #b8844f;
+  --vs-camera-heading: var(--brand-text);
+  --vs-camera-text: var(--brand-text-muted);
+  --vs-camera-shadow: rgb(0 0 0 / 0.12);
+  --vs-search-from: var(--brand-surface-muted);
+  --vs-search-to: var(--brand-surface-muted);
+  --vs-search-glow: transparent;
+  --vs-search-icon-from: #1d4a5a;
+  --vs-search-icon-to: #102f3a;
+  --vs-search-heading: var(--brand-text);
+  --vs-search-text: var(--brand-text-muted);
+  --vs-search-shadow: rgb(0 0 0 / 0.12);
+  /* Chapter-reader Stitch tokens (Chapter reading, Book index, Verse sheet, Reflection Journal) */
+  --ch-surface: var(--brand-canvas);
+  --ch-on-surface: var(--brand-text);
+  --ch-on-surface-variant: var(--brand-text-subtle);
+  --ch-primary: var(--brand-primary);
+  --ch-on-primary: var(--brand-on-primary);
+  --ch-primary-container: var(--brand-primary);
+  --ch-on-primary-container: var(--brand-primary-bright);
+  --ch-primary-fixed: var(--brand-primary-bright);
+  --ch-secondary: var(--brand-gold-text);
+  --ch-secondary-container: var(--brand-gold-soft);
+  --ch-on-secondary-container: var(--brand-gold-text);
+  --ch-secondary-fixed: var(--brand-gold-bright);
+  --ch-on-secondary-fixed-variant: var(--brand-gold-text);
+  --ch-tertiary: var(--brand-teal-text);
+  --ch-tertiary-fixed: var(--brand-teal-bright);
+  --ch-outline: var(--brand-text-subtle);
+  --ch-container-lowest: var(--brand-surface);
+  --ch-container-low: var(--brand-surface-muted);
+  --ch-container: var(--brand-surface-sunken);
+  --ch-container-high: var(--brand-surface-strong);
+  --ch-container-highest: var(--brand-surface-stronger);
+  --ch-inverse-surface: var(--brand-inverse);
+  --ch-inverse-on-surface: var(--brand-on-inverse);
+  --ch-error: var(--brand-danger);
+  --ch-error-container: var(--brand-danger-soft);
+}
+
+.dark {
+  /* Only the decorative values that are not plain aliases need dark versions. */
+  --vs-card-border: rgb(255 255 255 / 0.06);
+  --vs-ring: rgb(255 255 255 / 0.08);
+  --vs-illus: rgb(255 255 255 / 0.06);
+  --vs-cam-border: rgb(255 255 255 / 0.08);
+  --vs-voice-shadow: rgb(0 0 0 / 0.4);
+  --vs-camera-shadow: rgb(0 0 0 / 0.4);
+  --vs-search-shadow: rgb(0 0 0 / 0.4);
+}
+
+/* Single-verse reading view (Stitch 06): 28px by default, scaled by the same Settings preference. */
+:root {
+  --verse-focus-size: 1.75rem;
+  --chapter-size: 1.25rem;
+  /* Reading typeface and line spacing (Settings → Text Size). Defaults keep the approved look. */
+  --scripture-font: var(--font-display);
+  --chapter-leading: 2.1;
+  --focus-leading: 1.48;
+}
+[data-typeface="sans"] {
+  --scripture-font: var(--font-stitch);
+}
+[data-line-spacing="standard"] {
+  --chapter-leading: 1.7;
+  --focus-leading: 1.3;
+}
 [data-text-size="small"] {
   --verse-size: 1.1875rem;
+  --verse-focus-size: 1.5rem;
+  --chapter-size: 1.0625rem;
 }
 [data-text-size="medium"] {
   --verse-size: 1.3125rem;
+  --verse-focus-size: 1.75rem;
+  --chapter-size: 1.25rem;
 }
 [data-text-size="large"] {
   --verse-size: 1.5rem;
+  --verse-focus-size: 2rem;
+  --chapter-size: 1.4375rem;
 }
 [data-text-size="xlarge"] {
   --verse-size: 1.75rem;
+  --verse-focus-size: 2.25rem;
+  --chapter-size: 1.625rem;
+}
+
+/* Chapter reader (Stitch 22): Playfair at 20px with a 2.1 line height, scaled by the text-size setting. */
+@utility scripture-chapter {
+  font-family: var(--scripture-font);
+  font-size: var(--chapter-size);
+  font-weight: 400;
+  line-height: var(--chapter-leading);
+}
+
+/* The floating verse toolbar nudges up and down very slightly (Stitch 23). */
+@keyframes bounce-subtle {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -3px);
+  }
+}
+
+@utility animate-bounce-subtle {
+  animation: bounce-subtle 2.4s ease-in-out infinite;
+}
+
+/* Voice Lookup (Stitch 07): the rings around the microphone breathe while listening. */
+@keyframes voice-ripple {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@utility animate-voice-ripple {
+  animation: voice-ripple 2.2s ease-in-out infinite;
+}
+
+/* Horizontal chip rows scroll without a visible scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scripture-focus {
+  font-family: var(--scripture-font);
+  font-size: var(--verse-focus-size);
+  font-weight: 400;
+  line-height: var(--focus-leading);
+  letter-spacing: 0;
+  overflow-wrap: break-word;
+}
+
+/*
+ * The verse in a card (the Reflection page's reference card): the reader's typeface, text size and
+ * line spacing from Settings -> Text Size, a little smaller than the full-size single-verse view.
+ * At the default (medium, serif) it is the same 24px and about 38px line height as before.
+ */
+@utility scripture-card {
+  font-family: var(--scripture-font);
+  font-size: calc(var(--verse-focus-size) * 0.857);
+  font-weight: 400;
+  line-height: calc(var(--focus-leading) * 1.07);
+  overflow-wrap: break-word;
 }
 
 @utility scripture {
@@ -216,50 +634,6 @@
 
 .action-card:active {
   transform: scale(0.985);
-}
-
-.home-page .action-card {
-  border-color: var(--action-icon-ring);
-  box-shadow: var(--home-card-shadow);
-}
-
-.home-action-green {
-  background: radial-gradient(ellipse at top right, var(--home-green-highlight), transparent 45%), linear-gradient(var(--action-green-bg), var(--action-green-bg-deep));
-}
-
-.home-action-peach {
-  background: radial-gradient(ellipse at top right, var(--home-peach-highlight), transparent 45%), linear-gradient(var(--action-peach-bg), var(--action-peach-bg-deep));
-}
-
-.home-action-blue {
-  background: radial-gradient(ellipse at top right, var(--home-blue-highlight), transparent 45%), linear-gradient(var(--action-blue-bg), var(--action-blue-bg-deep));
-}
-
-.home-bottom-nav {
-  background: var(--home-nav-background);
-  backdrop-filter: none;
-}
-
-.home-bottom-nav ul {
-  max-width: 390px;
-}
-
-.home-bottom-nav a[data-status="active"] {
-  color: var(--home-nav-active);
-}
-
-.home-bottom-nav a::after {
-  display: none;
-}
-
-.home-bottom-nav a[data-status="active"] svg {
-  fill: currentColor;
-}
-
-.home-bottom-nav a,
-.home-bottom-nav button {
-  width: 100%;
-  font-size: 10px;
 }
 
 @media (hover: hover) {

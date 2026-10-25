@@ -3,12 +3,35 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && node scripts/sw/build-sw.mjs",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "live:smoke": "vitest run --config vitest.live.config.ts smoke",
+    "live:eval": "vitest run --config vitest.live.config.ts eval",
+    "check:bundle": "node scripts/check-bundle-secrets.mjs",
+    "test:e2e:library": "node scripts/e2e/saved-history.mjs",
+    "test:e2e:merge": "node scripts/e2e/guest-merge.mjs",
+    "test:e2e:smoke": "node scripts/e2e/mobile-smoke.mjs",
+    "test:e2e:highlights": "node scripts/e2e/highlights.mjs",
+    "test:e2e:highlights-account": "node scripts/e2e/highlights-account.mjs",
+    "test:e2e:journal": "node scripts/e2e/journal.mjs",
+    "test:e2e:reader-batch1d": "node scripts/e2e/reader-batch1d.mjs",
+    "test:e2e:saved-hubs": "node scripts/e2e/saved-hubs.mjs",
+    "test:e2e:cross-references": "node scripts/e2e/cross-references.mjs",
+    "test:e2e:offline": "node scripts/e2e/offline.mjs",
+    "test:e2e:offline-sw": "node scripts/e2e/offline-sw.mjs",
+    "test:e2e:journal-account": "node scripts/e2e/journal-account.mjs",
+    "test:db:history": "node scripts/db/history-migration-test.mjs",
+    "test:db:highlights": "node scripts/db/highlights-migration-test.mjs",
+    "test:db:journal": "node scripts/db/journal-migration-test.mjs",
     "format": "prettier --write ."
   },
   "overrides": {
@@ -16,7 +39,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@lovable.dev/cloud-auth-js": "^1.1.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -49,6 +71,7 @@
     "@tanstack/react-router": "1.170.41",
     "@tanstack/react-start": "1.168.60",
     "@tanstack/router-plugin": "1.168.42",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -56,6 +79,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
+    "openai": "^7.39.0",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",
@@ -89,6 +113,6 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",
-    "vite-plugin-pwa": "^2.0.0"
+    "vitest": "^5.0.5"
   }
 }

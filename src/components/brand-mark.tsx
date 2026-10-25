@@ -1,18 +1,20 @@
-import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function BrandMark({ className }: { className?: string }) {
+/** The official Verse Snap logo (cross over an open Bible), used wherever the app shows its mark. */
+export const LOGO_SRC = "/icons/logo-96.png";
+/** Sharper source for large placements (onboarding), so the logo stays crisp on high-DPI screens. */
+export const LOGO_SRC_LARGE = "/icons/icon-192.png";
+
+export function BrandMark({ className, large }: { className?: string; large?: boolean }) {
   return (
-    <span
-      className={cn(
-        "relative inline-flex h-10 w-10 items-center justify-center rounded-md border border-primary text-primary",
-        className,
-      )}
+    <img
+      src={large ? LOGO_SRC_LARGE : LOGO_SRC}
+      alt=""
       aria-hidden
-    >
-      <BookOpen className="h-5 w-5" strokeWidth={1.75} />
-      <span className="absolute -right-0.5 -top-0.5 h-2 w-2 border-r border-t border-primary" />
-      <span className="absolute -bottom-0.5 -left-0.5 h-2 w-2 border-b border-l border-primary" />
-    </span>
+      width={40}
+      height={40}
+      decoding="async"
+      className={cn("inline-block h-10 w-10 shrink-0 rounded-[22%] object-cover", className)}
+    />
   );
 }

@@ -1,25 +1,34 @@
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { Bookmark, BookOpenText, Clock, Home, Settings } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { getLastRead } from "@/lib/last-read";
+import {
+  BookmarkIcon,
+  BookOpenIcon,
+  ClockIcon,
+  GearIcon,
+  HomeIcon,
+} from "@/components/stitch-icons";
 
+// Stitch tab bar (checked against the Home, Saved and Settings designs): five tabs, 10px labels,
+// muted when idle, near-black (soft white in dark mode) and semibold when active.
 const TAB_CLASS =
-  "relative flex min-h-14 flex-col items-center justify-center gap-1 py-2 text-[0.6875rem] text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:font-medium data-[status=active]:text-primary after:absolute after:top-0 after:left-1/2 after:-translate-x-1/2 after:h-0.5 after:w-8 after:bg-transparent data-[status=active]:after:bg-primary";
-
-const ITEMS = [
-  { to: "/", label: "Home", icon: Home, exact: true },
-  { to: "/saved", label: "Saved", icon: Bookmark, exact: false },
-  { to: "/history", label: "History", icon: Clock, exact: false },
-  { to: "/settings", label: "Settings", icon: Settings, exact: false },
-] as const;
+  "flex min-h-12 w-full flex-col items-center justify-center gap-1 text-nav-inactive transition-colors hover:text-nav-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring data-[status=active]:text-nav-active [&[data-status=active]>span]:font-semibold";
+const LABEL_CLASS = "text-[10px] font-medium leading-none tracking-tight";
+const ICON_CLASS = "h-5 w-5";
 
 function ReadTab() {
   const navigate = useNavigate();
   const [lastRead] = useState(() => getLastRead());
+  // The reader, single verse page, book index and reflection journal all count as "Read".
+  const active = useRouterState({
+    select: (state) => /^\/(chapter|verse|books|reflect)(\/|$)/.test(state.location.pathname),
+  });
 
   return (
     <button
       type="button"
+      data-status={active ? "active" : undefined}
+      aria-current={active ? "page" : undefined}
       className={TAB_CLASS}
       onClick={() =>
         navigate({
@@ -32,21 +41,24 @@ function ReadTab() {
         })
       }
     >
-      <BookOpenText className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-      <span>Read</span>
+      <BookOpenIcon className={ICON_CLASS} />
+      <span className={LABEL_CLASS}>Read</span>
     </button>
   );
 }
 
 export function BottomNav() {
-  const isHome = useLocation({ select: (location) => location.pathname === "/" });
   return (
-    <nav className={`fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur-[2px] ${isHome ? "home-bottom-nav" : ""}`}>
-      <ul className="mx-auto grid max-w-[30rem] grid-cols-5">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-nav-border bg-nav-bg/95 font-stitch backdrop-blur-md">
+      <ul className="mx-auto grid max-w-[30rem] grid-cols-5 px-4 pt-0.5 pb-[max(0.125rem,env(safe-area-inset-bottom))]">
         <li>
           <Link to="/" activeOptions={{ exact: true }} className={TAB_CLASS}>
-            <Home className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-            <span>Home</span>
+            {({ isActive }) => (
+              <>
+                <HomeIcon filled={isActive} className={ICON_CLASS} />
+                <span className={LABEL_CLASS}>Home</span>
+              </>
+            )}
           </Link>
         </li>
         <li>
@@ -54,24 +66,35 @@ export function BottomNav() {
         </li>
         <li>
           <Link to="/saved" activeOptions={{ exact: false }} className={TAB_CLASS}>
-            <Bookmark className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-            <span>Saved</span>
+            {({ isActive }) => (
+              <>
+                <BookmarkIcon filled={isActive} className={ICON_CLASS} />
+                <span className={LABEL_CLASS}>Saved</span>
+              </>
+            )}
           </Link>
         </li>
         <li>
           <Link to="/history" activeOptions={{ exact: false }} className={TAB_CLASS}>
-            <Clock className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-            <span>History</span>
+            {({ isActive }) => (
+              <>
+                <ClockIcon className={ICON_CLASS} strokeWidth={isActive ? 2 : 1.8} />
+                <span className={LABEL_CLASS}>History</span>
+              </>
+            )}
           </Link>
         </li>
         <li>
           <Link to="/settings" activeOptions={{ exact: false }} className={TAB_CLASS}>
-            <Settings className="h-5 w-5" strokeWidth={1.75} aria-hidden />
-            <span>Settings</span>
+            {({ isActive }) => (
+              <>
+                <GearIcon className={ICON_CLASS} strokeWidth={isActive ? 2 : 1.8} />
+                <span className={LABEL_CLASS}>Settings</span>
+              </>
+            )}
           </Link>
         </li>
       </ul>
-      <div className="h-[env(safe-area-inset-bottom)]" />
     </nav>
   );
 }

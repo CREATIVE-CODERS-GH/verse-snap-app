@@ -1,0 +1,299 @@
+{
+  "generatedAt": "2026-10-21T20:24:54.634Z",
+  "machine": {
+    "platform": "win32",
+    "node": "v22.22.0",
+    "cpus": 12,
+    "note": "Single local machine; PostgreSQL 17.10 embedded with default settings (shared_buffers 128MB)."
+  },
+  "databaseOnly_sequential_byShape_ms": {
+    "phrase": {
+      "n": 100,
+      "p50": 13.1,
+      "p95": 16.6,
+      "p99": 19.5,
+      "max": 19.5,
+      "mean": 12.8
+    },
+    "several words": {
+      "n": 80,
+      "p50": 15,
+      "p95": 52.1,
+      "p99": 67.9,
+      "max": 67.9,
+      "mean": 23.6
+    },
+    "single keyword": {
+      "n": 100,
+      "p50": 7,
+      "p95": 10,
+      "p99": 14.9,
+      "max": 14.9,
+      "mean": 7.3
+    },
+    "very common word": {
+      "n": 80,
+      "p50": 29.2,
+      "p95": 96.7,
+      "p99": 134.7,
+      "max": 134.7,
+      "mean": 39.3
+    },
+    "typo": {
+      "n": 80,
+      "p50": 11.9,
+      "p95": 20.2,
+      "p99": 21.4,
+      "max": 21.4,
+      "mean": 12.6
+    },
+    "archaic": {
+      "n": 60,
+      "p50": 22.4,
+      "p95": 29.5,
+      "p99": 32.3,
+      "max": 32.3,
+      "mean": 23.2
+    },
+    "no match": {
+      "n": 20,
+      "p50": 33.8,
+      "p95": 40.1,
+      "p99": 40.1,
+      "max": 40.1,
+      "mean": 33.9
+    }
+  },
+  "pagination_ms": {
+    "God offset 0": {
+      "n": 10,
+      "p50": 89.6,
+      "p95": 124.6,
+      "p99": 124.6,
+      "max": 124.6,
+      "mean": 91.1
+    },
+    "God offset 25": {
+      "n": 10,
+      "p50": 83,
+      "p95": 89.9,
+      "p99": 89.9,
+      "max": 89.9,
+      "mean": 83.5
+    },
+    "God offset 250": {
+      "n": 10,
+      "p50": 89.3,
+      "p95": 173.8,
+      "p99": 173.8,
+      "max": 173.8,
+      "mean": 100.8
+    },
+    "God offset 500": {
+      "n": 10,
+      "p50": 88.7,
+      "p95": 95.3,
+      "p99": 95.3,
+      "max": 95.3,
+      "mean": 87.7
+    },
+    "God offset 750": {
+      "n": 10,
+      "p50": 91.3,
+      "p95": 109.3,
+      "p99": 109.3,
+      "max": 109.3,
+      "mean": 92
+    },
+    "God offset 1000": {
+      "n": 10,
+      "p50": 92.2,
+      "p95": 99.8,
+      "p99": 99.8,
+      "max": 99.8,
+      "mean": 91.8
+    },
+    "grace, every page (16 pages)": {
+      "n": 16,
+      "p50": 8.9,
+      "p95": 14.6,
+      "p99": 14.6,
+      "max": 14.6,
+      "mean": 9.2
+    }
+  },
+  "databaseOnly_concurrent_ms": {
+    "concurrency 1": {
+      "n": 400,
+      "p50": 12.3,
+      "p95": 49.2,
+      "p99": 74.3,
+      "max": 104.3,
+      "mean": 15.2,
+      "wallSeconds": 6.08,
+      "requestsPerSecond": 65.8,
+      "postgresCpuSeconds": 5.36,
+      "postgresMemoryMB": 655
+    },
+    "concurrency 4": {
+      "n": 400,
+      "p50": 14.9,
+      "p95": 67.2,
+      "p99": 106.5,
+      "max": 137.7,
+      "mean": 19.6,
+      "wallSeconds": 1.97,
+      "requestsPerSecond": 203.4,
+      "postgresCpuSeconds": 6.58,
+      "postgresMemoryMB": 775
+    },
+    "concurrency 8": {
+      "n": 400,
+      "p50": 16.9,
+      "p95": 97.3,
+      "p99": 174.3,
+      "max": 199.6,
+      "mean": 25.2,
+      "wallSeconds": 1.3,
+      "requestsPerSecond": 308.5,
+      "postgresCpuSeconds": 8.08,
+      "postgresMemoryMB": 934
+    },
+    "concurrency 16": {
+      "n": 400,
+      "p50": 18,
+      "p95": 118.9,
+      "p99": 627.9,
+      "max": 1028.3,
+      "mean": 42.2,
+      "wallSeconds": 1.11,
+      "requestsPerSecond": 359,
+      "postgresCpuSeconds": 7.59,
+      "postgresMemoryMB": 1249
+    }
+  },
+  "servicePath_concurrent_ms": {
+    "concurrency 1": {
+      "n": 400,
+      "p50": 15.9,
+      "p95": 63.5,
+      "p99": 90.4,
+      "max": 167.8,
+      "mean": 20.7,
+      "wallSeconds": 8.3,
+      "requestsPerSecond": 48.2,
+      "failures": 0,
+      "postgresCpuSeconds": 6.33,
+      "postgresMemoryMB": 1407,
+      "nodeRssMB": 96
+    },
+    "concurrency 4": {
+      "n": 400,
+      "p50": 19.3,
+      "p95": 75.6,
+      "p99": 132.7,
+      "max": 157.8,
+      "mean": 25.5,
+      "wallSeconds": 2.57,
+      "requestsPerSecond": 155.8,
+      "failures": 0,
+      "postgresCpuSeconds": 7.67,
+      "postgresMemoryMB": 1439,
+      "nodeRssMB": 71
+    },
+    "concurrency 8": {
+      "n": 400,
+      "p50": 20.2,
+      "p95": 88.6,
+      "p99": 137.8,
+      "max": 150.8,
+      "mean": 26.7,
+      "wallSeconds": 1.35,
+      "requestsPerSecond": 297.1,
+      "failures": 0,
+      "postgresCpuSeconds": 8.11,
+      "postgresMemoryMB": 1575,
+      "nodeRssMB": 79
+    },
+    "concurrency 16": {
+      "n": 400,
+      "p50": 30.6,
+      "p95": 126.4,
+      "p99": 256.4,
+      "max": 337.8,
+      "mean": 43.7,
+      "wallSeconds": 1.14,
+      "requestsPerSecond": 351.4,
+      "failures": 0,
+      "postgresCpuSeconds": 8.89,
+      "postgresMemoryMB": 1589,
+      "nodeRssMB": 81
+    }
+  },
+  "quotaWriteOnly_ms": {
+    "concurrency 1": {
+      "n": 300,
+      "p50": 2,
+      "p95": 3.8,
+      "p99": 4.4,
+      "max": 6.1,
+      "mean": 2.2,
+      "wallSeconds": 0.65,
+      "requestsPerSecond": 458.9
+    },
+    "concurrency 8": {
+      "n": 300,
+      "p50": 4.2,
+      "p95": 16.3,
+      "p99": 25.4,
+      "max": 27.7,
+      "mean": 6,
+      "wallSeconds": 0.23,
+      "requestsPerSecond": 1324.3
+    },
+    "concurrency 16": {
+      "n": 300,
+      "p50": 8.2,
+      "p95": 43.4,
+      "p99": 62,
+      "max": 78.9,
+      "mean": 13,
+      "wallSeconds": 0.25,
+      "requestsPerSecond": 1203.6
+    }
+  },
+  "abusiveShapes_ms": {
+    "200 characters of real words": {
+      "n": 10,
+      "p50": 73.4,
+      "p95": 84.1,
+      "p99": 84.1,
+      "max": 84.1,
+      "mean": 75.5
+    },
+    "24 unknown words (typo repair worst case)": {
+      "n": 10,
+      "p50": 153.7,
+      "p95": 257.7,
+      "p99": 257.7,
+      "max": 257.7,
+      "mean": 173.9
+    },
+    "8 repairable typos": {
+      "n": 10,
+      "p50": 109.8,
+      "p95": 307.9,
+      "p99": 307.9,
+      "max": 307.9,
+      "mean": 124.2
+    },
+    "common word, deepest page": {
+      "n": 10,
+      "p50": 83.6,
+      "p95": 97.5,
+      "p99": 97.5,
+      "max": 97.5,
+      "mean": 82.6
+    }
+  }
+}

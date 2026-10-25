@@ -8,6 +8,7 @@ import {
   type VerseRef,
 } from "./types";
 import { BIBLE_TRANSLATIONS, resolveTranslation } from "./translations";
+import { assembleVerseText } from "./verse-text";
 
 const BASE_URL = "https://bible.helloao.org/api";
 
@@ -26,18 +27,6 @@ interface ApiChapter {
 }
 
 const booksPromises = new Map<string, Promise<ApiBook[]>>();
-
-function readableText(value: unknown): string {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value.map(readableText).join("");
-  if (!value || typeof value !== "object") return "";
-  const item = value as Record<string, unknown>;
-  // Footnotes can separate words without whitespace in the API content.
-  if ("noteId" in item) return " ";
-  if (typeof item["text"] === "string") return item["text"];
-  if (Array.isArray(item["content"])) return readableText(item["content"]);
-  return "";
-}
 
 const REQUEST_TIMEOUT_MS = 12_000;
 
@@ -108,19 +97,33 @@ async function fetchChapter(
   if (!Array.isArray(content))
     throw new BibleServiceError("provider", "The chapter text is unavailable.");
 
+  return chapterFromApiContent(ref, content, edition.code);
+}
+
+/**
+ * One chapter in the app's shape, from the API's chapter content. Shared by the chapter fetch and the
+ * offline download (which reads a whole translation file), so both give identical text.
+ */
+export function chapterFromApiContent(
+  ref: Omit<VerseRef, "verse">,
+  content: unknown[],
+  translationCode: string,
+): Chapter | null {
+  const localBook = findBook(ref.bookId);
+  if (!localBook) return null;
   const verses = content.flatMap((block): Verse[] => {
     if (!block || typeof block !== "object") return [];
     const item = block as { type?: unknown; number?: unknown; content?: unknown };
     if (item.type !== "verse" || typeof item.number !== "number") return [];
     const verseRef: VerseRef = { ...ref, bookName: localBook.name, verse: item.number };
-    const text = readableText(item.content).replace(/\s+/g, " ").trim();
+    const text = assembleVerseText(item.content);
     return text
-      ? [{ ...verseRef, translation: edition.code, text, reference: formatReference(verseRef) }]
+      ? [{ ...verseRef, translation: translationCode, text, reference: formatReference(verseRef) }]
       : [];
   });
 
   return {
-    translation: edition.code,
+    translation: translationCode,
     bookId: localBook.id,
     bookName: localBook.name,
     chapter: ref.chapter,
