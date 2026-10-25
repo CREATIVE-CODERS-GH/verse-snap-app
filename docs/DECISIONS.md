@@ -30,3 +30,7 @@ Short records of choices worth not re-litigating. Newest last. Longer write-ups:
 - **Production cutover done (2026-10-25):** PR #2 (`a9f8908`) replaced the Lovable `main` with the Verse Snap app via a
   keep-our-tree merge (both histories kept, no force-push). `main` = Production, GitHub default and Vercel Production Branch (first Production deployment succeeded);
   `testing/vercel-mobile-preview` = development and Preview. Branch protection on `main` is still to be configured. Lovable code and `.lovable/` stay out; the archive branch and tag are the only copies.
+- **Repository cleanup, phase 1 (2026-10-25):** design exports (Stitch HTML/CSS/screenshots) never go in the repo: they are
+  git-ignored and only images the app uses live in `public/`. "Stitch" in code names (`stitch-icons`, `font-stitch`,
+  `variant="stitch"`) is live app code, not a prototype; do not rename it for its own sake. `@lovable.dev/vite-tanstack-config`
+  stays until a separate, approved task replaces it.
