@@ -1,0 +1,4531 @@
+{
+  "generatedAt": "2026-10-21T20:22:32.697Z",
+  "measurement": "Each query has author-written expectations (written from knowledge of the texts BEFORE the first run; any later change is recorded in 'revised'). A query PASSES when every stated expectation holds. hit@10 = share of queries with a 'verses' expectation whose expected verse(s) appear in the first 10 results (all of them when mode is 'all', one of them when 'any'). MRR@25 = mean over the same queries of 1/rank of the first expected verse among the first 25 results (0 if absent). These measure whether specific, known verses are found; they are NOT a general relevance score and the set is small (author-chosen, not sampled from real users).",
+  "queries": 90,
+  "passed": 85,
+  "failed": 5,
+  "queriesWithVerseExpectation": 42,
+  "hitAt10": 0.905,
+  "mrrAt25": 0.728,
+  "byCategory": {
+    "exact phrase": {
+      "queries": 17,
+      "passed": 17
+    },
+    "different translation wording": {
+      "queries": 5,
+      "passed": 4
+    },
+    "single keyword": {
+      "queries": 8,
+      "passed": 6
+    },
+    "multiple keywords": {
+      "queries": 6,
+      "passed": 6
+    },
+    "biblical name": {
+      "queries": 7,
+      "passed": 7
+    },
+    "archaic wording": {
+      "queries": 9,
+      "passed": 8
+    },
+    "misspelling": {
+      "queries": 13,
+      "passed": 12
+    },
+    "modern wording": {
+      "queries": 7,
+      "passed": 7
+    },
+    "no matches": {
+      "queries": 5,
+      "passed": 5
+    },
+    "many matches": {
+      "queries": 4,
+      "passed": 4
+    },
+    "scripture reference": {
+      "queries": 7,
+      "passed": 7
+    },
+    "edition filter": {
+      "queries": 2,
+      "passed": 2
+    }
+  },
+  "results": [
+    {
+      "id": "p01",
+      "category": "exact phrase",
+      "query": "for God so loved the world",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 14,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:16",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 3:16",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 3:16",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "1JN 4:9",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 4:9",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1JN 4:9",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 3:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 3:17",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JAS 2:5",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1JN 3:17",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p02",
+      "category": "exact phrase",
+      "query": "In the beginning God created the heavens and the earth",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "GEN 1:1",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 1:1",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 1:1",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p03",
+      "category": "exact phrase",
+      "query": "Jesus wept",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 10,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 11:35",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 11:35",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 11:35",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:41",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 26:75",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 26:75",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 26:75",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 14:72",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MRK 14:72",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MRK 14:72",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p04",
+      "category": "exact phrase",
+      "query": "The LORD is my shepherd",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 69,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PSA 23:1",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 23:1",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HOS 4:16",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:9",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1KI 22:17",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CH 18:16",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1KI 22:17",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p05",
+      "category": "exact phrase",
+      "query": "be still and know that I am God",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 6,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "PSA 46:10",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 46:10",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 46:10",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 9:30",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ECC 8:12",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CH 25:16",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p06",
+      "category": "exact phrase",
+      "query": "love is patient and kind",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 2,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "1CO 13:4",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1CO 13:4",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p07",
+      "category": "exact phrase",
+      "query": "I can do all things through Christ who strengthens me",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 1,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "PHP 4:13",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p08",
+      "category": "exact phrase",
+      "query": "Let there be light",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 39,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "GEN 1:3",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 1:3",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 1:3",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 1:14",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 1:14",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 1:14",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 50:10",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 50:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 50:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 4:6",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p09",
+      "category": "exact phrase",
+      "query": "the LORD is my light and my salvation",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 5,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PSA 27:1",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 27:1",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "ACT 13:47",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ACT 13:47",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ACT 13:47",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p10",
+      "category": "exact phrase",
+      "query": "faith, hope, and love",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 10,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "1CO 13:13",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "1CO 13:13",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "1CO 13:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "COL 1:5",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1TH 5:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1TH 5:8",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1TH 1:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1TH 5:8",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1TH 1:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1TH 1:3",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p11",
+      "category": "exact phrase",
+      "query": "with God all things are possible",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 8,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "MAT 19:26",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 19:26",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 19:26",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "MRK 10:27",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 10:27",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MRK 10:27",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 18:27",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 18:27",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p12",
+      "category": "exact phrase",
+      "query": "a time to be born and a time to die",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "ECC 3:2",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ECC 3:2",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "ECC 3:2",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["BSB", "ASV", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p13",
+      "category": "different translation wording",
+      "query": "Do not be anxious about anything",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 472,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "1CO 10:19",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "1CO 10:19",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "1CO 10:19",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:34",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 6:34",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CO 2:10",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CO 2:10",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "JDG 13:14",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 14:14",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 14:14",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": null,
+      "status": "fail",
+      "failures": ["verses: any of PHP 4:6 not in the first 10"],
+      "limitation": "NIV wording; BSB reads 'Be anxious for nothing', so no edition has these words together",
+      "baseline": "fail"
+    },
+    {
+      "id": "p14",
+      "category": "exact phrase",
+      "query": "Trust in the LORD with all your heart",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 8,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PRO 3:5",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "PRO 3:5",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 112:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 112:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JER 17:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 28:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JER 17:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 28:7",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p15",
+      "category": "exact phrase",
+      "query": "Ask and it will be given to you",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 30,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "MAT 7:7",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 7:7",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 11:9",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 11:9",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 7:7",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 11:9",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "1KI 10:13",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "1KI 9:13",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1SA 1:27",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 1:27",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p16",
+      "category": "exact phrase",
+      "query": "The wages of sin is death",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "ROM 6:23",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ROM 6:23",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "ROM 6:23",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["BSB", "ASV", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p17",
+      "category": "exact phrase",
+      "query": "Seek first the kingdom of God",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 2,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:33",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:33",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "p18",
+      "category": "exact phrase",
+      "query": "I am the way, the truth, and the life",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "JHN 14:6",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 14:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 14:6",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k01",
+      "category": "single keyword",
+      "query": "shepherd",
+      "route": "keyword",
+      "searched": true,
+      "total": 306,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 34:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:8",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:23",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:23",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k02",
+      "category": "single keyword",
+      "query": "grace",
+      "route": "keyword",
+      "searched": true,
+      "total": 395,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "ROM 11:6",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ROM 11:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 13:25",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ROM 11:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1CO 15:10",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1CO 15:10",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 1:16",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1CO 15:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 1:16",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 1:16",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k03",
+      "category": "single keyword",
+      "query": "Selah",
+      "route": "keyword",
+      "searched": true,
+      "total": 224,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PSA 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 49:13",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 20:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 49:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 50:6",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 66:4",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 68:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 75:3",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k04",
+      "category": "single keyword",
+      "query": "manna",
+      "route": "keyword",
+      "searched": true,
+      "total": 48,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "EXO 16:35",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JOS 5:12",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EXO 16:35",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOS 5:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EXO 16:35",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JOS 5:12",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "NUM 11:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 6:49",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 6:49",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "NUM 11:6",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "fail",
+      "failures": ["verses: any of EXO 16:31 not in the first 25"],
+      "limitation": "Single-keyword results are ordered by length-normalised term frequency, not by prominence: a famous verse can sit beyond the first 25 of 48 matches",
+      "baseline": "fail"
+    },
+    {
+      "id": "k05",
+      "category": "single keyword",
+      "query": "covenant",
+      "route": "keyword",
+      "searched": true,
+      "total": 912,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "LEV 26:42",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LEV 26:42",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LEV 26:42",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2KI 23:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2KI 23:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2KI 23:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 17:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 16:60",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 16:60",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 17:7",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k06",
+      "category": "single keyword",
+      "query": "forgiveness",
+      "route": "keyword",
+      "searched": true,
+      "total": 205,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:12",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 11:26",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 20:23",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 2:10",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k07",
+      "category": "single keyword",
+      "query": "wilderness",
+      "route": "keyword",
+      "searched": true,
+      "total": 809,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "PSA 29:8",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 29:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 29:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 64:10",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EXO 19:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EXO 19:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 21:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 21:1",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 64:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "NUM 10:12",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "BSB", "WEB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "k08",
+      "category": "single keyword",
+      "query": "hallelujah",
+      "route": "keyword",
+      "searched": true,
+      "total": 36,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PSA 115:18",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 146:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 147:20",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 105:45",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 135:21",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 149:9",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 150:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 116:19",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 135:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 148:1",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB"],
+      "firstExpectedRank": null,
+      "status": "fail",
+      "failures": ["verses: any of REV 19:1 not in the first 25"],
+      "limitation": "Same: 36 matches in three editions, ordered by verse length, not prominence",
+      "baseline": "fail"
+    },
+    {
+      "id": "m01",
+      "category": "multiple keywords",
+      "query": "peace understanding hearts",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "PHP 4:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PHP 4:7",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PHP 4:7",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "m02",
+      "category": "multiple keywords",
+      "query": "faith works dead",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 10,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JAS 2:26",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JAS 2:26",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HEB 6:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 6:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JAS 2:20",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 6:1",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JAS 2:17",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JAS 2:17",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "COL 2:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "COL 2:12",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "m03",
+      "category": "multiple keywords",
+      "query": "wise men east",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 2,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "MAT 2:1",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 2:1",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "m04",
+      "category": "multiple keywords",
+      "query": "water wine wedding",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 2516,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "JHN 2:9",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 2:9",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 2:9",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 1:22",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "JOL 3:18",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "JOL 3:18",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 1:22",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 1:22",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOL 3:18",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "1TI 5:23",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["BSB", "ASV", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "m05",
+      "category": "multiple keywords",
+      "query": "camel needle eye",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 9,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "MRK 10:25",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 10:25",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 19:24",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 19:24",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MRK 10:25",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 18:25",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 18:25",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 19:24",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 18:25",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": 3,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "m06",
+      "category": "multiple keywords",
+      "query": "rich man kingdom heaven",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "MAT 19:23",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 19:23",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 19:23",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n01",
+      "category": "biblical name",
+      "query": "Melchizedek",
+      "route": "keyword",
+      "searched": true,
+      "total": 35,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "HEB 7:10",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HEB 7:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 7:17",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 5:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 5:10",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HEB 5:10",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HEB 7:17",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 7:10",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 7:17",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 110:4",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": 16,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n02",
+      "category": "biblical name",
+      "query": "Nebuchadnezzar",
+      "route": "keyword",
+      "searched": true,
+      "total": 237,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "DAN 2:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 2:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2KI 24:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "DAN 4:28",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 4:28",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DAN 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DAN 3:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 3:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JER 21:2",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n03",
+      "category": "biblical name",
+      "query": "Zacchaeus",
+      "route": "keyword",
+      "searched": true,
+      "total": 7,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 19:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 19:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 19:8",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": 2,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n04",
+      "category": "biblical name",
+      "query": "Bartimaeus",
+      "route": "keyword",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "MRK 10:50",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 10:46",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MRK 10:46",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": 2,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n05",
+      "category": "biblical name",
+      "query": "Jehovah",
+      "route": "keyword",
+      "searched": true,
+      "total": 5821,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "NUM 9:23",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1KI 19:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 33:22",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 3:21",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 26:4",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JER 33:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JER 23:38",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 1:28",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CH 7:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 146:8",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n06",
+      "category": "biblical name",
+      "query": "Beelzebub",
+      "route": "keyword",
+      "searched": true,
+      "total": 7,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "LUK 11:15",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 12:27",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 11:19",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 12:24",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MRK 3:22",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 10:25",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 11:18",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 4,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "n07",
+      "category": "biblical name",
+      "query": "Mephibosheth",
+      "route": "keyword",
+      "searched": true,
+      "total": 40,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "2SA 9:12",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2SA 9:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2SA 9:12",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2SA 9:6",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2SA 9:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2SA 9:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2SA 19:25",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2SA 9:8",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2SA 9:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2SA 9:13",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 4,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a01",
+      "category": "archaic wording",
+      "query": "thou shalt not kill",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 13,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "MAT 19:18",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ROM 13:9",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "EXO 20:13",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 5:17",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 13:9",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 5:21",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "EXO 29:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 14:15",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LEV 20:16",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 12:21",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 3,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a02",
+      "category": "archaic wording",
+      "query": "Abraham begat Isaac",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 4,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "GEN 25:19",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "1CH 1:34",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 1:2",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ACT 7:8",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 3,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a03",
+      "category": "archaic wording",
+      "query": "whosoever believeth on him",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 6,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:15",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ROM 10:11",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 12:46",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "1JN 5:1",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:16",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 11:26",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 5,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a04",
+      "category": "archaic wording",
+      "query": "verily verily I say unto thee",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 11,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:11",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:5",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:3",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 13:38",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 21:18",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 23:43",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 5:26",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 26:34",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MRK 14:30",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1KI 1:30",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 3,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a05",
+      "category": "archaic wording",
+      "query": "love suffereth long",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 1,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "1CO 13:4",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a06",
+      "category": "different translation wording",
+      "query": "charity suffereth long",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 882,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "1CO 13:4",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 94:3",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "DEU 1:46",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 6:3",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 13:1",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 94:3",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 13:1",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 94:3",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 130:6",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "ECC 3:15",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a07",
+      "category": "archaic wording",
+      "query": "hearken",
+      "route": "keyword",
+      "searched": true,
+      "total": 261,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JER 6:17",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JER 26:5",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOS 1:17",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 3:7",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JDG 9:7",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LEV 26:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2KI 17:40",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 28:21",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CH 30:20",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOB 13:6",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a08",
+      "category": "archaic wording",
+      "query": "peradventure",
+      "route": "keyword",
+      "searched": true,
+      "total": 29,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "GEN 24:39",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 18:29",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 27:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 42:4",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 25:9",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2TI 2:25",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 43:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 18:24",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 18:30",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOS 9:7",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a09",
+      "category": "archaic wording",
+      "query": "wherefore",
+      "route": "keyword",
+      "searched": true,
+      "total": 314,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "EXO 17:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 58:3",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 11:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JER 12:1",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 115:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1CO 10:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CO 11:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOB 42:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 95:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ROM 4:22",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "a10",
+      "category": "archaic wording",
+      "query": "Comforter",
+      "route": "keyword",
+      "searched": true,
+      "total": 267,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "2CO 1:4",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 66:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 1:4",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 1:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CO 1:4",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CO 1:6",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CO 1:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 40:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 40:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 66:13",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "fail",
+      "failures": [
+        "verses: any of JHN 14:26[ASV] not in the first 10",
+        "onlyEditions: found WEB,BSB,ASV"
+      ],
+      "limitation": "The English stemmer maps Comforter, comfort and comforted to one word, so exact archaic forms are not preferred; ASV John 14:26 is among 267 matches",
+      "baseline": "fail"
+    },
+    {
+      "id": "t01",
+      "category": "misspelling",
+      "query": "sheperd",
+      "route": "keyword",
+      "searched": true,
+      "total": 306,
+      "correctedQuery": "shepherd",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EZK 34:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:8",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:23",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 34:23",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t02",
+      "category": "misspelling",
+      "query": "forgivness",
+      "route": "keyword",
+      "searched": true,
+      "total": 205,
+      "correctedQuery": "forgiveness",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:12",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 11:26",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 6:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "MAT 6:15",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 20:23",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 2:10",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t03",
+      "category": "misspelling",
+      "query": "righteousnes",
+      "route": "keyword",
+      "searched": true,
+      "total": 1680,
+      "correctedQuery": "righteousness",
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "ROM 9:30",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ROM 10:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 3:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ROM 9:30",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1JN 3:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1JN 3:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 33:12",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 119:142",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZK 33:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 33:13",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t04",
+      "category": "misspelling",
+      "query": "resurection",
+      "route": "keyword",
+      "searched": true,
+      "total": 122,
+      "correctedQuery": "resurrection",
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "JHN 5:29",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 5:29",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 11:35",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HEB 11:35",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 5:29",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 20:27",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PHP 3:11",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 22:28",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 22:28",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MRK 12:23",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t05",
+      "category": "misspelling",
+      "query": "Nebuchadnezer",
+      "route": "keyword",
+      "searched": true,
+      "total": 237,
+      "correctedQuery": "nebuchadnezzar",
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "DAN 2:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 2:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2KI 24:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "DAN 4:28",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 4:28",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DAN 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 3:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DAN 3:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DAN 3:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JER 21:2",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t06",
+      "category": "misspelling",
+      "query": "begoten Son",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 12,
+      "correctedQuery": "begotten Son",
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 1:18",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:16",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:18",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 11:17",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "1JN 4:9",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "ECC 5:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JDG 8:30",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 1:5",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "PSA 2:7",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "HEB 5:5",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 2,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t07",
+      "category": "misspelling",
+      "query": "Jeruselem",
+      "route": "keyword",
+      "searched": true,
+      "total": 2298,
+      "correctedQuery": "jerusalem",
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "EZR 10:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ACT 9:28",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EZR 10:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JER 37:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JER 37:5",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JER 38:28",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ZEC 12:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ZEC 12:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ACT 1:12",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1KI 15:4",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t08",
+      "category": "misspelling",
+      "query": "Pharoah",
+      "route": "keyword",
+      "searched": true,
+      "total": 727,
+      "correctedQuery": "pharaoh",
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "GEN 12:15",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 12:15",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 41:25",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 41:25",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 40:11",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "GEN 40:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "GEN 41:25",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "GEN 41:28",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1KI 11:20",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1KI 11:20",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t09",
+      "category": "misspelling",
+      "query": "Isreal",
+      "route": "keyword",
+      "searched": true,
+      "total": 6418,
+      "correctedQuery": "israel",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "NUM 8:19",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 8:19",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1SA 7:14",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 7:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JDG 21:3",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JDG 21:3",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 25:8",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "NUM 25:8",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JDG 21:3",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2SA 5:2",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t10",
+      "category": "misspelling",
+      "query": "beleive",
+      "route": "keyword",
+      "searched": true,
+      "total": 759,
+      "correctedQuery": "believe",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "JHN 10:38",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 5:47",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 3:18",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 3:18",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 5:46",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 5:46",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 5:47",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 5:10",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1JN 5:10",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 21:32",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t11",
+      "category": "misspelling",
+      "query": "tounge",
+      "route": "keyword",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": "lounge",
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "AMO 6:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "AMO 6:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "AMO 6:4",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": null,
+      "status": "fail",
+      "failures": ["total: 3 < 50", "corrected: expected \"tongue\", got \"lounge\""],
+      "limitation": "Not repaired correctly: tounge to lounge (one edit) beats tongue (two edits). Weighing frequency against distance was tried and was worse (young, offer)",
+      "baseline": "fail"
+    },
+    {
+      "id": "t12",
+      "category": "misspelling",
+      "query": "salavation",
+      "route": "keyword",
+      "searched": true,
+      "total": 474,
+      "correctedQuery": "salvation",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "ISA 12:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 46:13",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 12:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 12:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 6:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HEB 2:3",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 46:13",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ISA 46:13",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "HAB 3:13",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CO 6:2",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "t13",
+      "category": "misspelling",
+      "query": "commandements",
+      "route": "keyword",
+      "searched": true,
+      "total": 2507,
+      "correctedQuery": "commandments",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "NUM 9:23",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 27:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DEU 27:1",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 9:23",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "NUM 9:23",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2KI 9:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1JN 2:7",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DEU 30:11",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DEU 4:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JOS 11:15",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w01",
+      "category": "modern wording",
+      "query": "smartphone",
+      "route": "keyword",
+      "searched": true,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w02",
+      "category": "modern wording",
+      "query": "computer",
+      "route": "keyword",
+      "searched": true,
+      "total": 8,
+      "correctedQuery": "compete",
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "2CO 3:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2TI 2:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2TI 2:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1CO 6:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "1CO 9:25",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JER 12:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2SA 2:14",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2SA 2:14",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w03",
+      "category": "modern wording",
+      "query": "internet",
+      "route": "keyword",
+      "searched": true,
+      "total": 46,
+      "correctedQuery": "interest",
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "DEU 23:19",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 23:19",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PHP 2:4",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 24:2",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 24:2",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "DEU 23:20",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "DEU 23:20",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PHP 2:21",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LEV 25:37",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LEV 25:37",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["WEB", "ASV", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w04",
+      "category": "modern wording",
+      "query": "coffee",
+      "route": "keyword",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": "coffer",
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "1SA 6:11",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 6:8",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 6:15",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w05",
+      "category": "modern wording",
+      "query": "pizza",
+      "route": "keyword",
+      "searched": true,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w06",
+      "category": "modern wording",
+      "query": "electricity",
+      "route": "keyword",
+      "searched": true,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "w07",
+      "category": "modern wording",
+      "query": "anxiety and worry",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 38,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:34",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "1PE 5:7",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "1PE 5:7",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "1SA 9:5",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "1SA 10:2",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 12:29",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "1PE 5:7",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 94:19",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 6:27",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 12:25",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "z01",
+      "category": "no matches",
+      "query": "zeppelin submarine",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "z02",
+      "category": "no matches",
+      "query": "xqzvwk",
+      "route": "nonsense",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "z03",
+      "category": "no matches",
+      "query": "qwerty asdf zxcv",
+      "route": "nonsense",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "z04",
+      "category": "no matches",
+      "query": "the and of",
+      "route": "refine",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "z05",
+      "category": "no matches",
+      "query": "a",
+      "route": "refine",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "x01",
+      "category": "many matches",
+      "query": "God",
+      "route": "keyword",
+      "searched": true,
+      "total": 11900,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "MAT 22:32",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 22:32",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 3:6",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "EXO 3:6",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "MAT 22:32",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "EXO 3:6",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "PSA 43:4",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 3:15",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 43:4",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2TH 2:4",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["ASV", "WEB", "BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "x02",
+      "category": "many matches",
+      "query": "the LORD said",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 2309,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "DEU 2:17",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CH 18:20",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "AMO 7:8",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 6:10",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 13:1",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 14:1",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 16:11",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 25:1",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 30:11",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "EXO 30:17",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "x03",
+      "category": "many matches",
+      "query": "love",
+      "route": "keyword",
+      "searched": true,
+      "total": 1637,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "LUK 6:32",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 6:32",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "LUK 6:32",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 15:9",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 14:21",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "HOS 3:1",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 14:21",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 15:9",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "1SA 20:17",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "1SA 20:17",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "x04",
+      "category": "many matches",
+      "query": "Jesus",
+      "route": "keyword",
+      "searched": true,
+      "total": 3203,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "LUK 19:35",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "LUK 19:35",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 19:9",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CO 4:5",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CO 4:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CO 4:5",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 26:50",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 11:7",
+          "tier": 2
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 11:35",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 11:35",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r01",
+      "category": "scripture reference",
+      "query": "John 3:16",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r02",
+      "category": "scripture reference",
+      "query": "Psalm 23",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r03",
+      "category": "scripture reference",
+      "query": "1 Cor 13:4",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r04",
+      "category": "scripture reference",
+      "query": "go to Ruth",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r05",
+      "category": "scripture reference",
+      "query": "Phillipians 4:13",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r06",
+      "category": "scripture reference",
+      "query": "John 3:16 BSB",
+      "route": "reference",
+      "searched": false,
+      "total": 0,
+      "correctedQuery": null,
+      "top10": [],
+      "editionsInTop10": [],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "r07",
+      "category": "scripture reference",
+      "query": "Hezekiah 3:16",
+      "route": "keyword",
+      "searched": true,
+      "total": 388,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "2KI 19:14",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CH 32:26",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "ISA 37:14",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "2KI 19:14",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "2CH 32:26",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CH 32:26",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "2CH 32:30",
+          "tier": 1
+        },
+        {
+          "edition": "ASV",
+          "ref": "ISA 37:14",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2KI 20:12",
+          "tier": 1
+        },
+        {
+          "edition": "BSB",
+          "ref": "NUM 31:46",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["WEB", "BSB", "ASV"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "d01",
+      "category": "different translation wording",
+      "query": "you shall not murder",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 24,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "EXO 20:13",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "EXO 20:13",
+          "tier": 3
+        },
+        {
+          "edition": "BSB",
+          "ref": "DEU 5:17",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "DEU 5:17",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 19:18",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "ROM 13:9",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "MAT 5:21",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "NUM 35:16",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "NUM 35:16",
+          "tier": 2
+        },
+        {
+          "edition": "WEB",
+          "ref": "NUM 35:17",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "WEB", "ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "d02",
+      "category": "different translation wording",
+      "query": "he gave his only begotten Son",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 1,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:16",
+          "tier": 3
+        }
+      ],
+      "editionsInTop10": ["ASV"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "d03",
+      "category": "different translation wording",
+      "query": "born of water and the Spirit",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 3,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "JHN 3:5",
+          "tier": 3
+        },
+        {
+          "edition": "ASV",
+          "ref": "JHN 3:5",
+          "tier": 3
+        },
+        {
+          "edition": "WEB",
+          "ref": "JHN 3:5",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB", "ASV", "WEB"],
+      "firstExpectedRank": 1,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "f01",
+      "category": "edition filter",
+      "query": "shepherd",
+      "route": "keyword",
+      "searched": true,
+      "total": 113,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:2",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 10:11",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:23",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "ZEC 13:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:8",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "PSA 23:1",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "LUK 2:18",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:7",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "EZK 34:9",
+          "tier": 2
+        },
+        {
+          "edition": "BSB",
+          "ref": "JHN 10:2",
+          "tier": 2
+        }
+      ],
+      "editionsInTop10": ["BSB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    },
+    {
+      "id": "f02",
+      "category": "edition filter",
+      "query": "thou shalt not kill",
+      "route": "needs_ai",
+      "searched": true,
+      "total": 491,
+      "correctedQuery": null,
+      "top10": [
+        {
+          "edition": "WEB",
+          "ref": "ISA 27:7",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "ACT 7:28",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CH 29:22",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2CH 25:3",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "JOB 5:2",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "MRK 12:5",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "1SA 17:9",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "LEV 24:21",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "2SA 3:30",
+          "tier": 1
+        },
+        {
+          "edition": "WEB",
+          "ref": "1KI 19:17",
+          "tier": 1
+        }
+      ],
+      "editionsInTop10": ["WEB"],
+      "firstExpectedRank": null,
+      "status": "pass",
+      "failures": [],
+      "baseline": "pass"
+    }
+  ]
+}

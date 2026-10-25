@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { FullScreenLoading } from "./components/search-states";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
@@ -21,6 +22,9 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // Stitch 15: a page that takes a moment to load shows the loading screen, not a blank page.
+    defaultPendingComponent: FullScreenLoading,
+    defaultPendingMs: 600,
   });
 
   return router;

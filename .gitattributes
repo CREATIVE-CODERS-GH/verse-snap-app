@@ -1,0 +1,15 @@
+# Normalise line endings: LF in the repository and in working copies.
+# (Windows checkouts with core.autocrlf=true otherwise show every file as CRLF
+# and fail the Prettier endOfLine rule.)
+* text=auto eol=lf
+
+# Binary assets must never be converted.
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.traineddata binary

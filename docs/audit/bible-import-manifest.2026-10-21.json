@@ -1,0 +1,344 @@
+{
+  "generatedAt": "2026-10-21T16:52:49.407Z",
+  "editions": {
+    "WEB": {
+      "identifier": "ENGWEBP",
+      "licenseStatus": "approved",
+      "noticeUrl": "https://ebible.org/engwebp/copyright.htm",
+      "source": {
+        "url": "https://bible.helloao.org/api/ENGWEBP/complete.json",
+        "bytes": 6293463,
+        "sha256": "afa177afbcf775b294bee9b13059090b548e4d996679cf53214bfaaea9e427fd",
+        "etag": "W/\"84c5657dc0247417cbff829c659f0cd1\"",
+        "lastModified": "Mon, 12 Oct 2026 19:04:09 GMT",
+        "downloadedAt": "2026-10-21T16:36:31.115Z"
+      },
+      "rowsToImport": 31098,
+      "verseBlocksInFile": 31103,
+      "chapters": 1189,
+      "files": [
+        {
+          "name": "WEB_00_check.sql",
+          "sha256": "2cd3b6dd6a87fa9f936bb6c0c1f0a3dc2468ca168918710af2ac530991699d65",
+          "bytes": 549
+        },
+        {
+          "name": "WEB_01.sql",
+          "sha256": "786219e089193d33e295d2b3afbf2c13e5e9f35c04db75f0a827d48faf1d2995",
+          "bytes": 316278
+        },
+        {
+          "name": "WEB_02.sql",
+          "sha256": "71c081191deef765996439beb28ba847a3cf699a1c0aad83837cb81331de1175",
+          "bytes": 330477
+        },
+        {
+          "name": "WEB_03.sql",
+          "sha256": "da93d27c1ac50cf69024a4e1fbae206f4a99584883c42e0bb0b896e033c0db06",
+          "bytes": 341365
+        },
+        {
+          "name": "WEB_04.sql",
+          "sha256": "157f3cbce4d22a2add158d023d3b819e6e136ec57f68080f2add0e563bb210ed",
+          "bytes": 361282
+        },
+        {
+          "name": "WEB_05.sql",
+          "sha256": "231bf338dcdba513342cd167f0401156525d63cb3ac568de5bbaf6280f887f47",
+          "bytes": 365494
+        },
+        {
+          "name": "WEB_06.sql",
+          "sha256": "ef25d5e8ebef64b350cab1b724c2ae93b7bcf13d4ec339b3a4ef9cb83c35ea31",
+          "bytes": 342398
+        },
+        {
+          "name": "WEB_07.sql",
+          "sha256": "bf3200a82c69bdc33bf27c60504d05e8ecb7511431992f6b6b101f7bd5b664a8",
+          "bytes": 285751
+        },
+        {
+          "name": "WEB_08.sql",
+          "sha256": "3fe073a764dad7f55c1cf1680705d6984dcd4cde84e390390bf4665a50bd07d5",
+          "bytes": 239471
+        },
+        {
+          "name": "WEB_09.sql",
+          "sha256": "74542bdee2dc9b64965b6b76db0b358ace4c98ab011f46bfc34e14ce288e346d",
+          "bytes": 260929
+        },
+        {
+          "name": "WEB_10.sql",
+          "sha256": "dc78eeb55b80a0786564d5f9e59fe6809600a555b71e58e6d9144c73b71a767b",
+          "bytes": 373617
+        },
+        {
+          "name": "WEB_11.sql",
+          "sha256": "cd1e53ba45297ada54c892ef2e13cf5fcf81bed6af475bc1f8901288be0234a7",
+          "bytes": 373021
+        },
+        {
+          "name": "WEB_12.sql",
+          "sha256": "315079c4782c0f056cf7d7419bf3809ef8bce1fc7dd72f704e68a1bbbf1a22f6",
+          "bytes": 329426
+        },
+        {
+          "name": "WEB_13.sql",
+          "sha256": "b80ed8b4df9f4c07444490c24241b8f515c6aa78df116517dfff5da1ab259212",
+          "bytes": 288387
+        },
+        {
+          "name": "WEB_14.sql",
+          "sha256": "67501a85d4940703b96c091dea83ef41eda393492222d8b3c431ec2cd01c5051",
+          "bytes": 299257
+        },
+        {
+          "name": "WEB_15.sql",
+          "sha256": "c5dd3e4853a19dea441d76b0727f574fd11d0004d84739dce61df7d3ebf14438",
+          "bytes": 288686
+        },
+        {
+          "name": "WEB_16.sql",
+          "sha256": "bcd442685e433455aebb88a2c0c77c75e2e473afa6c1be12df9c3ced08490d99",
+          "bytes": 178731
+        },
+        {
+          "name": "WEB_90_verify.sql",
+          "sha256": "9f1ee01d89d1ce7fa982b8a7aef27bfe8cc5c7e9a1bc50c6a915d688f5e58e5f",
+          "bytes": 631
+        },
+        {
+          "name": "WEB_99_promote.sql",
+          "sha256": "2f4a66eb4be26c8cdb871ecb62831c46e9c8c9ff94b272185ca630efca87a9c3",
+          "bytes": 684
+        }
+      ]
+    },
+    "BSB": {
+      "identifier": "BSB",
+      "licenseStatus": "approved",
+      "noticeUrl": "https://berean.bible/terms.htm",
+      "source": {
+        "url": "https://bible.helloao.org/api/BSB/complete.json",
+        "bytes": 8155925,
+        "sha256": "d02b81e78441f5ae5dadec0688ad8596cde6793c28f52ab711d901a855698b6a",
+        "etag": "W/\"64c6d5ac308a93246c5d58a0aa0e35ac\"",
+        "lastModified": "Mon, 12 Oct 2026 19:04:09 GMT",
+        "downloadedAt": "2026-10-21T16:36:33.563Z"
+      },
+      "rowsToImport": 31086,
+      "verseBlocksInFile": 31086,
+      "chapters": 1189,
+      "files": [
+        {
+          "name": "BSB_00_check.sql",
+          "sha256": "2f7716dce3b1e880bd7a1eb09762c18aac145e59b69b852b9a4d0b9e52525a5a",
+          "bytes": 545
+        },
+        {
+          "name": "BSB_01.sql",
+          "sha256": "8459af0d2bd8626c7f525295945c97fc80eae768ff76800a4619a3414fd26f71",
+          "bytes": 309884
+        },
+        {
+          "name": "BSB_02.sql",
+          "sha256": "7e1792fa70682e0771df05ba77df115797ff82f9ec22af64b090698796471952",
+          "bytes": 310151
+        },
+        {
+          "name": "BSB_03.sql",
+          "sha256": "f46697185dc025d40f1991d5d81e0bb31f69411ae7d1814a82b0d78b1a960db8",
+          "bytes": 324388
+        },
+        {
+          "name": "BSB_04.sql",
+          "sha256": "aea430c0a3445ef7b83cd5b956ff3c6b9836d002dffc88299b5953e96badce30",
+          "bytes": 346854
+        },
+        {
+          "name": "BSB_05.sql",
+          "sha256": "64617a5b0575bd60c4b15b95318f38c6cf8a257159d0a3f4cccfca981c11e09d",
+          "bytes": 359496
+        },
+        {
+          "name": "BSB_06.sql",
+          "sha256": "929bd1af58d210a7452e105d8fa8da1c434e9f4289e6c23f91e64994a92f511d",
+          "bytes": 333998
+        },
+        {
+          "name": "BSB_07.sql",
+          "sha256": "90aace64b24ddff7a0e1d4052e8bee8b2d3d579f2dfb5b680002cc30c174afb7",
+          "bytes": 273745
+        },
+        {
+          "name": "BSB_08.sql",
+          "sha256": "a563737255826104d6a5ca6a789344d4634e6ce856257f1c7ba3f3eb7e64823f",
+          "bytes": 232053
+        },
+        {
+          "name": "BSB_09.sql",
+          "sha256": "185235583159f741345c3b8c014aa0c5dc5900047f2f69111a00aaf796b21304",
+          "bytes": 253215
+        },
+        {
+          "name": "BSB_10.sql",
+          "sha256": "d5a8cccb11d64db975101932e382c664af06a50272e1a84373a3cceb7870e7e3",
+          "bytes": 361111
+        },
+        {
+          "name": "BSB_11.sql",
+          "sha256": "0bfe07779afdb47ab7213779b735c5c4e05b6fe9cabdc5a1e4be3a2cce25d585",
+          "bytes": 357845
+        },
+        {
+          "name": "BSB_12.sql",
+          "sha256": "8ab2dd9bf88e100040177c7202cbde8ee1b6fc586f5cdefc27448e9c7d33521c",
+          "bytes": 320028
+        },
+        {
+          "name": "BSB_13.sql",
+          "sha256": "cb61065d71a5872ab04eb98d9cce9712377b713b07a95cdad061c07179f842e9",
+          "bytes": 283815
+        },
+        {
+          "name": "BSB_14.sql",
+          "sha256": "52620c5a2b7a0d3a698e1f0dcfc3a48a01509b0ac21f5097386333b63d1febe0",
+          "bytes": 293058
+        },
+        {
+          "name": "BSB_15.sql",
+          "sha256": "bbe9429488830e4315f803d2fdc790cb29ebc6f5c1e5fb7cafd57d7c3511ad94",
+          "bytes": 285752
+        },
+        {
+          "name": "BSB_16.sql",
+          "sha256": "702a80a4d30e2a40fa6cd04be65670e961a5fbfaf9c55fa2bbe44e60dfa04ae6",
+          "bytes": 175293
+        },
+        {
+          "name": "BSB_90_verify.sql",
+          "sha256": "c0f454cdae5511497191ef24a6351725abe649fd2aecc9f58337822cf4817c36",
+          "bytes": 627
+        },
+        {
+          "name": "BSB_99_promote.sql",
+          "sha256": "4051aca55e1220c5e6576f92943f0058c464e26d22a0fad083a0f49a48e50f06",
+          "bytes": 680
+        }
+      ]
+    },
+    "ASV": {
+      "identifier": "eng_asv",
+      "licenseStatus": "approved",
+      "noticeUrl": "https://ebible.org/Scriptures/details.php?id=eng-asv",
+      "source": {
+        "url": "https://bible.helloao.org/api/eng_asv/complete.json",
+        "bytes": 6152058,
+        "sha256": "125acd86760f362fe5a8b47791057e546c26dcd0cde628f6017af146752cc69a",
+        "etag": "W/\"7106a17e0b7d20dde061302ca89e3d62\"",
+        "lastModified": "Mon, 12 Oct 2026 19:44:50 GMT",
+        "downloadedAt": "2026-10-21T16:36:36.204Z"
+      },
+      "rowsToImport": 31086,
+      "verseBlocksInFile": 31102,
+      "chapters": 1189,
+      "files": [
+        {
+          "name": "ASV_00_check.sql",
+          "sha256": "c500bf77f633f6261e89b81ebf73de6cf6180c88a10d86bc53e817b6d951a26e",
+          "bytes": 549
+        },
+        {
+          "name": "ASV_01.sql",
+          "sha256": "5aede3bd13e02aea175c85ea7199b3290ad6a6ac71636f32c2015dec1bc8343d",
+          "bytes": 325187
+        },
+        {
+          "name": "ASV_02.sql",
+          "sha256": "6ead85a9668554d63391ee0a115d8754fdd4fb35ec75fe3626ed89411361b6d7",
+          "bytes": 340181
+        },
+        {
+          "name": "ASV_03.sql",
+          "sha256": "511575430b35c8133b435ee22258ae4aa5435500d17dc9dddb71dc09a3addf23",
+          "bytes": 351765
+        },
+        {
+          "name": "ASV_04.sql",
+          "sha256": "c6a48dc79d81b683ef353aff7f4f1917e77deae893a1c3f0a350c4e4107698f0",
+          "bytes": 372855
+        },
+        {
+          "name": "ASV_05.sql",
+          "sha256": "40e73eb955c38630cdfdb434a6f6d085721c7a0492bd9f83075ba669836f193a",
+          "bytes": 376450
+        },
+        {
+          "name": "ASV_06.sql",
+          "sha256": "80acef7364891770c26b5261a1d6a7daa60f7cb3dca24c736439fb081588c043",
+          "bytes": 351762
+        },
+        {
+          "name": "ASV_07.sql",
+          "sha256": "889fffa738c280cc4ea4b95c876a42c15b225cd95be042f59fae059efee3cec4",
+          "bytes": 293834
+        },
+        {
+          "name": "ASV_08.sql",
+          "sha256": "af85cd7972fe2578922e85e02e5abba26e2f93bf6a30bc429daf9e1cc2489b74",
+          "bytes": 247289
+        },
+        {
+          "name": "ASV_09.sql",
+          "sha256": "5e087f2966eb7fba3838556abdf94d160a08c272aebad7df02c06d4ef48a2d8f",
+          "bytes": 268181
+        },
+        {
+          "name": "ASV_10.sql",
+          "sha256": "bb73c8099434aaa7fbf52c0d5a7a80a4776743b628b4621c0d1ed5a40acd5097",
+          "bytes": 380402
+        },
+        {
+          "name": "ASV_11.sql",
+          "sha256": "9f2036b81cd8fc38490c4c99543c7f8fb641c3e0dc503fd1af66661b839a7e2c",
+          "bytes": 383025
+        },
+        {
+          "name": "ASV_12.sql",
+          "sha256": "ee8c5437a87458d9981fc8386396fd158201812643afa828a8dcb8a6b6408df7",
+          "bytes": 334679
+        },
+        {
+          "name": "ASV_13.sql",
+          "sha256": "c4d14db685235abf2641eb71384d6079d3ef29628113c6f332ff534d5d85cff7",
+          "bytes": 291744
+        },
+        {
+          "name": "ASV_14.sql",
+          "sha256": "90489475e0f6595c2f18ccb0d870684777e54ed303a96592281156ea4076e361",
+          "bytes": 301606
+        },
+        {
+          "name": "ASV_15.sql",
+          "sha256": "7aeb0ff8559185c173177c09f781c2bcd81a5b3252f068ecfbe4ce32af458678",
+          "bytes": 288563
+        },
+        {
+          "name": "ASV_16.sql",
+          "sha256": "b5f7b7f07db9b98df96180b5630f935d609fd6ad829dd6f47d0cf6a72ea3312d",
+          "bytes": 180876
+        },
+        {
+          "name": "ASV_90_verify.sql",
+          "sha256": "9927b0ad8e968d42d82878c92c155861699ce3cca1a1034a74073f4a30570f76",
+          "bytes": 631
+        },
+        {
+          "name": "ASV_99_promote.sql",
+          "sha256": "d229bbb1e9859584b2d130bbf50483bb91323488a7171d598882e5425972178c",
+          "bytes": 684
+        }
+      ]
+    }
+  }
+}

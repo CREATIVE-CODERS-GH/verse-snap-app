@@ -1,0 +1,406 @@
+{
+  "generatedAt": "2026-10-21T16:52:49.407Z",
+  "editions": {
+    "WEB": {
+      "identifier": "ENGWEBP",
+      "sourceUrl": "https://bible.helloao.org/api/ENGWEBP/complete.json",
+      "noticeUrl": "https://ebible.org/engwebp/copyright.htm",
+      "bytes": 6293463,
+      "sha256": "afa177afbcf775b294bee9b13059090b548e4d996679cf53214bfaaea9e427fd",
+      "pinnedSha256Matches": true,
+      "publisherListedSha256": "72b3e6d83b3cd1c0a0e02a8b2254244d7568ca6c3235f52f93c71764590b8042",
+      "publisherChecksumReproduced": false,
+      "etag": "W/\"84c5657dc0247417cbff829c659f0cd1\"",
+      "lastModified": "Mon, 12 Oct 2026 19:04:09 GMT",
+      "downloadedAt": "2026-10-21T16:36:31.115Z",
+      "verseBlocksInFile": 31103,
+      "rowsToImport": 31098,
+      "chapters": 1189,
+      "emptyVerses": ["LUK 17:36", "ACT 8:37", "ACT 15:34", "ACT 24:7", "ROM 16:25"],
+      "gapsInNumbering": [],
+      "duplicateReferences": [],
+      "readerWouldRunWordsTogether": 7705,
+      "headings": 0,
+      "psalmSubtitleBlocksNotIndexed": 117,
+      "nonAsciiCharacters": {
+        "’": 9403,
+        "“": 7842,
+        "”": 6376,
+        "‘": 1979,
+        "—": 359
+      },
+      "unusualCharacterVerses": [],
+      "nonNfcVerses": [],
+      "countMismatches": [],
+      "blocksWithUnknownType": {},
+      "hardProblems": 0
+    },
+    "BSB": {
+      "identifier": "BSB",
+      "sourceUrl": "https://bible.helloao.org/api/BSB/complete.json",
+      "noticeUrl": "https://berean.bible/terms.htm",
+      "bytes": 8155925,
+      "sha256": "d02b81e78441f5ae5dadec0688ad8596cde6793c28f52ab711d901a855698b6a",
+      "pinnedSha256Matches": true,
+      "publisherListedSha256": "6cc5238e442b4204b0f617cc5c932bc04f3bae4a0658e6393b0e319653ebe37f",
+      "publisherChecksumReproduced": false,
+      "etag": "W/\"64c6d5ac308a93246c5d58a0aa0e35ac\"",
+      "lastModified": "Mon, 12 Oct 2026 19:04:09 GMT",
+      "downloadedAt": "2026-10-21T16:36:33.563Z",
+      "verseBlocksInFile": 31086,
+      "rowsToImport": 31086,
+      "chapters": 1189,
+      "emptyVerses": [],
+      "gapsInNumbering": [
+        "MAT 17: starts at 1, ends at 27, 26 verses; missing 21",
+        "MAT 18: starts at 1, ends at 35, 34 verses; missing 11",
+        "MAT 23: starts at 1, ends at 39, 38 verses; missing 14",
+        "MRK 7: starts at 1, ends at 37, 36 verses; missing 16",
+        "MRK 9: starts at 1, ends at 50, 48 verses; missing 44,46",
+        "MRK 11: starts at 1, ends at 33, 32 verses; missing 26",
+        "MRK 15: starts at 1, ends at 47, 46 verses; missing 28",
+        "LUK 17: starts at 1, ends at 37, 36 verses; missing 36",
+        "LUK 23: starts at 1, ends at 56, 55 verses; missing 17",
+        "JHN 5: starts at 1, ends at 47, 46 verses; missing 4",
+        "ACT 8: starts at 1, ends at 40, 39 verses; missing 37",
+        "ACT 15: starts at 1, ends at 41, 40 verses; missing 34",
+        "ACT 24: starts at 1, ends at 27, 26 verses; missing 7",
+        "ACT 28: starts at 1, ends at 31, 30 verses; missing 29",
+        "ROM 16: starts at 1, ends at 27, 26 verses; missing 24"
+      ],
+      "duplicateReferences": [],
+      "readerWouldRunWordsTogether": 9497,
+      "headings": 3091,
+      "psalmSubtitleBlocksNotIndexed": 116,
+      "nonAsciiCharacters": {
+        "“": 6740,
+        "”": 6681,
+        "’": 3598,
+        "—": 1669,
+        "‘": 1450
+      },
+      "unusualCharacterVerses": [],
+      "nonNfcVerses": [],
+      "countMismatches": [],
+      "blocksWithUnknownType": {},
+      "hardProblems": 0
+    },
+    "ASV": {
+      "identifier": "eng_asv",
+      "sourceUrl": "https://bible.helloao.org/api/eng_asv/complete.json",
+      "noticeUrl": "https://ebible.org/Scriptures/details.php?id=eng-asv",
+      "bytes": 6152058,
+      "sha256": "125acd86760f362fe5a8b47791057e546c26dcd0cde628f6017af146752cc69a",
+      "pinnedSha256Matches": true,
+      "publisherListedSha256": "154967f9f68504bdf9a8d7abaae4ef6a93f20f779df84e62c1c8828427731839",
+      "publisherChecksumReproduced": false,
+      "etag": "W/\"7106a17e0b7d20dde061302ca89e3d62\"",
+      "lastModified": "Mon, 12 Oct 2026 19:44:50 GMT",
+      "downloadedAt": "2026-10-21T16:36:36.204Z",
+      "verseBlocksInFile": 31102,
+      "rowsToImport": 31086,
+      "chapters": 1189,
+      "emptyVerses": [
+        "MAT 17:21",
+        "MAT 18:11",
+        "MAT 23:14",
+        "MRK 7:16",
+        "MRK 9:44",
+        "MRK 9:46",
+        "MRK 11:26",
+        "MRK 15:28",
+        "LUK 17:36",
+        "LUK 23:17",
+        "JHN 5:4",
+        "ACT 8:37",
+        "ACT 15:34",
+        "ACT 24:7",
+        "ACT 28:29",
+        "ROM 16:24"
+      ],
+      "gapsInNumbering": [],
+      "duplicateReferences": [],
+      "readerWouldRunWordsTogether": 5059,
+      "headings": 0,
+      "psalmSubtitleBlocksNotIndexed": 116,
+      "nonAsciiCharacters": {
+        "’": 1999,
+        "æ": 135,
+        "—": 41,
+        "ב": 1,
+        "ג": 1,
+        "ד": 1,
+        "ה": 1,
+        "ו": 1,
+        "ז": 1,
+        "ח": 1,
+        "ט": 1,
+        "י": 1,
+        "כ": 1,
+        "ל": 1,
+        "מ": 1,
+        "נ": 1,
+        "ס": 1,
+        "ע": 1,
+        "פ": 1,
+        "צ": 1,
+        "ק": 1,
+        "ר": 1,
+        "ש": 1,
+        "ת": 1,
+        "ï": 1,
+        "Æ": 1,
+        "ü": 1
+      },
+      "unusualCharacterVerses": [],
+      "nonNfcVerses": [],
+      "countMismatches": [],
+      "blocksWithUnknownType": {},
+      "hardProblems": 0
+    }
+  },
+  "chapterDifferences": {
+    "WEB vs BSB": [
+      {
+        "chapter": "MAT 17",
+        "firstHas": 27,
+        "secondHas": 26,
+        "onlyInFirst": [21],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MAT 18",
+        "firstHas": 35,
+        "secondHas": 34,
+        "onlyInFirst": [11],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MAT 23",
+        "firstHas": 39,
+        "secondHas": 38,
+        "onlyInFirst": [14],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MRK 7",
+        "firstHas": 37,
+        "secondHas": 36,
+        "onlyInFirst": [16],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MRK 9",
+        "firstHas": 50,
+        "secondHas": 48,
+        "onlyInFirst": [44, 46],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MRK 11",
+        "firstHas": 33,
+        "secondHas": 32,
+        "onlyInFirst": [26],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "MRK 15",
+        "firstHas": 47,
+        "secondHas": 46,
+        "onlyInFirst": [28],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "LUK 17",
+        "firstHas": 37,
+        "secondHas": 36,
+        "onlyInFirst": [36],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "LUK 23",
+        "firstHas": 56,
+        "secondHas": 55,
+        "onlyInFirst": [17],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "JHN 5",
+        "firstHas": 47,
+        "secondHas": 46,
+        "onlyInFirst": [4],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ACT 8",
+        "firstHas": 40,
+        "secondHas": 39,
+        "onlyInFirst": [37],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ACT 15",
+        "firstHas": 41,
+        "secondHas": 40,
+        "onlyInFirst": [34],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ACT 24",
+        "firstHas": 27,
+        "secondHas": 26,
+        "onlyInFirst": [7],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ACT 28",
+        "firstHas": 31,
+        "secondHas": 30,
+        "onlyInFirst": [29],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ROM 14",
+        "firstHas": 26,
+        "secondHas": 23,
+        "onlyInFirst": [24, 25, 26],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ROM 16",
+        "firstHas": 25,
+        "secondHas": 26,
+        "onlyInFirst": [24],
+        "onlyInSecond": [26, 27]
+      }
+    ],
+    "WEB vs ASV": [
+      {
+        "chapter": "ROM 14",
+        "firstHas": 26,
+        "secondHas": 23,
+        "onlyInFirst": [24, 25, 26],
+        "onlyInSecond": []
+      },
+      {
+        "chapter": "ROM 16",
+        "firstHas": 25,
+        "secondHas": 27,
+        "onlyInFirst": [],
+        "onlyInSecond": [26, 27]
+      }
+    ],
+    "BSB vs ASV": [
+      {
+        "chapter": "MAT 17",
+        "firstHas": 26,
+        "secondHas": 27,
+        "onlyInFirst": [],
+        "onlyInSecond": [21]
+      },
+      {
+        "chapter": "MAT 18",
+        "firstHas": 34,
+        "secondHas": 35,
+        "onlyInFirst": [],
+        "onlyInSecond": [11]
+      },
+      {
+        "chapter": "MAT 23",
+        "firstHas": 38,
+        "secondHas": 39,
+        "onlyInFirst": [],
+        "onlyInSecond": [14]
+      },
+      {
+        "chapter": "MRK 7",
+        "firstHas": 36,
+        "secondHas": 37,
+        "onlyInFirst": [],
+        "onlyInSecond": [16]
+      },
+      {
+        "chapter": "MRK 9",
+        "firstHas": 48,
+        "secondHas": 50,
+        "onlyInFirst": [],
+        "onlyInSecond": [44, 46]
+      },
+      {
+        "chapter": "MRK 11",
+        "firstHas": 32,
+        "secondHas": 33,
+        "onlyInFirst": [],
+        "onlyInSecond": [26]
+      },
+      {
+        "chapter": "MRK 15",
+        "firstHas": 46,
+        "secondHas": 47,
+        "onlyInFirst": [],
+        "onlyInSecond": [28]
+      },
+      {
+        "chapter": "LUK 17",
+        "firstHas": 36,
+        "secondHas": 37,
+        "onlyInFirst": [],
+        "onlyInSecond": [36]
+      },
+      {
+        "chapter": "LUK 23",
+        "firstHas": 55,
+        "secondHas": 56,
+        "onlyInFirst": [],
+        "onlyInSecond": [17]
+      },
+      {
+        "chapter": "JHN 5",
+        "firstHas": 46,
+        "secondHas": 47,
+        "onlyInFirst": [],
+        "onlyInSecond": [4]
+      },
+      {
+        "chapter": "ACT 8",
+        "firstHas": 39,
+        "secondHas": 40,
+        "onlyInFirst": [],
+        "onlyInSecond": [37]
+      },
+      {
+        "chapter": "ACT 15",
+        "firstHas": 40,
+        "secondHas": 41,
+        "onlyInFirst": [],
+        "onlyInSecond": [34]
+      },
+      {
+        "chapter": "ACT 24",
+        "firstHas": 26,
+        "secondHas": 27,
+        "onlyInFirst": [],
+        "onlyInSecond": [7]
+      },
+      {
+        "chapter": "ACT 28",
+        "firstHas": 30,
+        "secondHas": 31,
+        "onlyInFirst": [],
+        "onlyInSecond": [29]
+      },
+      {
+        "chapter": "ROM 16",
+        "firstHas": 26,
+        "secondHas": 27,
+        "onlyInFirst": [],
+        "onlyInSecond": [24]
+      }
+    ]
+  },
+  "readerCheck": {
+    "checkedChapters": 3567,
+    "checkedRows": 93270,
+    "problems": []
+  }
+}
