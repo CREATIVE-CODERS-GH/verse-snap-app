@@ -15,9 +15,9 @@ describe("Home screen", () => {
     expect(home).toMatch(/to="\/search"[\s\S]*?title="Search the Bible"/);
   });
 
-  it("keeps the settings link, onboarding gate and analytics", () => {
-    expect(home).toContain('to="/settings"');
-    expect(home).toContain('aria-label="Settings"');
+  it("keeps the onboarding gate and analytics, with Settings only in the bottom tabs", () => {
+    expect(home).not.toContain('to="/settings"');
+    expect(home).not.toContain("GearIcon");
     expect(home).toContain("hasCompletedOnboarding()");
     expect(home).toContain('trackEvent("app_open")');
     expect(home).toContain('trackEvent("onboarding_completed")');
