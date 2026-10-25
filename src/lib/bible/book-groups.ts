@@ -128,6 +128,19 @@ export function groupsOf(testament: Testament): BookGroup[] {
   return BOOK_GROUPS.filter((group) => group.testament === testament);
 }
 
+export const ALL_GROUP_ID = "all";
+
+/** A leading "All" chip for a testament: every book of it, in order. Not part of BOOK_GROUPS. */
+export function allGroupOf(testament: Testament): BookGroup {
+  return {
+    id: ALL_GROUP_ID,
+    testament,
+    label: "All",
+    kind: "",
+    bookIds: groupsOf(testament).flatMap((group) => group.bookIds),
+  };
+}
+
 export function groupOfBook(bookId: string): BookGroup | undefined {
   return BOOK_GROUPS.find((group) => group.bookIds.includes(bookId));
 }
