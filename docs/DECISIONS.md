@@ -27,3 +27,6 @@ Short records of choices worth not re-litigating. Newest last. Longer write-ups:
   Production by a keep-our-tree merge (`-s ours`) then a plain fast-forward (no force-push); the testing branch stays
   the Preview branch. `@lovable.dev/vite-tanstack-config` is kept for now; replacing it is a separate task. The old
   Supabase project guard (`scripts/check-free-search-env.mjs`) stays.
+- **Production cutover done (2026-10-25):** PR #2 (`a9f8908`) replaced the Lovable `main` with the Verse Snap app via a
+  keep-our-tree merge (both histories kept, no force-push). `main` = Production, GitHub default and Vercel Production Branch (first Production deployment succeeded);
+  `testing/vercel-mobile-preview` = development and Preview. Branch protection on `main` is still to be configured. Lovable code and `.lovable/` stay out; the archive branch and tag are the only copies.
