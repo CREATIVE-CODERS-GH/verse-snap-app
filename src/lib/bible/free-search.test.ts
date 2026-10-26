@@ -18,6 +18,8 @@ import {
   freeSearchKey,
   freeSearchInfiniteOptions,
   getFreeSearchProvider,
+  groupedSummary,
+  groupVerseHits,
   pageOfResults,
   preparingProvider,
   resultKey,
@@ -521,5 +523,97 @@ describe("large result sets stay light", () => {
     expect(out.total).toBe(62_000);
     expect(out.results).toHaveLength(25);
     expect(ms).toBeLessThan(2000);
+  });
+});
+
+describe("one result per verse across editions", () => {
+  const hit = (translation: string, bookId: string, chapter: number, verse: number, text: string) =>
+    ({
+      translation,
+      bookId,
+      bookName: bookId,
+      chapter,
+      verse,
+      reference: `${bookId} ${chapter}:${verse}`,
+      text,
+    }) satisfies FreeSearchHit;
+
+  const rows = [
+    hit("BSB", "psalms", 23, 1, "The LORD is my shepherd; I shall not want."),
+    hit("WEB", "psalms", 23, 1, "The LORD is my shepherd; I shall lack nothing."),
+    hit("WEB", "ezekiel", 34, 2, "Woe to the shepherds of Israel"),
+    hit("ASV", "psalms", 23, 1, "Jehovah is my shepherd; I shall not want."),
+    hit("BSB", "ezekiel", 34, 2, "Woe to the shepherds of Israel"),
+  ];
+
+  it("folds the same verse found in several editions into one result", () => {
+    const grouped = groupVerseHits(rows);
+    expect(grouped.map((item) => item.reference)).toEqual(["psalms 23:1", "ezekiel 34:2"]);
+  });
+
+  it("shows the best-matching edition and lists the others beside it", () => {
+    const [psalm, ezekiel] = groupVerseHits(rows);
+    expect(psalm).toMatchObject({
+      translation: "BSB",
+      text: "The LORD is my shepherd; I shall not want.",
+      editions: ["BSB", "WEB", "ASV"],
+    });
+    expect(ezekiel).toMatchObject({ translation: "WEB", editions: ["WEB", "BSB"] });
+  });
+
+  it("keeps verses in the order of their best match and never rewrites Scripture text", () => {
+    const grouped = groupVerseHits([...rows].reverse());
+    expect(grouped[0]?.reference).toBe("ezekiel 34:2");
+    expect(grouped[0]?.text).toBe("Woe to the shepherds of Israel");
+    expect(grouped[1]?.text).toBe("Jehovah is my shepherd; I shall not want.");
+  });
+
+  it("does not list an edition twice and leaves the rows it was given alone", () => {
+    const copy = JSON.parse(JSON.stringify(rows));
+    const grouped = groupVerseHits([...rows, rows[0] as FreeSearchHit]);
+    expect(grouped[0]?.editions).toEqual(["BSB", "WEB", "ASV"]);
+    expect(rows).toEqual(copy);
+  });
+
+  it("opens the verse in the edition shown", () => {
+    const [psalm] = groupVerseHits(rows);
+    expect(resultRouteParams(psalm as FreeSearchHit).translation).toBe("BSB");
+  });
+
+  it("an empty search gives no groups", () => {
+    expect(groupVerseHits([])).toEqual([]);
+  });
+
+  it("describes how many verses are shown without claiming an exact total", () => {
+    expect(groupedSummary(10, false, false)).toBe("Showing 10 verses");
+    expect(groupedSummary(1, true, false)).toBe("1 verse");
+    expect(groupedSummary(37, true, false)).toBe("37 verses");
+    expect(groupedSummary(1200, true, true)).toContain("Refine your search");
+  });
+
+  it("renders one row per verse, with the other editions beside it", async () => {
+    const grouped = groupVerseHits(rows);
+    const root = createRootRoute();
+    const list = createRoute({
+      getParentRoute: () => root,
+      path: "/",
+      component: () =>
+        createElement(SearchResultsList, { items: grouped, shown: 10, onShowMore: () => {} }),
+    });
+    const verse = createRoute({
+      getParentRoute: () => root,
+      path: "/verse/$translation/$book/$chapter/$verse",
+      component: () => null,
+    });
+    const router = createRouter({
+      routeTree: root.addChildren([list, verse]),
+      history: createMemoryHistory({ initialEntries: ["/"] }),
+    });
+    await router.load();
+    const markup = renderToStaticMarkup(createElement(RouterProvider, { router }));
+    expect(markup.match(/<li/g)).toHaveLength(2);
+    expect(markup).toContain('href="/verse/BSB/psalms/23/1"');
+    expect(markup).not.toContain('href="/verse/WEB/psalms/23/1"');
+    expect(markup).toContain("also WEB, ASV");
   });
 });

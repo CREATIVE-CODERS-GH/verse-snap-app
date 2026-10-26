@@ -41,7 +41,8 @@ import {
   FREE_SEARCH_PREPARING_MESSAGE,
   freeSearchInfiniteOptions,
   getFreeSearchProvider,
-  resultSummary,
+  groupedSummary,
+  groupVerseHits,
   searchedSummary,
   SMART_SEARCH_LABEL,
   SMART_SEARCH_OFFERED,
@@ -184,8 +185,11 @@ function SearchPage() {
   const freePages = freeSearch.data?.pages ?? [];
   const firstFreePage = freePages[0];
   const lastFreePage = freePages.at(-1);
-  const freeResults = freePages.flatMap((page) => page.results);
-  const freeTotal = firstFreePage?.total ?? 0;
+  // One result per verse, however many editions it matched in (see groupVerseHits).
+  const freeResults = useMemo(
+    () => groupVerseHits(freeSearch.data?.pages.flatMap((page) => page.results) ?? []),
+    [freeSearch.data],
+  );
   const freeNotice = firstFreePage ? unindexedNotice(firstFreePage) : null;
   const freeSearched = searchedSummary(firstFreePage?.searchedEditions ?? []);
   // How many result rows are on screen; a new search starts again from the first page.
@@ -435,9 +439,9 @@ function SearchPage() {
               items={freeResults}
               shown={shown}
               onShowMore={showMoreFree}
-              summary={resultSummary(
+              summary={groupedSummary(
                 Math.min(shown, freeResults.length),
-                freeTotal,
+                shown >= freeResults.length && !freeSearch.hasNextPage,
                 Boolean(lastFreePage?.limitReached) && shown >= freeResults.length,
               )}
               canLoadMore={Boolean(freeSearch.hasNextPage)}
