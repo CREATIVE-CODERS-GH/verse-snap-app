@@ -32,6 +32,8 @@ interface ResultRowContentProps {
   reference: string;
   translation: string;
   text: string;
+  /** Other editions the same verse matched in (search groups one result per verse). */
+  alsoIn?: readonly string[];
   /** Shown only when real match-level data exists; nothing in the app supplies it yet. */
   matchLevel?: MatchLevel;
 }
@@ -40,6 +42,7 @@ export function ResultRowContent({
   reference,
   translation,
   text,
+  alsoIn,
   matchLevel,
 }: ResultRowContentProps) {
   const badge = matchLevel ? BADGES[matchLevel] : null;
@@ -48,6 +51,9 @@ export function ResultRowContent({
       <span className="mb-1.5 flex items-baseline gap-1.5">
         <span className="text-[15px] font-bold tracking-tight text-vs-text">{reference}</span>
         <span className="text-[11px] font-medium text-vs-text-secondary">{translation}</span>
+        {alsoIn && alsoIn.length > 0 ? (
+          <span className="text-[11px] text-vs-text-secondary">· also {alsoIn.join(", ")}</span>
+        ) : null}
       </span>
       <span className="mb-2 line-clamp-3 text-[13px] font-normal leading-relaxed text-vs-text-secondary">
         {text}
