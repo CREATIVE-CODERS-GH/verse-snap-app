@@ -13,9 +13,10 @@
   deployment from `main` succeeded and the app works in Production.
 - **Pending:** `main` branch protection (not configured). After the docs PR merges, sync
   `testing/vercel-mobile-preview` with `main`.
-- **Next development priority:** repository cleanup. Phase 1 (unused asset/icon/component removal, ignore rules) is on
-  `chore/repo-cleanup-phase1`; remaining: unused shadcn `ui/` files and their dependencies, then replacing
-  `@lovable.dev/vite-tanstack-config` (needs `vite.config.ts` + lockfile changes, separate approval).
+- **Repository cleanup:** Phase 1 (unused assets/icons, ignore rules) and Phase 1B (unused shadcn `ui/` files and
+  31 packages) are merged. Phase 2 (this branch, `chore/remove-lovable-vite-config`): `vite.config.ts` is now native
+  Vite plugins and `@lovable.dev/vite-tanstack-config` is gone; Lovable independence is complete once it merges and
+  the Vercel Preview build is confirmed.
 - **Housekeeping:** `prod/pre-main-cutover-306bf67` backup tag was never created; skip unless wanted.
 
 ## Done and live
