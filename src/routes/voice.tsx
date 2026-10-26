@@ -7,6 +7,7 @@ import { classifyQuery } from "@/lib/bible/classify-query";
 import { routeQuery } from "@/lib/bible/search-router";
 import type { ParsedReference } from "@/lib/bible/parse-reference";
 import { usePreferences } from "@/lib/preferences";
+import { micProfile } from "@/lib/preferences-storage";
 import { trackEvent } from "@/lib/analytics";
 import { useBackOrHome } from "@/lib/use-back-or-home";
 import { cn } from "@/lib/utils";
@@ -91,7 +92,7 @@ function referenceLabel(reference: ParsedReference): string {
 
 function VoicePage() {
   const navigate = useNavigate();
-  const { translation, speechLanguage, autoListen, ready } = usePreferences();
+  const { translation, speechLanguage, micSensitivity, autoListen, ready } = usePreferences();
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const startingRef = useRef(false);
   const startTimerRef = useRef<number | null>(null);
@@ -173,7 +174,7 @@ function VoicePage() {
     recognition.continuous = false;
     recognition.interimResults = true;
     recognition.lang = speechLanguage;
-    recognition.maxAlternatives = 3;
+    recognition.maxAlternatives = micProfile(micSensitivity).maxAlternatives;
 
     recognition.onstart = () => {
       if (startTimerRef.current !== null) {
@@ -289,7 +290,7 @@ function VoicePage() {
       setState("error");
       setMessage("Voice search couldn't start. Try again.");
     }
-  }, [navigate, openReference, stopRecognition, speechLanguage]);
+  }, [navigate, openReference, stopRecognition, speechLanguage, micSensitivity]);
 
   // Starts listening on open unless "Auto-listen on launch" is turned off in Voice & Audio.
   const autoStarted = useRef(false);

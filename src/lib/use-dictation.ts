@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePreferences } from "./preferences";
 
 /** The slice of the Web Speech API this app uses (not in the standard DOM typings). */
 interface RecognitionResultList {
@@ -31,6 +32,7 @@ export type DictationState = "idle" | "listening" | "unsupported" | "error";
 
 /** Voice input for a text field: one spoken phrase, delivered to `onText`. */
 export function useDictation(onText: (text: string) => void) {
+  const { speechLanguage } = usePreferences();
   const [state, setState] = useState<DictationState>("idle");
   const recognition = useRef<RecognitionLike | null>(null);
   const callback = useRef(onText);
@@ -49,7 +51,7 @@ export function useDictation(onText: (text: string) => void) {
       return;
     }
     const instance = new Recognition();
-    instance.lang = "en-US";
+    instance.lang = speechLanguage;
     instance.interimResults = false;
     instance.maxAlternatives = 1;
     instance.onresult = (event) => {
@@ -65,7 +67,7 @@ export function useDictation(onText: (text: string) => void) {
     } catch {
       setState("error");
     }
-  }, [state]);
+  }, [state, speechLanguage]);
 
   return { state, toggle, supported: recognitionConstructor() !== null };
 }

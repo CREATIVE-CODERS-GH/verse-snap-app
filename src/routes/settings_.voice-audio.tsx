@@ -17,6 +17,8 @@ import {
 } from "@/components/stitch-icons";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences, type MicSensitivity, type Narrator } from "@/lib/preferences";
+import { useDeviceVoices } from "@/lib/narration/narration";
+import { voiceLabel } from "@/lib/narration/voices";
 import { PLAYBACK_SPEEDS, SPEECH_LANGUAGES } from "@/lib/preferences-storage";
 import { useSpeak } from "@/lib/use-speak";
 import { cn } from "@/lib/utils";
@@ -44,30 +46,50 @@ const NARRATORS: readonly {
   {
     id: "classic",
     title: "Classic Resonant",
-    subtitle: "Rich, measured cadence with historical solemnity",
-    badge: "Male",
+    subtitle: "A lower, measured delivery with historical solemnity",
+    badge: "Deeper",
     icon: <VolumeIcon className="h-5 w-5" />,
   },
   {
     id: "gentle",
     title: "Gentle Reading",
-    subtitle: "Warm, intimate narration suited for contemplation",
-    badge: "Female",
+    subtitle: "A brighter, slightly slower delivery suited for contemplation",
+    badge: "Brighter",
     icon: <RecordVoiceIcon className="h-5 w-5" />,
   },
   {
     id: "peaceful",
-    title: "Peaceful Ambient",
-    subtitle: "Soft narration with quiet acoustic soundscape",
-    badge: "Soundscape",
+    title: "Peaceful Reading",
+    subtitle: "A slow, unhurried delivery for quiet reflection",
+    badge: "Slower",
     icon: <NatureIcon className="h-5 w-5" />,
   },
 ];
 
-const SENSITIVITY: readonly { value: MicSensitivity; label: string; status: string }[] = [
-  { value: "quiet", label: "Quiet", status: "Quiet sanctuary" },
-  { value: "standard", label: "Standard", status: "Standard" },
-  { value: "open", label: "Open air", status: "Open air" },
+const SENSITIVITY: readonly {
+  value: MicSensitivity;
+  label: string;
+  status: string;
+  hint: string;
+}[] = [
+  {
+    value: "quiet",
+    label: "Quiet",
+    status: "Quiet sanctuary",
+    hint: "Trusts the first match it hears. Best in a quiet room.",
+  },
+  {
+    value: "standard",
+    label: "Standard",
+    status: "Standard",
+    hint: "Balanced for most places.",
+  },
+  {
+    value: "open",
+    label: "Open air",
+    status: "Open air",
+    hint: "Considers more possible matches when it is noisy around you.",
+  },
 ];
 
 /** What the badge beside "Playback Speed" says for each speed. */
@@ -158,6 +180,9 @@ function VoiceAudioPage() {
   const prefs = usePreferences();
   const [languageOpen, setLanguageOpen] = useState(false);
   const speech = useSpeak((message) => toast(message));
+  const voices = useDeviceVoices();
+  const [voiceOpen, setVoiceOpen] = useState(false);
+  const chosenVoice = voices.find((item) => item.uri === prefs.voiceURI);
   const narrator = NARRATORS.find((item) => item.id === prefs.narrator) ?? NARRATORS[0]!;
   const language =
     SPEECH_LANGUAGES.find((item) => item.code === prefs.speechLanguage) ?? SPEECH_LANGUAGES[0]!;
@@ -244,10 +269,10 @@ function VoiceAudioPage() {
               >
                 <div className="flex min-w-0 flex-col">
                   <span className="text-[15px] font-semibold leading-snug text-brand-text">
-                    Speech recognition language
+                    Speech language
                   </span>
                   <span className="mt-0.5 text-[13px] leading-normal text-brand-text-muted">
-                    Localized natural accents &amp; books
+                    Used by Say a Verse, dictation and the read-aloud accent
                   </span>
                 </div>
                 <div className="flex shrink-0 items-center gap-1.5">
@@ -292,6 +317,7 @@ function VoiceAudioPage() {
                     );
                   })}
                 </div>
+                <p className="text-[12px] leading-snug text-brand-text-muted">{sensitivity.hint}</p>
               </div>
             </div>
           </Section>
@@ -367,6 +393,31 @@ function VoiceAudioPage() {
                 );
               })}
             </div>
+            <button
+              type="button"
+              onClick={() => setVoiceOpen(true)}
+              aria-haspopup="dialog"
+              className={cn(
+                CARD,
+                "mt-2.5 flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-brand-surface-muted/60",
+                FOCUS,
+              )}
+            >
+              <span className="flex min-w-0 flex-col">
+                <span className="text-[15px] font-semibold leading-snug text-brand-text">
+                  Device voice
+                </span>
+                <span className="mt-0.5 text-[13px] leading-normal text-brand-text-muted">
+                  The voice this phone uses to read aloud
+                </span>
+              </span>
+              <span className="flex shrink-0 items-center gap-1.5">
+                <span className="max-w-[9rem] truncate text-[14px] font-medium text-brand-text">
+                  {chosenVoice ? chosenVoice.name : "Automatic"}
+                </span>
+                <ChevronRightIcon className="h-5 w-5 text-brand-text-muted" aria-hidden />
+              </span>
+            </button>
           </Section>
 
           {/* Speed */}
@@ -491,14 +542,34 @@ function VoiceAudioPage() {
       <ChoiceSheet
         open={languageOpen}
         onOpenChange={setLanguageOpen}
-        title="Speech recognition language"
-        description="Used by Say a Verse"
+        title="Speech language"
+        description="Used by Say a Verse, dictation and the read-aloud accent"
         name="speech-language"
         options={SPEECH_LANGUAGES.map((item) => ({ id: item.code, label: item.label }))}
         value={prefs.speechLanguage}
         onChange={(speechLanguage) => {
           prefs.update({ speechLanguage });
           setLanguageOpen(false);
+        }}
+      />
+      <ChoiceSheet
+        open={voiceOpen}
+        onOpenChange={setVoiceOpen}
+        title="Device voice"
+        description={
+          voices.length > 0
+            ? "Voices installed on this device. They differ by phone and browser."
+            : "This device offers no choice of voices, so its default voice is used."
+        }
+        name="device-voice"
+        options={[
+          { id: "", label: "Automatic" },
+          ...voices.map((item) => ({ id: item.uri, label: voiceLabel(item) })),
+        ]}
+        value={chosenVoice ? prefs.voiceURI : ""}
+        onChange={(voiceURI) => {
+          prefs.update({ voiceURI });
+          setVoiceOpen(false);
         }}
       />
     </div>
