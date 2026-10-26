@@ -197,8 +197,8 @@ export function Onboarding({ onComplete }: OnboardingProps) {
             <div className="absolute inset-0 overflow-hidden">
               <img
                 src="/stitch/onboarding-hero.jpg"
-                alt="A person sitting on a rocky mountain ledge, looking out over a valley at sunset"
-                className="h-full w-full scale-105 object-cover object-bottom"
+                alt="An open Bible on a lakeside rock at sunrise, with mountains in the distance"
+                className="h-full w-full scale-105 object-cover object-[50%_75%]"
                 draggable={false}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
