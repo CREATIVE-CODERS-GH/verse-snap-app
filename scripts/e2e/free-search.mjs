@@ -43,6 +43,14 @@ const MOCK = `
         const p = page(75, 5000, offset);
         return offset >= 50 ? { ...p, hasMore: false, limitReached: true } : { ...p, hasMore: true };
       }
+      if (q.includes('three editions')) {
+        // The same 10 verses, each found in BSB, WEB and ASV: 30 rows from the server.
+        const results = [];
+        for (let i = 0; i < 10; i += 1) for (const translation of ['BSB', 'WEB', 'ASV']) {
+          results.push({ ...mk(i, translation), text: translation + ' wording of verse ' + i });
+        }
+        return { status: 'ready', total: 30, offset: 0, results, hasMore: false, limitReached: false, searchedEditions: ['WEB', 'BSB', 'ASV'] };
+      }
       if (q.includes('sheperd')) return repair === false ? page(0, 0, 0) : page(2, 2, offset, { correctedQuery: 'shepherd now' });
       return page(2, 2, offset);
     },
@@ -115,8 +123,8 @@ for (const [width, height] of [
   await open("plenty of verses here");
   t = await text();
   check(
-    `${tag} paging: first 10 of 60, with 'Showing 10 of 60 verses'`,
-    (await rows()) === 10 && /Showing 10 of 60 verses/.test(t),
+    `${tag} paging: first 10 of 60, with 'Showing 10 verses'`,
+    (await rows()) === 10 && /Showing 10 verses/.test(t),
     `${await rows()} ${t.slice(-120)}`,
   );
   await showMore();
@@ -135,8 +143,8 @@ for (const [width, height] of [
     JSON.stringify(await ev("window.__calls")),
   );
   check(
-    `${tag} paging: summary follows ('Showing 30 of 60 verses')`,
-    /Showing 30 of 60 verses/.test(await text()),
+    `${tag} paging: summary follows ('Showing 30 verses')`,
+    /Showing 30 verses/.test(await text()),
   );
   for (let i = 0; i < 4; i += 1) await showMore();
   await waitFor("document.querySelectorAll('section[aria-live] ul > li').length === 60");
@@ -207,10 +215,34 @@ for (const [width, height] of [
   t = await text();
   check(
     `${tag} retrieval limit: says it and suggests refining`,
-    /Showing 75 of 5,000 verses\. Refine your search to narrow the results\./.test(t),
+    /Showing 75 verses\. There are more matches than can be shown\. Refine your search to narrow the results\./.test(
+      t,
+    ),
     t.slice(-200),
   );
   check(`${tag} retrieval limit: no overflow`, (await overflow()) <= 0);
+
+  // The same verse in several editions is one result, with the other editions listed beside it.
+  await open("three editions of every verse");
+  t = await text();
+  check(
+    `${tag} editions: 30 matches across 3 editions show as 10 verses, one row each`,
+    (await rows()) === 10 && /\b10 verses\b/.test(t) && !/Show more verses/.test(t),
+    `${await rows()} len=${t.length} ${JSON.stringify(t.slice(-200))}`,
+  );
+  check(
+    `${tag} editions: each row shows the best edition and lists the others`,
+    (await ev(
+      "[...document.querySelectorAll('section[aria-live] ul > li')].every((li) => /BSB wording of verse/.test(li.innerText) && /also WEB, ASV/.test(li.innerText) && !/WEB wording/.test(li.innerText))",
+    )) === true,
+  );
+  check(
+    `${tag} editions: each row opens the verse in the edition shown`,
+    (await ev(
+      "[...document.querySelectorAll('section[aria-live] ul > li a')].every((a) => a.getAttribute('href').startsWith('/verse/BSB/'))",
+    )) === true,
+  );
+  check(`${tag} editions: no overflow`, (await overflow()) <= 0);
 
   // Rate-limit message with retry.
   await open("too many searches now", "document.body.innerText.includes('searched a lot')");

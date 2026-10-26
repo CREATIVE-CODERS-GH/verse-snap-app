@@ -247,6 +247,51 @@ export function resultKey(item: FreeSearchHit): string {
   return `${item.translation}-${item.bookId}-${item.chapter}-${item.verse}`;
 }
 
+/** One verse that matched, however many of the searched editions it was found in. */
+export interface GroupedHit extends FreeSearchHit {
+  /** Every edition the verse matched in, the one shown (`translation`) first, then in match order. */
+  editions: string[];
+}
+
+/** Identifies a verse independent of edition. */
+export function verseKey(item: FreeSearchHit): string {
+  return `${item.bookId}-${item.chapter}-${item.verse}`;
+}
+
+/**
+ * The search finds a verse once per edition, so "the LORD is my shepherd" came back as Psalm 23:1 three
+ * times (BSB, WEB, ASV). This folds those rows into one result per verse. The row that matched best
+ * (the first one, as results arrive best first) supplies the text shown and the edition the verse
+ * opens in, and the other editions are listed beside it. Verses keep the order of their best match, and
+ * the text of every edition is left exactly as it was found.
+ */
+export function groupVerseHits(hits: readonly FreeSearchHit[]): GroupedHit[] {
+  const groups = new Map<string, GroupedHit>();
+  for (const hit of hits) {
+    const key = verseKey(hit);
+    const existing = groups.get(key);
+    if (!existing) {
+      groups.set(key, { ...hit, editions: [hit.translation] });
+    } else if (!existing.editions.includes(hit.translation)) {
+      existing.editions.push(hit.translation);
+    }
+  }
+  return [...groups.values()];
+}
+
+/**
+ * The line under grouped results. Matches are counted per edition on the server, so there is no exact
+ * verse total: say how many verses are shown, and note when more can be loaded or the search cap was hit.
+ */
+export function groupedSummary(shown: number, allShown: boolean, limitReached: boolean): string {
+  const format = (n: number) => n.toLocaleString("en-US");
+  const noun = shown === 1 ? "verse" : "verses";
+  if (limitReached) {
+    return `Showing ${format(shown)} ${noun}. There are more matches than can be shown. Refine your search to narrow the results.`;
+  }
+  return allShown ? `${format(shown)} ${noun}` : `Showing ${format(shown)} ${noun}`;
+}
+
 /**
  * "Showing 10 of 395 verses", or "395 verses" once everything is shown. When the matches exceed what
  * the search can serve, the text says so and suggests narrowing the search.

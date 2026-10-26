@@ -4,8 +4,12 @@ import {
   pageOfResults,
   resultKey,
   resultRouteParams,
+  verseKey,
   type FreeSearchHit,
 } from "@/lib/bible/free-search";
+
+/** A result row; `editions` is present when the same verse was found in several editions. */
+type ResultItem = FreeSearchHit & { editions?: readonly string[] };
 
 /** Says which editions full-text search does not cover yet; never worded as "no results". */
 export function UnindexedNotice({ message }: { message: string }) {
@@ -92,7 +96,7 @@ export function SearchResultsList({
   moreError = false,
   onRetryMore,
 }: {
-  items: readonly FreeSearchHit[];
+  items: readonly ResultItem[];
   shown: number;
   onShowMore: () => void;
   summary?: string | undefined;
@@ -108,7 +112,7 @@ export function SearchResultsList({
       <h2 className="sr-only">Relevant verses</h2>
       <ul className="divide-y divide-vs-border/70">
         {visible.map((item) => (
-          <li key={resultKey(item)}>
+          <li key={item.editions ? verseKey(item) : resultKey(item)}>
             <Link
               to="/verse/$translation/$book/$chapter/$verse"
               params={resultRouteParams(item)}
@@ -118,6 +122,7 @@ export function SearchResultsList({
                 reference={item.reference}
                 translation={item.translation}
                 text={item.text}
+                alsoIn={item.editions?.slice(1) ?? []}
               />
             </Link>
           </li>
