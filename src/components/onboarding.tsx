@@ -1,18 +1,23 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { ArrowRightIcon, CameraIcon, MicIcon, SearchIcon } from "@/components/stitch-icons";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
+import {
+  ArrowRightIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  MicIcon,
+  SearchIcon,
+} from "@/components/stitch-icons";
 import { BrandMark } from "@/components/brand-mark";
-import { usePreferences } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 
 /*
- * First-run onboarding (Stitch 01 Welcome, 02 How It Works, 03 Get Started), shown by the Home
- * route until it has been completed once. Colours come from the shared theme tokens, so it follows
- * light and dark mode like the rest of the app.
+ * First-run onboarding, shown by the Home route until it has been completed once: Welcome, then
+ * the Speak a Verse, Search the Bible and Scan a Verse screens (Stitch onboarding set). Colours
+ * come from the shared theme tokens, so it follows light and dark mode like the rest of the app.
  */
 
 const STORAGE_KEY = "versesnap.onboarding.v1";
-const STEPS = 3;
+const STEPS = 4;
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -49,7 +54,7 @@ function markComplete() {
   }
 }
 
-/** Three dots; each one is a button so people can step back without a swipe. */
+/** One dot per screen; each one is a button so people can step back without a swipe. */
 function Dots({
   step,
   onSelect,
@@ -57,7 +62,7 @@ function Dots({
 }: {
   step: number;
   onSelect: (step: number) => void;
-  tone: "light" | "dark";
+  tone: "light" | "dark" | "onPrimary";
 }) {
   return (
     <nav aria-label="Onboarding progress" className="flex items-center justify-center gap-1">
@@ -77,9 +82,14 @@ function Dots({
                 "block rounded-full transition-all duration-200",
                 tone === "light"
                   ? cn("h-1.5 w-1.5", active ? "bg-white" : "bg-white/40")
-                  : active
-                    ? "h-2 w-2 bg-brand-text"
-                    : "h-1.5 w-1.5 bg-brand-border-strong",
+                  : tone === "onPrimary"
+                    ? cn(
+                        "h-1.5",
+                        active ? "w-5 bg-brand-on-primary" : "w-1.5 bg-brand-on-primary/40",
+                      )
+                    : active
+                      ? "h-2 w-2 bg-brand-text"
+                      : "h-1.5 w-1.5 bg-brand-border-strong",
               )}
             />
           </button>
@@ -90,37 +100,42 @@ function Dots({
 }
 
 const PRIMARY_BUTTON =
-  "w-full rounded-full bg-brand-primary py-3.5 text-center text-base font-medium text-brand-on-primary shadow-md transition-all hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas active:scale-[0.99]";
+  "flex w-full items-center justify-center gap-2 rounded-full bg-brand-primary py-3.5 text-center text-base font-medium text-brand-on-primary shadow-md transition-all hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas active:scale-[0.99]";
 
-function Feature({
-  icon,
-  circle,
-  title,
-  text,
-}: {
-  icon: ReactNode;
-  circle: string;
-  title: string;
-  text: string;
-}) {
+/** Example results shown on the Search screen (public-domain wording; nothing here is interactive). */
+const SEARCH_EXAMPLES = [
+  {
+    reference: "John 14:27",
+    text: "Peace I leave with you, my peace I give unto you…",
+    stripe: "bg-brand-gold-text",
+  },
+  {
+    reference: "Philippians 4:6–7",
+    text: "Be careful for nothing; but in every thing by prayer…",
+    stripe: "bg-brand-primary",
+  },
+  {
+    reference: "Isaiah 26:3",
+    text: "Thou wilt keep him in perfect peace…",
+    stripe: "bg-brand-teal-text",
+  },
+];
+
+/** Decorative sound bars beside the microphone; they pulse unless the person prefers less motion. */
+function SoundBars({ heights }: { heights: string[] }) {
   return (
-    <li className="flex items-center gap-4">
-      <span
-        className={cn(
-          "flex h-14 w-14 shrink-0 items-center justify-center rounded-full shadow-sm",
-          circle,
-        )}
-        aria-hidden
-      >
-        {icon}
-      </span>
-      <span className="flex flex-col">
-        <span className="mb-0.5 text-[17px] font-semibold leading-tight text-brand-text">
-          {title}
-        </span>
-        <span className="text-[13px] leading-normal text-brand-text-muted">{text}</span>
-      </span>
-    </li>
+    <span className="flex items-center gap-1" aria-hidden>
+      {heights.map((height, index) => (
+        <span
+          key={index}
+          style={{ animationDelay: `${index * 0.15}s` }}
+          className={cn(
+            "w-1.5 animate-pulse rounded-full bg-brand-on-primary/80 motion-reduce:animate-none",
+            height,
+          )}
+        />
+      ))}
+    </span>
   );
 }
 
@@ -129,7 +144,6 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const headingRef = useRef<HTMLHeadingElement | null>(null);
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const navigate = useNavigate();
-  const { translation } = usePreferences();
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -142,14 +156,11 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     onComplete();
   };
 
-  // "John 3:16" on the last screen opens that verse straight away.
-  const openFirstVerse = () => {
+  // "Already have an account? Sign in" on the last screen ends onboarding and opens sign-in.
+  const signIn = () => {
     markComplete();
     onComplete();
-    void navigate({
-      to: "/verse/$translation/$book/$chapter/$verse",
-      params: { translation, book: "john", chapter: "3", verse: "16" },
-    });
+    void navigate({ to: "/auth" });
   };
 
   // Horizontal swipes move between screens; arrow keys do the same.
@@ -222,113 +233,196 @@ export function Onboarding({ onComplete }: OnboardingProps) {
           </section>
         </div>
       ) : step === 1 ? (
-        /* ---------- 02 How It Works ---------- */
-        <div className="mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col justify-between">
-          <div>
-            <section className="px-8 pb-6 pt-[calc(3.5rem+env(safe-area-inset-top))]">
+        /* ---------- 02 Speak a Verse ---------- */
+        <div className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-brand-primary text-brand-on-primary">
+          <div
+            className="pointer-events-none absolute -top-16 left-1/2 h-[340px] w-[340px] -translate-x-1/2 rounded-full bg-brand-on-primary/10 blur-3xl"
+            aria-hidden
+          />
+          <div className="relative mx-auto flex w-full max-w-[30rem] flex-1 flex-col px-7 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[calc(1rem+env(safe-area-inset-top))]">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={finish}
+                className="rounded-full border border-brand-on-primary/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-on-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-on-primary"
+              >
+                Skip
+              </button>
+            </div>
+            <div className="mt-3 flex flex-col items-center text-center">
+              <BrandMark large className="h-14 w-14 rounded-2xl shadow-lg" />
+              <p className="mt-2 text-base font-bold tracking-wide">Verse Snap</p>
               <h1
                 ref={headingRef}
                 tabIndex={-1}
-                className="font-display text-[32px] font-bold leading-[1.2] tracking-tight text-brand-text outline-none"
+                className="mt-1 text-[13px] font-bold uppercase tracking-[0.28em] opacity-90 outline-none"
               >
-                Three simple ways
-                <br />
-                to find Scripture.
+                Speak a Verse
               </h1>
-            </section>
-            <ul className="flex flex-col gap-6 px-8 pt-3">
-              <Feature
-                icon={<MicIcon className="h-6 w-6" />}
-                circle="bg-brand-gold-soft text-brand-gold-text"
-                title="Say a Verse"
-                text="Speak a Bible reference."
-              />
-              <Feature
-                icon={<CameraIcon className="h-6 w-6" />}
-                circle="bg-brand-primary-soft text-brand-primary"
-                title="Snap a Verse"
-                text="Point your camera at a Bible reference."
-              />
-              <Feature
-                icon={<SearchIcon className="h-6 w-6" />}
-                circle="bg-brand-teal-soft text-brand-teal-text"
-                title="Search the Bible"
-                text="Enter a reference or describe a verse."
-              />
-            </ul>
+            </div>
+
+            <div className="flex flex-1 flex-col items-center justify-center py-6">
+              <div className="flex w-full max-w-[340px] items-center justify-between" aria-hidden>
+                <SoundBars heights={["h-2.5", "h-[18px]", "h-[26px]", "h-3.5"]} />
+                <div className="flex h-[188px] w-[188px] items-center justify-center rounded-full border-2 border-brand-on-primary/50 bg-brand-on-primary/10 p-2.5 shadow-[0_0_50px_10px_rgba(255,255,255,0.12)]">
+                  <div className="flex h-full w-full items-center justify-center rounded-full border border-brand-on-primary/30 bg-brand-on-primary/15">
+                    <MicIcon className="h-14 w-14" />
+                  </div>
+                </div>
+                <SoundBars heights={["h-3.5", "h-[26px]", "h-[18px]", "h-2.5"]} />
+              </div>
+              <div
+                className="mt-6 flex items-center gap-2.5 rounded-full bg-brand-on-primary px-6 py-3 text-sm font-semibold text-brand-primary shadow-lg"
+                aria-hidden
+              >
+                <span className="flex items-center gap-0.5">
+                  <span className="h-3 w-1 rounded-full bg-brand-primary" />
+                  <span className="h-4 w-1 rounded-full bg-brand-primary" />
+                  <span className="h-2 w-1 rounded-full bg-brand-primary" />
+                </span>
+                Speak a verse…
+              </div>
+            </div>
+
+            <footer>
+              <div className="mb-5">
+                <Dots step={step} onSelect={goTo} tone="onPrimary" />
+              </div>
+              <button
+                type="button"
+                onClick={() => goTo(2)}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-brand-on-primary py-4 text-base font-semibold text-brand-primary shadow-xl transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-on-primary focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary active:scale-[0.99]"
+              >
+                Continue
+                <ArrowRightIcon className="h-4 w-4" aria-hidden />
+              </button>
+            </footer>
           </div>
-          <footer className="px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-10">
-            <div className="mb-6">
+        </div>
+      ) : step === 2 ? (
+        /* ---------- 03 Search the Bible ---------- */
+        <div className="mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[calc(2rem+env(safe-area-inset-top))]">
+          <section className="flex flex-col items-center text-center">
+            <BrandMark large className="h-16 w-16 rounded-2xl shadow-md" />
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="mt-4 text-[29px] font-extrabold leading-tight tracking-tight text-brand-text outline-none"
+            >
+              Search the Bible
+            </h1>
+            <p className="mt-2 max-w-[270px] text-sm leading-relaxed text-brand-text-muted">
+              Find verses, topics and answers in seconds.
+            </p>
+          </section>
+
+          <section className="mt-6 flex flex-1 flex-col gap-3" aria-label="Example search">
+            <div
+              className="flex items-center justify-between rounded-2xl border border-brand-border bg-brand-surface px-4 py-3.5 shadow-sm"
+              aria-hidden
+            >
+              <span className="flex items-center gap-3">
+                <SearchIcon className="h-5 w-5 text-brand-text-subtle" />
+                <span className="text-[15px] font-medium text-brand-text">peace</span>
+                <span className="h-4 w-0.5 animate-pulse rounded-full bg-brand-primary motion-reduce:animate-none" />
+              </span>
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-border-strong text-brand-surface">
+                <CloseIcon className="h-3 w-3" />
+              </span>
+            </div>
+            <ul className="flex flex-col gap-2.5">
+              {SEARCH_EXAMPLES.map((example) => (
+                <li
+                  key={example.reference}
+                  className="flex items-center justify-between rounded-2xl border border-brand-border bg-brand-surface p-4 shadow-sm"
+                >
+                  <span className="flex items-start gap-3.5 pr-2">
+                    <span
+                      className={cn("mt-0.5 h-9 w-1.5 shrink-0 rounded-full", example.stripe)}
+                      aria-hidden
+                    />
+                    <span className="flex flex-col">
+                      <span className="text-sm font-bold tracking-tight text-brand-text">
+                        {example.reference}
+                      </span>
+                      <span className="mt-0.5 line-clamp-1 text-[12.5px] text-brand-text-muted">
+                        {example.text}
+                      </span>
+                    </span>
+                  </span>
+                  <ChevronRightIcon
+                    className="h-4 w-4 shrink-0 text-brand-text-subtle"
+                    aria-hidden
+                  />
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <footer className="pt-8">
+            <div className="mb-5">
               <Dots step={step} onSelect={goTo} tone="dark" />
             </div>
-            <button type="button" onClick={() => goTo(2)} className={PRIMARY_BUTTON}>
-              Next
+            <button type="button" onClick={() => goTo(3)} className={PRIMARY_BUTTON}>
+              Continue
+              <ArrowRightIcon className="h-4 w-4" aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={finish}
+              className="mt-3 w-full py-1 text-center text-xs font-medium text-brand-text-muted hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+            >
+              Skip for now
             </button>
           </footer>
         </div>
       ) : (
-        /* ---------- 03 Get Started ---------- */
-        <div className="relative flex min-h-dvh w-full flex-col overflow-hidden">
-          <svg
-            className="pointer-events-none absolute inset-0 h-full w-full"
-            fill="none"
-            preserveAspectRatio="none"
-            viewBox="0 0 390 844"
-            aria-hidden
-          >
-            <path
-              d="M-60 490C30 460 120 540 230 495C330 455 370 510 440 480V844H-60V490Z"
-              className="fill-brand-primary-soft"
-              opacity="0.7"
-            />
-            <path
-              d="M-40 560C50 540 140 600 250 565C340 535 390 580 440 560V844H-40V560Z"
-              className="fill-brand-primary-soft"
-            />
-          </svg>
-          <div className="relative mx-auto flex w-full max-w-[30rem] flex-1 flex-col items-center justify-between px-8 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[calc(3.5rem+env(safe-area-inset-top))] text-center">
-            <div className="flex max-w-[300px] flex-col items-center">
-              <h1
-                ref={headingRef}
-                tabIndex={-1}
-                className="font-display text-[32px] font-bold leading-[1.2] tracking-tight text-brand-text outline-none"
-              >
-                Let’s find
-                <br />
-                your first verse.
-              </h1>
-              <p className="mt-3 max-w-[270px] text-[14.5px] leading-relaxed text-brand-text-muted">
-                Try saying, snapping or searching for a Bible reference.
-              </p>
-            </div>
+        /* ---------- 04 Scan a Verse ---------- */
+        <div className="mx-auto flex min-h-dvh w-full max-w-[30rem] flex-col">
+          <header className="flex flex-col items-center px-6 pt-[calc(2rem+env(safe-area-inset-top))] text-center">
+            <BrandMark large className="h-[68px] w-[68px] shadow-lg" />
+            <h1
+              ref={headingRef}
+              tabIndex={-1}
+              className="mt-5 text-2xl font-bold tracking-tight text-brand-text outline-none"
+            >
+              Scan a Verse
+            </h1>
+            <p className="mt-2 text-[14.5px] text-brand-text-muted">
+              Take a photo and instantly get the verse.
+            </p>
+          </header>
 
-            <div className="my-auto flex w-full items-center justify-center py-6">
-              <div className="relative -rotate-[7deg]">
-                <div className="flex h-[175px] w-[280px] items-center justify-center rounded-[24px] border border-brand-border bg-brand-surface-muted/90 p-5 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.18)] backdrop-blur-sm">
-                  <button
-                    type="button"
-                    onClick={openFirstVerse}
-                    aria-label="Open John 3:16"
-                    className="flex h-[52px] w-[220px] items-center justify-between rounded-full border border-brand-border bg-brand-surface px-5 shadow-[0_2px_10px_rgba(0,0,0,0.04)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus active:scale-[0.98]"
-                  >
-                    <span className="text-base font-semibold tracking-tight text-brand-text">
-                      John 3:16
-                    </span>
-                    <ArrowRightIcon className="h-4 w-4 text-brand-text-muted" aria-hidden />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <footer className="w-full">
-              <div className="mb-6">
-                <Dots step={step} onSelect={goTo} tone="dark" />
-              </div>
-              <button type="button" onClick={finish} className={PRIMARY_BUTTON}>
-                Start Exploring
-              </button>
-            </footer>
+          <div className="relative min-h-[16rem] flex-1 overflow-hidden">
+            <img
+              src="/stitch/onboarding-scan.jpg"
+              alt="A phone held over an open Bible, scanning John 3:15"
+              className="h-full w-full scale-[1.03] object-cover object-center"
+              draggable={false}
+            />
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-brand-canvas via-brand-canvas/70 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-brand-canvas via-brand-canvas/90 to-transparent" />
           </div>
+
+          <footer className="px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1">
+            <div className="mb-5">
+              <Dots step={step} onSelect={goTo} tone="dark" />
+            </div>
+            <button type="button" onClick={finish} className={PRIMARY_BUTTON}>
+              Get Started
+              <ArrowRightIcon className="h-5 w-5" aria-hidden />
+            </button>
+            <p className="mt-3.5 text-center text-sm text-brand-text-muted">
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={signIn}
+                className="font-semibold text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+              >
+                Sign in
+              </button>
+            </p>
+          </footer>
         </div>
       )}
     </main>
