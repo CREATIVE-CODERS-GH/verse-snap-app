@@ -7,7 +7,7 @@ Read `AGENTS.md` too (translation catalogue rule). Lovable is retired (`docs/DEC
 ## Stack
 TanStack Start/Router (file routes) + Nitro, Vite, React 19, TanStack Query, Radix, Tailwind v4,
 Supabase (auth + Postgres + RLS), Node 22, **npm**. Hosting: Vercel (Nitro picks the Vercel preset
-when `VERCEL=1`; `vercel.json` uses `npm ci`). `routeTree.gen.ts` is generated — never hand-edit.
+when `VERCEL=1`; `vercel.json` uses `npm ci`). `vite.config.ts` is plain Vite plugins (no Lovable wrapper); dev port 8080 is on the OAuth redirect lists. `routeTree.gen.ts` is generated — never hand-edit.
 
 ## Where things are
 - `src/routes/` screens · `src/components/` UI parts · `src/lib/` logic (`library`, `highlights`,

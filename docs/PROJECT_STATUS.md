@@ -36,10 +36,11 @@ checklist: `roadmap.md` (historical).*
   Reader fallback, offline app shell service worker, `/offline-shell`, iPhone install guide.
 
 ## In progress
-- Nothing in flight. Next: repository cleanup (Stitch references, `@lovable.dev/vite-tanstack-config`); `main` branch protection is pending (see `docs/NEXT_TASK.md`).
+- Phase 2 cleanup in review: remove `@lovable.dev/vite-tanstack-config` (native `vite.config.ts`). `main` branch protection is pending (see `docs/NEXT_TASK.md`).
 
 ## Recently completed
 - Lovable retired and `main` replaced by the Verse Snap app (PR #2, 2026-10-25); `main` is the GitHub default branch and the Vercel Production Branch; the first Production deployment succeeded.
+- Repository cleanup phases 1 and 1B (unused assets, icons, 41 shadcn components, 31 packages).
 - Books page: "All" chip first in each testament, selected by default (PR #1).
 
 ## Pending / needs approval

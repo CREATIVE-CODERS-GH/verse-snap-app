@@ -34,3 +34,9 @@ Short records of choices worth not re-litigating. Newest last. Longer write-ups:
   git-ignored and only images the app uses live in `public/`. "Stitch" in code names (`stitch-icons`, `font-stitch`,
   `variant="stitch"`) is live app code, not a prototype; do not rename it for its own sake. `@lovable.dev/vite-tanstack-config`
   stays until a separate, approved task replaces it.
+- **Lovable build wrapper removed (2026-10-26):** `vite.config.ts` lists the plugins directly (Tailwind, tsconfig paths,
+  TanStack Start with client import protection and the `server` entry, Nitro on build only, React) with `lightningcss`, the
+  `@` alias, dedupe, and dev server `host "::"` / port **8080** kept (8080 is on the Supabase and Google OAuth redirect
+  lists). Nitro now picks its target from the environment only: Vercel (`VERCEL=1`) output is byte-identical to before;
+  a local build with no environment variables is a Node server instead of the old Cloudflare default. Lovable-only
+  extras (sandbox detection, error loggers, assets proxy, devtools injection) are gone. The retired-project guards stay.
