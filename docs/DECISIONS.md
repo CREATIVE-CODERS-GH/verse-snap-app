@@ -30,3 +30,13 @@ Short records of choices worth not re-litigating. Newest last. Longer write-ups:
 - **Production cutover done (2026-10-25):** PR #2 (`a9f8908`) replaced the Lovable `main` with the Verse Snap app via a
   keep-our-tree merge (both histories kept, no force-push). `main` = Production, GitHub default and Vercel Production Branch (first Production deployment succeeded);
   `testing/vercel-mobile-preview` = development and Preview. Branch protection on `main` is still to be configured. Lovable code and `.lovable/` stay out; the archive branch and tag are the only copies.
+- **Repository cleanup, phase 1 (2026-10-25):** design exports (Stitch HTML/CSS/screenshots) never go in the repo: they are
+  git-ignored and only images the app uses live in `public/`. "Stitch" in code names (`stitch-icons`, `font-stitch`,
+  `variant="stitch"`) is live app code, not a prototype; do not rename it for its own sake. `@lovable.dev/vite-tanstack-config`
+  stays until a separate, approved task replaces it.
+- **Lovable build wrapper removed (2026-10-26):** `vite.config.ts` lists the plugins directly (Tailwind, tsconfig paths,
+  TanStack Start with client import protection and the `server` entry, Nitro on build only, React) with `lightningcss`, the
+  `@` alias, dedupe, and dev server `host "::"` / port **8080** kept (8080 is on the Supabase and Google OAuth redirect
+  lists). Nitro now picks its target from the environment only: Vercel (`VERCEL=1`) output is byte-identical to before;
+  a local build with no environment variables is a Node server instead of the old Cloudflare default. Lovable-only
+  extras (sandbox detection, error loggers, assets proxy, devtools injection) are gone. The retired-project guards stay.
