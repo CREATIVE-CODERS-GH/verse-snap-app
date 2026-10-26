@@ -48,11 +48,11 @@ describe("single-verse reading screen (Stitch 06)", () => {
       'trackEvent("verse_opened")',
       'trackEvent("verse_saved")',
       'trackEvent("verse_copied")',
-      'trackEvent("verse_listened")',
+      // Listening goes through the shared narration engine (src/lib/use-speak.ts).
+      "useSpeak(",
+      "speech.toggle(",
       // Share opens the Share Options sheet (Stitch 13), which handles text and image sharing.
       "<ShareSheet",
-      "SpeechSynthesisUtterance",
-      "Number.parseFloat(playbackSpeed)",
       'toast("Copied")',
       "verseQuery.refetch()",
       "You’re offline, and this verse isn’t saved on this device yet.",

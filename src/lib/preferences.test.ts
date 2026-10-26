@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { parseStoredPreferences } from "./preferences-storage";
+import { micProfile, parseStoredPreferences } from "./preferences-storage";
 
 describe("parseStoredPreferences", () => {
   it("returns null when nothing usable is stored", () => {
@@ -66,5 +66,23 @@ describe("preference saving order", () => {
 
   it("reads the stored values with the validating parser", () => {
     expect(source).toContain("parseStoredPreferences(window.localStorage.getItem(STORAGE_KEY))");
+  });
+});
+
+describe("voice and audio preferences", () => {
+  it("keeps a saved device voice and defaults to Automatic", () => {
+    expect(
+      parseStoredPreferences(JSON.stringify({ voiceURI: "com.apple.voice.Samantha" })),
+    ).toMatchObject({
+      voiceURI: "com.apple.voice.Samantha",
+    });
+    expect(parseStoredPreferences(JSON.stringify({ voiceURI: 7 }))).toMatchObject({ voiceURI: "" });
+    expect(parseStoredPreferences(JSON.stringify({}))).toMatchObject({ voiceURI: "" });
+  });
+
+  it("maps microphone sensitivity to the number of alternatives Say a Verse considers", () => {
+    expect(micProfile("quiet").maxAlternatives).toBe(1);
+    expect(micProfile("standard").maxAlternatives).toBe(3);
+    expect(micProfile("open").maxAlternatives).toBe(5);
   });
 });

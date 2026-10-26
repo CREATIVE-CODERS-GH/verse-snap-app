@@ -21,6 +21,8 @@ export interface Preferences {
   speechLanguage: string;
   micSensitivity: MicSensitivity;
   narrator: Narrator;
+  /** `voiceURI` of the device voice used to read Scripture aloud; empty means "Automatic". */
+  voiceURI: string;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -34,6 +36,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   speechLanguage: "en-US",
   micSensitivity: "standard",
   narrator: "classic",
+  voiceURI: "",
 };
 
 const TEXT_SIZES: readonly TextSize[] = ["small", "medium", "large", "xlarge"];
@@ -43,6 +46,16 @@ const TYPEFACES: readonly Typeface[] = ["serif", "sans"];
 const LINE_SPACINGS: readonly LineSpacing[] = ["standard", "relaxed"];
 const MIC_SENSITIVITIES: readonly MicSensitivity[] = ["quiet", "standard", "open"];
 const NARRATORS: readonly Narrator[] = ["classic", "gentle", "peaceful"];
+
+/**
+ * What the microphone sensitivity setting changes for Say a Verse. The speech engine has no
+ * sensitivity dial, so it sets how many alternative transcripts are considered: a quiet room needs
+ * one clear reading, open air benefits from more candidates for the reference parser to try.
+ */
+export function micProfile(sensitivity: MicSensitivity): { maxAlternatives: number } {
+  const alternatives: Record<MicSensitivity, number> = { quiet: 1, standard: 3, open: 5 };
+  return { maxAlternatives: alternatives[sensitivity] ?? alternatives.standard };
+}
 
 /** Speech-recognition languages offered in Voice & Audio settings. */
 export const SPEECH_LANGUAGES: readonly { code: string; label: string }[] = [
@@ -97,5 +110,6 @@ export function parseStoredPreferences(raw: string | null): Preferences | null {
     ),
     micSensitivity: oneOf(parsed.micSensitivity, MIC_SENSITIVITIES, d.micSensitivity),
     narrator: oneOf(parsed.narrator, NARRATORS, d.narrator),
+    voiceURI: typeof parsed.voiceURI === "string" ? parsed.voiceURI.slice(0, 300) : d.voiceURI,
   };
 }

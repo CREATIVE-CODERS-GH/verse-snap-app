@@ -18,6 +18,7 @@ import { OAuthReturnNotice } from "@/components/oauth-return-notice";
 import { invalidateUserQueries, planAuthEvent } from "@/lib/auth-events";
 import { supabase, isSupabaseConfigured } from "@/integrations/supabase/client";
 import { AuthProvider } from "@/lib/auth";
+import { NarrationProvider } from "@/lib/narration/narration";
 import { PreferencesProvider } from "@/lib/preferences";
 import { registerServiceWorker } from "@/lib/pwa-register";
 import { isConnectionError, NetworkErrorScreen, PILL_OUTLINE } from "@/components/search-states";
@@ -203,13 +204,15 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <PreferencesProvider>
-          <AuthSync />
-          <OAuthReturnNotice />
-          <GuestMergePrompt />
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <Toaster position="top-center" />
-          <Analytics beforeSend={withoutQuery} />
+          <NarrationProvider>
+            <AuthSync />
+            <OAuthReturnNotice />
+            <GuestMergePrompt />
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <Toaster position="top-center" />
+            <Analytics beforeSend={withoutQuery} />
+          </NarrationProvider>
         </PreferencesProvider>
       </AuthProvider>
     </QueryClientProvider>

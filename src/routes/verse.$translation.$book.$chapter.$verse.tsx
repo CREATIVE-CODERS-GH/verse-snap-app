@@ -43,8 +43,8 @@ import { bibleService } from "@/lib/bible/service";
 import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
-import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
+import { useSpeak } from "@/lib/use-speak";
 import { useBackOrHome } from "@/lib/use-back-or-home";
 
 export const Route = createFileRoute("/verse/$translation/$book/$chapter/$verse")({
@@ -86,9 +86,8 @@ function VersePage() {
   const params = Route.useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { playbackSpeed } = usePreferences();
   const queryClient = useQueryClient();
-  const [speaking, setSpeaking] = useState(false);
+  const speech = useSpeak((message) => toast(message));
   const [shareOpen, setShareOpen] = useState(false);
   const [relatedOpen, setRelatedOpen] = useState(false);
   const xrefs = useVerseCrossRefs(params.book, Number(params.chapter), Number(params.verse));
@@ -182,8 +181,6 @@ function VersePage() {
     queryClient,
   ]);
 
-  useEffect(() => () => window.speechSynthesis?.cancel(), []);
-
   const shareText = verse ? `${verse.reference}\n${verse.translation}\n\n${verse.text}` : "";
 
   async function handleCopy() {
@@ -203,23 +200,8 @@ function VersePage() {
   }
 
   function handleListen() {
-    if (!verse || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
-      toast("Listening isn't available on this device");
-      return;
-    }
-    if (speaking) {
-      window.speechSynthesis.cancel();
-      setSpeaking(false);
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(`${verse.reference}. ${verse.text}`);
-    utterance.rate = Number.parseFloat(playbackSpeed) || 1;
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-    trackEvent("verse_listened");
-    setSpeaking(true);
+    if (!verse) return;
+    speech.toggle(`${verse.reference}. ${verse.text}`);
   }
 
   const providerError = verseQuery.error instanceof BibleServiceError ? verseQuery.error : null;
@@ -341,9 +323,9 @@ function VersePage() {
                   disabled={!verse}
                 />
                 <ReaderAction
-                  label={speaking ? "Stop" : "Listen"}
+                  label={speech.speaking ? "Stop" : "Listen"}
                   icon={
-                    speaking ? (
+                    speech.speaking ? (
                       <StopSquareIcon className="h-[19px] w-[19px]" />
                     ) : (
                       <VolumeIcon className="h-[19px] w-[19px]" />
