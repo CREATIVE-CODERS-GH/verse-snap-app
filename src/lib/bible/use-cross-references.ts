@@ -30,7 +30,7 @@ export function useVerseCrossRefs(bookId: string, chapter: number, verse: number
 }
 
 /** The passage as it exists in the reader's edition (end clamped; unavailable if it starts too late). */
-export function usePassageFit(passage: CrossPassage, translation: string) {
+export function usePassageFit(passage: CrossPassage, translation: string, enabled = true) {
   const book = findBook(passage.book);
   const { data } = useQuery({
     // The same key as the chapter reader, so a chapter already read is not fetched again.
@@ -40,7 +40,7 @@ export function usePassageFit(passage: CrossPassage, translation: string) {
         { bookId: passage.book, bookName: passage.bookName, chapter: passage.chapter },
         translation,
       ),
-    enabled: Boolean(book),
+    enabled: Boolean(book) && enabled,
     staleTime: 5 * 60_000,
     retry: 1,
   });

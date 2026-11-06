@@ -29,6 +29,8 @@ import {
   type CrossPassage,
 } from "@/lib/bible/cross-references";
 import { usePassageFit, useVerseCrossRefs } from "@/lib/bible/use-cross-references";
+import { PublisherNotice } from "@/components/publisher-notice";
+import { isRestrictedTranslation } from "@/lib/bible/translations";
 import { bibleService } from "@/lib/bible/service";
 import type { Verse } from "@/lib/bible/types";
 import { useAuth } from "@/lib/auth";
@@ -183,6 +185,12 @@ function ReferencesPage() {
             <p className="mt-3 border-l-2 border-brand-gold pl-3 font-display text-[15px] italic leading-relaxed text-brand-text">
               “{anchor.data.text}”
             </p>
+          ) : null}
+          {anchor.data ? (
+            <PublisherNotice
+              translation={anchor.data.translation}
+              className="mt-2 text-[11px] leading-relaxed text-brand-text-muted"
+            />
           ) : null}
         </section>
 
@@ -356,7 +364,10 @@ function PassageCard({
   const queryClient = useQueryClient();
   const { user, loading } = useAuth();
   // The passage as it exists in this edition: the end verse clamped to the chapter's last verse.
-  const fit = usePassageFit(original, translation);
+  // Licensed editions (NIV, AMP) show references only in the explorer: their text is not kept, listed
+  // in bulk or fetched once per card.
+  const licensed = isRestrictedTranslation(translation);
+  const fit = usePassageFit(original, translation, !licensed);
   const passage = fit.passage;
   const numbers = Array.from({ length: passage.to - passage.from + 1 }, (_, i) => passage.from + i);
   const results = useQueries({
@@ -368,6 +379,7 @@ function PassageCard({
           translation,
         ),
       retry: 1,
+      enabled: !licensed,
     })),
   });
   const verses = results
@@ -399,9 +411,20 @@ function PassageCard({
   });
   const toggleSave = useMutation({
     mutationFn: async () => {
-      if (!first) return;
+      // A licensed edition is saved by reference: the entry never carries its text, so none is needed.
+      const verse =
+        first ??
+        (licensed
+          ? {
+              ...firstRef,
+              translation,
+              text: "",
+              reference: `${firstRef.bookName} ${firstRef.chapter}:${firstRef.verse}`,
+            }
+          : undefined);
+      if (!verse) return;
       if (saved) await library.unsave(firstRef, translation, user?.id);
-      else await library.save(first, user?.id);
+      else await library.save(verse, user?.id);
     },
     onSuccess: () => {
       if (!saved) trackEvent("verse_saved");
@@ -414,6 +437,49 @@ function PassageCard({
     },
     onError: () => toast("Could not update saved verses"),
   });
+
+  if (licensed) {
+    return (
+      <article
+        className="rounded-xl bg-brand-surface-muted p-3.5"
+        data-testid="licensed-passage-card"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-[15px] font-semibold text-brand-text">{label}</h3>
+          <button
+            type="button"
+            aria-label={saved ? `Remove ${label} from saved` : `Save ${label}`}
+            aria-pressed={Boolean(saved)}
+            disabled={toggleSave.isPending}
+            onClick={() => toggleSave.mutate()}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-brand-text-muted transition-colors hover:bg-brand-surface hover:text-brand-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus disabled:opacity-40"
+          >
+            <BookmarkIcon className="h-[18px] w-[18px]" filled={Boolean(saved)} />
+          </button>
+        </div>
+        <p className="mt-2 text-[14px] leading-relaxed text-brand-text-muted">
+          Open this passage to read it in {translation}.
+        </p>
+        <div className="mt-2.5 flex items-center justify-between">
+          <span className="text-[11.5px] text-brand-text-muted">
+            {category} · {translation}
+          </span>
+          <Link
+            to="/verse/$translation/$book/$chapter/$verse"
+            params={{
+              translation,
+              book: passage.book,
+              chapter: String(passage.chapter),
+              verse: String(passage.from),
+            }}
+            className="flex items-center gap-1 rounded-sm text-[12.5px] font-semibold text-brand-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus"
+          >
+            Read Passage <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden />
+          </Link>
+        </div>
+      </article>
+    );
+  }
 
   if (!fit.available) {
     return (

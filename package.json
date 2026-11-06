@@ -20,6 +20,8 @@
     "test:e2e:library": "node scripts/e2e/saved-history.mjs",
     "test:e2e:merge": "node scripts/e2e/guest-merge.mjs",
     "test:e2e:smoke": "node scripts/e2e/mobile-smoke.mjs",
+    "test:e2e:youversion": "node scripts/e2e/youversion.mjs",
+    "test:e2e:youversion-stability": "node scripts/e2e/youversion-stability.mjs",
     "test:e2e:highlights": "node scripts/e2e/highlights.mjs",
     "test:e2e:highlights-account": "node scripts/e2e/highlights-account.mjs",
     "test:e2e:journal": "node scripts/e2e/journal.mjs",

@@ -33,14 +33,16 @@ import {
 } from "@/components/stitch-icons";
 import { CrossReferenceSheet } from "@/components/cross-reference-parts";
 import { OfflineSwitch } from "@/components/offline-switch";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { ShareSheet } from "@/components/share-sheet";
+import { verseShareText } from "@/lib/share-verse-card";
 import { TranslationSheet } from "@/components/translation-sheet";
 import { findBook } from "@/lib/bible/books";
 import { rankPassages, SHEET_LIMIT } from "@/lib/bible/cross-references";
 import { useVerseCrossRefs } from "@/lib/bible/use-cross-references";
 import { BibleServiceError, type Verse } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
-import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
+import { BIBLE_TRANSLATIONS, canCopyText, translationName } from "@/lib/bible/translations";
 import { useAuth } from "@/lib/auth";
 import { library } from "@/lib/library";
 import { trackEvent } from "@/lib/analytics";
@@ -181,10 +183,10 @@ function VersePage() {
     queryClient,
   ]);
 
-  const shareText = verse ? `${verse.reference}\n${verse.translation}\n\n${verse.text}` : "";
+  const shareText = verse ? verseShareText(verse) : "";
 
   async function handleCopy() {
-    if (!verse) return;
+    if (!verse || !canCopyText(verse.translation)) return;
     try {
       await copyText(shareText);
       trackEvent("verse_copied");
@@ -278,6 +280,10 @@ function VersePage() {
                 {verse.reference} ({verse.translation})
                 <span className="sr-only">, {translationName(verse.translation)}</span>
               </p>
+              <PublisherNotice
+                translation={verse.translation}
+                className="mt-4 max-w-sm px-4 text-center text-[11px] leading-relaxed text-vs-text-secondary"
+              />
               <div className="mt-6 flex w-full justify-center">
                 <Link
                   to="/chapter/$translation/$book/$chapter"
@@ -320,7 +326,7 @@ function VersePage() {
                   label="Copy"
                   icon={<CopyDocIcon className="h-[19px] w-[19px]" />}
                   onClick={handleCopy}
-                  disabled={!verse}
+                  disabled={!verse || !canCopyText(verse.translation)}
                 />
                 <ReaderAction
                   label={speech.speaking ? "Stop" : "Listen"}

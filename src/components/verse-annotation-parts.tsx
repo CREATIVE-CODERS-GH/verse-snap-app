@@ -102,10 +102,13 @@ export function toneInfo(tone: Tone): ToneInfo {
 /** The floating Copy · Compare · Share toolbar that sits above the selected verse. */
 export function SelectionToolbar({
   onCopy,
+  copyDisabled = false,
   onCompare,
   onShare,
 }: {
   onCopy: () => void;
+  /** True for an edition whose text may not be copied (NIV). */
+  copyDisabled?: boolean;
   onCompare: () => void;
   onShare: () => void;
 }) {
@@ -117,7 +120,12 @@ export function SelectionToolbar({
       aria-label="Verse actions"
       className="absolute -top-12 left-1/2 z-20 flex animate-bounce-subtle items-center gap-2 whitespace-nowrap rounded-full bg-ch-inverse-surface px-3 py-1.5 text-ch-inverse-on-surface shadow-xl"
     >
-      <button type="button" onClick={onCopy} className={button}>
+      <button
+        type="button"
+        onClick={onCopy}
+        disabled={copyDisabled}
+        className={`${button} disabled:opacity-50`}
+      >
         <CopyDocIcon className="h-[17px] w-[17px] text-ch-primary-fixed" aria-hidden />
         <span className="text-[11px] font-medium leading-[14px]">Copy</span>
       </button>
@@ -325,6 +333,7 @@ export function QuickActions({
   saveDisabled,
   onToggleSave,
   onCopy,
+  copyDisabled = false,
   onCompare,
 }: {
   speaking: boolean;
@@ -333,6 +342,8 @@ export function QuickActions({
   saveDisabled?: boolean;
   onToggleSave: () => void;
   onCopy: () => void;
+  /** True for an edition whose text may not be copied (NIV). */
+  copyDisabled?: boolean;
   onCompare: () => void;
 }) {
   const item =
@@ -358,7 +369,7 @@ export function QuickActions({
         <BookmarkIcon className="h-[18px] w-[18px] text-ch-primary" filled={saved} aria-hidden />
         <span className={label}>{saved ? "Saved" : "Save"}</span>
       </button>
-      <button type="button" onClick={onCopy} className={item}>
+      <button type="button" onClick={onCopy} disabled={copyDisabled} className={item}>
         <CopyDocIcon className="h-[18px] w-[18px] text-ch-secondary" aria-hidden />
         <span className={label}>Copy</span>
       </button>

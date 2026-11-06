@@ -5,6 +5,7 @@ import { Fragment, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { SampleBadge } from "@/components/chapter-reader-parts";
 import { SheetFrame } from "@/components/chapter-sheets";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { MORE_BUTTON_CLASS } from "@/components/reflection-parts";
 import {
   ArrowLeftIcon,
@@ -21,7 +22,12 @@ import {
 import { findBook } from "@/lib/bible/books";
 import { getRootNotes, TRANSLATION_APPROACH } from "@/lib/bible/compare-sample";
 import { bibleService } from "@/lib/bible/service";
-import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
+import {
+  BIBLE_TRANSLATIONS,
+  appendPublisherNotices,
+  canCopyText,
+  translationName,
+} from "@/lib/bible/translations";
 import type { Verse } from "@/lib/bible/types";
 import { useAuth } from "@/lib/auth";
 import { copyText } from "@/lib/copy-text";
@@ -170,8 +176,13 @@ function ComparePage() {
   });
 
   const copyVerse = async (verse: Verse) => {
+    if (!canCopyText(verse.translation)) return;
     try {
-      await copyText(`${verse.reference} (${verse.translation})\n${verse.text}`);
+      await copyText(
+        appendPublisherNotices(`${verse.reference} (${verse.translation})\n${verse.text}`, [
+          verse.translation,
+        ]),
+      );
       trackEvent("verse_copied");
       toast("Copied");
     } catch {
@@ -189,7 +200,10 @@ function ComparePage() {
     );
   const copyAll = () =>
     void copyText(
-      [reference, ...loaded.map((verse) => `${verse.translation}: ${verse.text}`)].join("\n\n"),
+      appendPublisherNotices(
+        [reference, ...loaded.map((verse) => `${verse.translation}: ${verse.text}`)].join("\n\n"),
+        loaded.map((verse) => verse.translation),
+      ),
     ).then(
       () => toast("All translations copied"),
       () => toast("Could not copy"),
@@ -329,6 +343,12 @@ function ComparePage() {
                       </span>
                     )}
                   </p>
+                  {verse ? (
+                    <PublisherNotice
+                      translation={code}
+                      className="mt-2 text-[11px] leading-relaxed text-brand-text-muted"
+                    />
+                  ) : null}
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-[11px] text-brand-text-muted">
                       {TRANSLATION_APPROACH[code] ?? "Bible translation"}
@@ -343,7 +363,7 @@ function ComparePage() {
                       </IconAction>
                       <IconAction
                         label={`Copy ${code}`}
-                        disabled={!verse}
+                        disabled={!verse || !canCopyText(code)}
                         onClick={() => verse && void copyVerse(verse)}
                       >
                         <CopyDocIcon className="h-[18px] w-[18px]" />

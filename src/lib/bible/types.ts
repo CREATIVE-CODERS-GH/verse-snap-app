@@ -10,6 +10,15 @@ export interface Verse extends VerseRef {
   text: string;
   /** Human readable reference, e.g. "John 3:16" */
   reference: string;
+  /** Set when one passage of text spans several verses (a bridged "3-4"): the last verse it covers. */
+  through?: number;
+}
+
+/** True when this verse's text is the one for verse number `n` (exactly, or inside a bridged range). */
+export function coversVerse(verse: Pick<Verse, "verse" | "through">, n: number): boolean {
+  return (
+    verse.verse === n || (verse.through !== undefined && n > verse.verse && n <= verse.through)
+  );
 }
 
 export interface Chapter {
@@ -21,10 +30,19 @@ export interface Chapter {
   verses: Verse[];
 }
 
+/** The publisher notice a licensed edition must show wherever its text is displayed. */
+export interface TranslationAttribution {
+  notice: string;
+  linkLabel: string;
+  linkUrl: string;
+}
+
 export interface Translation {
   code: string;
   name: string;
   language: string;
+  /** Present only on licensed (YouVersion) editions. */
+  attribution?: TranslationAttribution;
 }
 
 /**

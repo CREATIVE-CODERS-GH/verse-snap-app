@@ -1,10 +1,18 @@
 import { trackEvent } from "./analytics";
 import type { Verse } from "./bible/types";
+import { canShareExternally, publisherNoticeText } from "./bible/translations";
 import { copyText } from "./copy-text";
 import { createVerseImageBlob, verseImageFileName } from "./share-verse-image";
 
+/** Shown instead of sharing when the publisher's terms do not yet allow it. */
+export const externalShareMessage = (translation: string) =>
+  `Sharing ${translation} outside Verse Snap isn’t available yet. You can copy the verse instead.`;
+
+/** The text copied for one verse. Licensed editions carry their publisher notice (and link) with them. */
 export function verseShareText(verse: Verse): string {
-  return `${verse.reference}\n${verse.translation}\n\n${verse.text}`;
+  const base = `${verse.reference}\n${verse.translation}\n\n${verse.text}`;
+  const notice = publisherNoticeText(verse.translation);
+  return notice ? `${base}\n\n${notice}` : base;
 }
 
 /**
@@ -16,6 +24,11 @@ export async function shareVerseCard(
   verse: Verse,
   notify: (message: string) => void,
 ): Promise<void> {
+  // A licensed edition that may not leave the app (NIV) is neither exported nor shared.
+  if (!canShareExternally(verse.translation)) {
+    notify(externalShareMessage(verse.translation));
+    return;
+  }
   const shareText = verseShareText(verse);
   trackEvent("verse_shared");
   try {
@@ -46,6 +59,10 @@ export async function shareVerseText(
   notify: (message: string) => void,
   track = true,
 ): Promise<void> {
+  if (!canShareExternally(verse.translation)) {
+    notify(externalShareMessage(verse.translation));
+    return;
+  }
   const shareText = verseShareText(verse);
   if (track) trackEvent("verse_shared");
   if (typeof navigator.share === "function") {

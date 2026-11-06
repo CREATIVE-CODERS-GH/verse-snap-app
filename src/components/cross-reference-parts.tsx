@@ -10,6 +10,7 @@ import {
   testamentOf,
   type CrossPassage,
 } from "@/lib/bible/cross-references";
+import { isRestrictedTranslation } from "@/lib/bible/translations";
 import { cn } from "@/lib/utils";
 
 /*
@@ -47,7 +48,9 @@ function PassageRow({
   translation: string;
   onOpen: () => void;
 }) {
-  const fit = usePassageFit(original, translation);
+  // Licensed editions (NIV, AMP) show references only here: their text is not kept or listed in bulk.
+  const licensed = isRestrictedTranslation(translation);
+  const fit = usePassageFit(original, translation, !licensed);
   const passage = fit.passage;
   const label = passageLabel(passage);
   const { data, isLoading } = useQuery({
@@ -63,7 +66,7 @@ function PassageRow({
         },
         translation,
       ),
-    enabled: fit.available,
+    enabled: fit.available && !licensed,
     retry: 1,
     staleTime: 5 * 60_000,
   });
@@ -215,6 +218,14 @@ export function CrossReferenceSheet({
             ))}
           </ul>
         )}
+        {!loading && !failed && passages.length > 0 && isRestrictedTranslation(translation) ? (
+          <p
+            data-testid="licensed-xref-note"
+            className="mt-2 text-[12px] leading-relaxed text-brand-text-muted"
+          >
+            Verse text for {translation} isn’t listed here. Open a passage to read it.
+          </p>
+        ) : null}
         {!loading && !failed && total > 0 ? (
           <Link
             to="/references/$translation/$book/$chapter/$verse"

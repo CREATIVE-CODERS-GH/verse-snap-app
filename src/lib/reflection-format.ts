@@ -1,3 +1,4 @@
+import { isRestrictedTranslation } from "./bible/translations";
 /**
  * Plain-text formatting for the Reflection Journal editor (Stitch Screen 24).
  *
@@ -103,6 +104,8 @@ export function applyFormat(state: EditorState, kind: FormatKind, citation = "")
 
 /** The citation the quote button inserts: “verse text” — Reference (EDITION). */
 export function scriptureCitation(text: string, reference: string, edition: string): string {
+  // A saved note must not keep licensed text (NIV, AMP): the quote button inserts the reference only.
+  if (isRestrictedTranslation(edition)) return `${reference} (${edition})`;
   return `“${text.trim()}” — ${reference} (${edition})`;
 }
 

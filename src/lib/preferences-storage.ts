@@ -1,4 +1,7 @@
 /** Saved reading preferences: their types, defaults and the validating reader (no React). */
+import { isRestrictedTranslation } from "./bible/translations";
+import { YOUVERSION_TRANSLATIONS_ENABLED } from "./bible/youversion-schema";
+
 export type TextSize = "small" | "medium" | "large" | "xlarge";
 export type Theme = "light" | "dark" | "system";
 /** Scripture typeface: Playfair Display (serif) or Inter (sans). */
@@ -88,12 +91,19 @@ export function parseStoredPreferences(raw: string | null): Preferences | null {
   } catch {
     return null;
   }
-  const translation =
+  const storedTranslation =
     parsed.translation === "KJV"
       ? "KJAV"
       : typeof parsed.translation === "string" && parsed.translation
         ? parsed.translation
         : DEFAULT_PREFERENCES.translation;
+  // A device that chose a licensed edition (NIV, AMP) while the feature was on falls back to the
+  // default whenever it is off, so switching the flag off never strands a reader on an unavailable
+  // translation. The stored choice is untouched, so turning the flag back on restores it.
+  const translation =
+    isRestrictedTranslation(storedTranslation) && !YOUVERSION_TRANSLATIONS_ENABLED
+      ? DEFAULT_PREFERENCES.translation
+      : storedTranslation;
   const d = DEFAULT_PREFERENCES;
   return {
     textSize: oneOf(parsed.textSize, TEXT_SIZES, d.textSize),

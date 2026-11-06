@@ -41,6 +41,7 @@ import { useAuth } from "@/lib/auth";
 import { findBook } from "@/lib/bible/books";
 import { getReflectionSuggestions } from "@/lib/bible/reflection-sample";
 import { BibleServiceError } from "@/lib/bible/types";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { bibleService } from "@/lib/bible/service";
 import { copyText } from "@/lib/copy-text";
 import { highlights } from "@/lib/highlights";
@@ -774,7 +775,13 @@ function ReflectionPage() {
                     <LoadingState />
                   </span>
                 ) : verse ? (
-                  `“${verse.text}”`
+                  <>
+                    {`“${verse.text}”`}
+                    <PublisherNotice
+                      translation={verse.translation}
+                      className="mt-2 text-[11px] not-italic leading-relaxed text-ch-on-surface-variant"
+                    />
+                  </>
                 ) : (
                   <span className="block font-stitch text-sm not-italic leading-5 text-ch-on-surface-variant">
                     {networkProblem

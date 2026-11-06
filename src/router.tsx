@@ -1,6 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { FullScreenLoading } from "./components/search-states";
+import { applyLicensedQueryPolicy } from "./lib/bible/query-policy";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
@@ -16,6 +17,9 @@ export const getRouter = () => {
       },
     },
   });
+
+  // Licensed editions (NIV, AMP) are not retained once no screen shows them.
+  applyLicensedQueryPolicy(queryClient);
 
   const router = createRouter({
     routeTree,

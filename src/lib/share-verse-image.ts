@@ -1,5 +1,5 @@
 import type { Verse } from "./bible/types";
-import { translationName } from "./bible/translations";
+import { canExportImage, translationAttribution, translationName } from "./bible/translations";
 
 /**
  * Renders a verse into a branded PNG card, entirely on the device.
@@ -54,6 +54,8 @@ function wrapLines(context: CanvasRenderingContext2D, text: string, maxWidth: nu
 }
 
 export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
+  if (!canExportImage(verse.translation))
+    throw new Error("Image export is not available for this translation");
   await ensureFonts();
 
   const canvas = document.createElement("canvas");
@@ -66,6 +68,13 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
   context.fillRect(0, 0, WIDTH, HEIGHT);
 
   const maxWidth = WIDTH - PADDING * 2;
+
+  // A licensed edition carries its full publisher notice on the image, in the footer.
+  const notice = translationAttribution(verse.translation)?.notice ?? "";
+  const NOTICE_LINE = 30;
+  context.font = '500 22px "Libre Franklin", system-ui, sans-serif';
+  const noticeLines = notice ? wrapLines(context, notice, maxWidth) : [];
+  const noticeHeight = noticeLines.length > 0 ? noticeLines.length * NOTICE_LINE + 24 : 0;
 
   // Brand mark, small and quiet, top left.
   context.fillStyle = COLORS.accent;
@@ -82,12 +91,12 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
     lineHeight = Math.round(fontSize * 1.45);
     lines = wrapLines(context, verse.text, maxWidth);
     const blockHeight = lines.length * lineHeight;
-    if (blockHeight <= HEIGHT - PADDING * 2 - 260) break;
+    if (blockHeight <= HEIGHT - PADDING * 2 - 260 - noticeHeight) break;
   }
 
   // Vertically center the verse between the brand mark and the footer.
   const blockHeight = lines.length * lineHeight;
-  const footerReserve = 260;
+  const footerReserve = 260 + noticeHeight;
   const textTop = Math.max(
     PADDING + 120,
     Math.round((HEIGHT - footerReserve - blockHeight) / 2) + Math.round(lineHeight * 0.75),
@@ -98,7 +107,7 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
   });
 
   // Reference + translation, anchored near the bottom.
-  const footerTop = HEIGHT - PADDING - 120;
+  const footerTop = HEIGHT - PADDING - 120 - noticeHeight;
   context.strokeStyle = COLORS.rule;
   context.lineWidth = 2;
   context.beginPath();
@@ -117,6 +126,13 @@ export async function createVerseImageBlob(verse: Verse): Promise<Blob> {
     PADDING,
     footerTop + 100,
   );
+
+  // Publisher notice, legible at the card's full size.
+  context.fillStyle = COLORS.muted;
+  context.font = '500 22px "Libre Franklin", system-ui, sans-serif';
+  noticeLines.forEach((line, index) => {
+    context.fillText(line, PADDING, footerTop + 100 + 40 + index * NOTICE_LINE);
+  });
 
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((blob) => {

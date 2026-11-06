@@ -1,6 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import type { ReactNode, RefObject } from "react";
 import { BrandMark } from "@/components/brand-mark";
+import { PublisherNotice } from "@/components/publisher-notice";
 import {
   CameraIcon,
   ChevronRightIcon,
@@ -10,7 +11,7 @@ import {
 } from "@/components/stitch-icons";
 import { trackEvent } from "@/lib/analytics";
 import type { Verse } from "@/lib/bible/types";
-import { translationName } from "@/lib/bible/translations";
+import { canCopyText, canShareExternally, translationName } from "@/lib/bible/translations";
 import { copyText } from "@/lib/copy-text";
 import { shareVerseCard, shareVerseText, verseShareText } from "@/lib/share-verse-card";
 
@@ -106,6 +107,8 @@ function ActionRow({
 
 export function ShareSheet({ open, onOpenChange, verse, notify, returnFocusRef }: ShareSheetProps) {
   const text = verseShareText(verse);
+  const external = canShareExternally(verse.translation);
+  const copyAllowed = canCopyText(verse.translation);
   const message = `${text}\n\nShared with Verse Snap`;
   const close = () => onOpenChange(false);
 
@@ -158,6 +161,10 @@ export function ShareSheet({ open, onOpenChange, verse, notify, returnFocusRef }
             <blockquote className="mb-3.5 line-clamp-6 px-1 text-center font-display text-[13px] italic leading-[1.45] text-brand-text-muted">
               “{verse.text}”
             </blockquote>
+            <PublisherNotice
+              translation={verse.translation}
+              className="-mt-2 mb-3 px-1 text-center text-[10px] leading-snug text-brand-text-muted"
+            />
             <figcaption className="flex items-center gap-2 border-t border-brand-border px-0.5 pt-2.5">
               <BrandMark className="h-7 w-7 rounded-lg" />
               <span className="flex flex-col text-left leading-tight">
@@ -172,10 +179,22 @@ export function ShareSheet({ open, onOpenChange, verse, notify, returnFocusRef }
             </figcaption>
           </figure>
 
-          <h3 className="mb-3 text-center text-[13px] font-semibold text-brand-text-muted">
-            Share
-          </h3>
-          <div className="mb-4 grid grid-cols-4 gap-2 px-1">
+          {!external ? (
+            <p
+              role="note"
+              data-testid="share-restricted-note"
+              className="mb-3 rounded-xl bg-brand-surface px-3 py-2 text-center text-[13px] leading-snug text-brand-text-muted"
+            >
+              Sharing {verse.translation} outside Verse Snap isn’t available yet because of the
+              publisher’s licence, and neither is copying its text. You can still read it here and
+              save its reference.
+            </p>
+          ) : (
+            <h3 className="mb-3 text-center text-[13px] font-semibold text-brand-text-muted">
+              Share
+            </h3>
+          )}
+          <div className={external ? "mb-4 grid grid-cols-4 gap-2 px-1" : "hidden"}>
             <Target
               label="Messages"
               circle="bg-[#34c759] text-white"
@@ -209,21 +228,27 @@ export function ShareSheet({ open, onOpenChange, verse, notify, returnFocusRef }
           </div>
 
           <div className="divide-y divide-brand-border overflow-hidden rounded-2xl border border-brand-border bg-brand-surface shadow-sm">
-            <ActionRow
-              icon={<CopyDocIcon className="h-5 w-5" />}
-              label="Copy text"
-              onClick={() => void copy()}
-            />
-            <ActionRow
-              icon={<GalleryIcon className="h-5 w-5" />}
-              label="Share as image"
-              onClick={asImage}
-            />
-            <ActionRow
-              icon={<MoreHorizIcon className="h-5 w-5" />}
-              label="More options..."
-              onClick={more}
-            />
+            {copyAllowed ? (
+              <ActionRow
+                icon={<CopyDocIcon className="h-5 w-5" />}
+                label="Copy text"
+                onClick={() => void copy()}
+              />
+            ) : null}
+            {external ? (
+              <>
+                <ActionRow
+                  icon={<GalleryIcon className="h-5 w-5" />}
+                  label="Share as image"
+                  onClick={asImage}
+                />
+                <ActionRow
+                  icon={<MoreHorizIcon className="h-5 w-5" />}
+                  label="More options..."
+                  onClick={more}
+                />
+              </>
+            ) : null}
           </div>
         </Dialog.Content>
       </Dialog.Portal>

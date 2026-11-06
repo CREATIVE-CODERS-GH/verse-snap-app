@@ -15,6 +15,7 @@ import {
 } from "@/components/stitch-icons";
 import { findBook } from "@/lib/bible/books";
 import { bibleService } from "@/lib/bible/service";
+import { canCopyText, canExportImage, translationAttribution } from "@/lib/bible/translations";
 import type { Verse } from "@/lib/bible/types";
 import { trackEvent } from "@/lib/analytics";
 import { copyText } from "@/lib/copy-text";
@@ -92,12 +93,20 @@ function CardStudioPage() {
     scale: 1,
   });
   const [busy, setBusy] = useState(false);
+  // Some licensed editions (NIV) may not be exported as images; the rest of the screen still works.
+  const imageExportAllowed = canExportImage(params.translation);
+  const copyAllowed = canCopyText(params.translation);
+  const notice = translationAttribution(params.translation)?.notice;
   const theme = cardTheme(options.theme);
   const set = (patch: Partial<CardOptions>) => setOptions((current) => ({ ...current, ...patch }));
   const scaleLabel = SCALES.find((item) => options.scale <= item.max)?.label ?? "Large";
 
   async function exportCard(mode: "share" | "save" | "story", card: Verse) {
     if (busy) return;
+    if (!canExportImage(card.translation)) {
+      toast(`Image cards aren’t available for ${card.translation}.`);
+      return;
+    }
     setBusy(true);
     const format: CardFormat = mode === "story" ? "story" : options.format;
     try {
@@ -132,6 +141,7 @@ function CardStudioPage() {
   }
 
   const copy = async (card: Verse) => {
+    if (!canCopyText(card.translation)) return;
     try {
       await copyText(verseShareText(card));
       trackEvent("verse_copied");
@@ -176,7 +186,7 @@ function CardStudioPage() {
           </div>
           <button
             type="button"
-            disabled={!verse || busy}
+            disabled={!verse || busy || !imageExportAllowed}
             onClick={() => verse && void exportCard("share", verse)}
             className="flex items-center gap-1.5 rounded-full bg-brand-primary px-4 py-2 text-[14px] font-semibold text-brand-on-primary shadow-sm transition-colors hover:bg-brand-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-focus focus-visible:ring-offset-2 focus-visible:ring-offset-brand-canvas disabled:opacity-60"
           >
@@ -254,6 +264,15 @@ function CardStudioPage() {
                   </span>
                   {verse.text}
                 </blockquote>
+                {notice ? (
+                  <p
+                    data-testid="card-notice"
+                    className="mb-[2cqw] text-left text-[2.4cqw] leading-snug"
+                    style={{ color: theme.muted }}
+                  >
+                    {notice}
+                  </p>
+                ) : null}
                 <div className="flex items-center justify-between text-[3.2cqw] font-semibold">
                   <span className="flex items-center gap-[1.5cqw]">
                     <BookOpenIcon className="h-[4cqw] w-[4cqw]" aria-hidden />
@@ -378,6 +397,16 @@ function CardStudioPage() {
 
         <section>
           <h2 className="mb-3 text-[15px] font-semibold text-brand-text">Instant Export</h2>
+          {!imageExportAllowed ? (
+            <p
+              role="note"
+              data-testid="card-export-note"
+              className="mb-3 rounded-xl bg-brand-surface-muted px-3 py-2 text-[13px] leading-snug text-brand-text-muted"
+            >
+              Image cards, sharing and copying aren’t available for {params.translation} because of
+              the publisher’s licence. You can still read it in Verse Snap.
+            </p>
+          ) : null}
           <div className="grid grid-cols-3 gap-2.5">
             {(
               [
@@ -389,7 +418,9 @@ function CardStudioPage() {
               <button
                 key={action.id}
                 type="button"
-                disabled={!verse || busy}
+                disabled={
+                  !verse || busy || (action.id === "copy" ? !copyAllowed : !imageExportAllowed)
+                }
                 onClick={() => {
                   if (!verse) return;
                   if (action.id === "copy") void copy(verse);

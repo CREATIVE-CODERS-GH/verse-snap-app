@@ -8,6 +8,7 @@ import {
   SubScreenHeader,
 } from "@/components/settings-parts";
 import { InfoIcon, ListBulletIcon, RefreshIcon } from "@/components/stitch-icons";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { bibleService } from "@/lib/bible/service";
 import { translationName } from "@/lib/bible/translations";
 import { usePreferences, type TextSize } from "@/lib/preferences";
@@ -74,6 +75,12 @@ function TextSizePage() {
                 ? "“Do not be conformed to this world, but be transformed by the renewing of your mind.”"
                 : "Loading verse…"}
           </p>
+          {preview.data ? (
+            <PublisherNotice
+              translation={prefs.translation}
+              className="mt-2 text-[11px] leading-relaxed text-brand-text-muted"
+            />
+          ) : null}
           <div className="mt-3 flex items-center justify-between text-[11.5px]">
             <span className="text-brand-gold-text">{translationName(prefs.translation)}</span>
             <span className="text-brand-text-muted">• Devotional Display</span>

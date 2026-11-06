@@ -16,8 +16,11 @@ import {
   VolumeIcon,
 } from "@/components/stitch-icons";
 import { toneInfo } from "@/components/verse-annotation-parts";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { findBook } from "@/lib/bible/books";
 import { bibleService } from "@/lib/bible/service";
+import { isRestrictedTranslation } from "@/lib/bible/translations";
+import { coversVerse } from "@/lib/bible/types";
 import type { SavedHighlight } from "@/lib/highlights";
 import type { Reflection } from "@/lib/journal";
 import type { LibraryEntry } from "@/lib/library";
@@ -324,20 +327,69 @@ function LinkedNotes({ notes }: { notes: Reflection[] }) {
 
 /* ---------- Verses (33) ---------- */
 
+/**
+ * At most this many licensed verses are previewed in one list, so a long list never shows a run of
+ * publisher text (the NIV terms limit how much one person may view at a time). The rest show the
+ * reference only; tapping one opens it.
+ */
+export const LICENSED_PREVIEW_LIMIT = 10;
+
+function licensedPreviewKeys<T>(
+  items: readonly T[],
+  keyOf: (item: T) => string,
+  translationOf: (item: T) => string,
+): Set<string> {
+  const keys = new Set<string>();
+  for (const item of items) {
+    if (keys.size >= LICENSED_PREVIEW_LIMIT) break;
+    if (isRestrictedTranslation(translationOf(item))) keys.add(keyOf(item));
+  }
+  return keys;
+}
+
+/**
+ * The text of a saved verse whose edition is licensed (NIV, AMP): fetched on demand through the same
+ * query as the chapter screen, so it lives only in memory for the session. Other editions return
+ * nothing here because their text is stored with the entry.
+ */
+function useLiveVerseText(entry: LibraryEntry, live: boolean): string | undefined {
+  const book = findBook(entry.bookId);
+  const needed =
+    live && !entry.verseText && isRestrictedTranslation(entry.translation) && Boolean(book);
+  const { data } = useQuery({
+    queryKey: ["chapter", entry.translation, entry.bookId, String(entry.chapter)],
+    queryFn: () =>
+      bibleService.getChapter(
+        { bookId: entry.bookId, bookName: book?.name ?? entry.bookId, chapter: entry.chapter },
+        entry.translation,
+      ),
+    enabled: needed,
+    staleTime: 5 * 60_000,
+  });
+  if (!needed || entry.verse === null) return undefined;
+  const verse = entry.verse;
+  return data?.verses.find((item) => coversVerse(item, verse))?.text;
+}
+
 function SavedVerseCard({
   entry,
   notes,
   editing,
   onRemove,
   removing,
+  livePreview,
 }: {
   entry: LibraryEntry;
+  livePreview: boolean;
   notes: Reflection[];
   editing: boolean;
   onRemove: (id: string) => void;
   removing: boolean;
 }) {
   const reference = verseReference(entry);
+  // Licensed editions are saved by reference only; the text is read live, in memory, and never stored.
+  const liveText = useLiveVerseText(entry, livePreview);
+  const shownText = entry.verseText || liveText;
   const linked = notesOnVerse(notes, entry);
   return (
     <li className={CARD}>
@@ -364,10 +416,16 @@ function SavedVerseCard({
           ) : null}
         </div>
       </div>
-      {entry.verseText ? (
+      {shownText ? (
         <p className="mt-2 line-clamp-4 font-display text-[15px] leading-relaxed text-brand-text">
-          “{entry.verseText}”
+          “{shownText}”
         </p>
+      ) : null}
+      {!entry.verseText && shownText ? (
+        <PublisherNotice
+          translation={entry.translation}
+          className="mt-1 text-[11px] leading-relaxed text-brand-text-muted"
+        />
       ) : null}
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className={META}>Saved {relativeTime(entry.at)}</span>
@@ -383,7 +441,7 @@ function SavedVerseCard({
           <PaletteIcon className="h-[18px] w-[18px]" aria-hidden />
           Card Studio
         </Link>
-        <ListenAction id={reference} text={`${reference}. ${entry.verseText}`} />
+        <ListenAction id={reference} text={shownText ? `${reference}. ${shownText}` : reference} />
       </div>
     </li>
   );
@@ -416,6 +474,11 @@ export function SavedVersesHub({
   removing: boolean;
   sortLabel: string;
 }) {
+  const previewKeys = licensedPreviewKeys(
+    entries,
+    (entry) => entry.id,
+    (entry) => entry.translation,
+  );
   return (
     <section aria-label="Saved verses">
       {shelves.length > 1 ? (
@@ -442,6 +505,7 @@ export function SavedVersesHub({
           {entries.map((entry) => (
             <SavedVerseCard
               key={entry.id}
+              livePreview={previewKeys.has(entry.id)}
               entry={entry}
               notes={notes}
               editing={editing}
@@ -457,8 +521,9 @@ export function SavedVersesHub({
 
 /* ---------- Highlights (34) ---------- */
 
-function HighlightVerseText({ item }: { item: SavedHighlight }) {
+function HighlightVerseText({ item, live }: { item: SavedHighlight; live: boolean }) {
   const book = findBook(item.bookId);
+  const hidden = isRestrictedTranslation(item.translation) && !live;
   const { data } = useQuery({
     // The same key as the chapter screen, so a chapter already read is not fetched again.
     queryKey: ["chapter", item.translation, item.bookId, String(item.chapter)],
@@ -467,11 +532,12 @@ function HighlightVerseText({ item }: { item: SavedHighlight }) {
         { bookId: item.bookId, bookName: book?.name ?? item.bookId, chapter: item.chapter },
         item.translation,
       ),
-    enabled: Boolean(book),
+    enabled: Boolean(book) && !hidden,
     staleTime: 5 * 60_000,
   });
-  const text = data?.verses.find((verse) => verse.verse === item.verse)?.text;
+  const text = data?.verses.find((verse) => coversVerse(verse, item.verse))?.text;
   const tone = toneInfo(item.color);
+  if (hidden) return null;
   if (!text) {
     return (
       <span
@@ -481,18 +547,32 @@ function HighlightVerseText({ item }: { item: SavedHighlight }) {
     );
   }
   return (
-    <p
-      className={cn(
-        "rounded-xl px-3 py-2 font-display text-[15px] leading-relaxed text-brand-text",
-        tone.tint,
-      )}
-    >
-      “{text}”
-    </p>
+    <>
+      <p
+        className={cn(
+          "rounded-xl px-3 py-2 font-display text-[15px] leading-relaxed text-brand-text",
+          tone.tint,
+        )}
+      >
+        “{text}”
+      </p>
+      <PublisherNotice
+        translation={item.translation}
+        className="mt-1 text-[11px] leading-relaxed text-brand-text-muted"
+      />
+    </>
   );
 }
 
-function HighlightCard({ item, notes }: { item: SavedHighlight; notes: Reflection[] }) {
+function HighlightCard({
+  item,
+  notes,
+  livePreview,
+}: {
+  item: SavedHighlight;
+  notes: Reflection[];
+  livePreview: boolean;
+}) {
   const reference = verseReference(item);
   const tone = toneInfo(item.color);
   const linked = notesOnVerse(notes, item);
@@ -509,7 +589,7 @@ function HighlightCard({ item, notes }: { item: SavedHighlight; notes: Reflectio
         <span className={EDITION_CHIP}>{item.translation}</span>
       </div>
       <div className="mt-2">
-        <HighlightVerseText item={item} />
+        <HighlightVerseText item={item} live={livePreview} />
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className={cn(META, "inline-flex items-center gap-1.5")}>
@@ -558,6 +638,11 @@ export function SavedHighlightsHub({
   failed: boolean;
   sortLabel: string;
 }) {
+  const highlightPreviewKeys = licensedPreviewKeys(
+    items,
+    (item) => `${item.translation}/${item.bookId}/${item.chapter}/${item.verse}`,
+    (item) => item.translation,
+  );
   return (
     <section aria-label="Highlights">
       {colours.length > 1 ? (
@@ -586,6 +671,9 @@ export function SavedHighlightsHub({
           {items.map((item) => (
             <HighlightCard
               key={`${item.translation}/${item.bookId}/${item.chapter}/${item.verse}`}
+              livePreview={highlightPreviewKeys.has(
+                `${item.translation}/${item.bookId}/${item.chapter}/${item.verse}`,
+              )}
               item={item}
               notes={notes}
             />

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { SheetFrame } from "@/components/chapter-sheets";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { ArrowRightIcon } from "@/components/stitch-icons";
 import { bibleService } from "@/lib/bible/service";
 import type { VerseRef } from "@/lib/bible/types";
@@ -55,6 +56,12 @@ function CompareRow({
           </span>
         )}
       </p>
+      {query.data ? (
+        <PublisherNotice
+          translation={edition.code}
+          className="mt-1 text-[11px] leading-relaxed text-ch-on-surface-variant"
+        />
+      ) : null}
     </li>
   );
 }

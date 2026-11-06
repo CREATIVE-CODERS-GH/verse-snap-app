@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Verse, VerseRef } from "./bible/service";
+import { isRestrictedTranslation } from "./bible/translations";
 import { ACCOUNT_HISTORY_V2, HISTORY_ENTRY_KEY } from "./history-schema";
 
 /** A saved verse (always a single verse). */
@@ -127,6 +128,15 @@ export const guestStore = {
   },
 };
 
+/**
+ * Licensed editions (NIV, AMP) are saved by reference only: the publisher licences do not allow us to
+ * keep their text on the device or in the account. The reference and translation are enough to read it
+ * again live. Every other edition keeps the verse text as before.
+ */
+function storableVerseText(verse: Verse): string {
+  return isRestrictedTranslation(verse.translation) ? "" : verse.text;
+}
+
 function localEntry(verse: Verse): LibraryEntry {
   return {
     id: verseKey(verse, verse.translation),
@@ -135,7 +145,7 @@ function localEntry(verse: Verse): LibraryEntry {
     bookName: verse.bookName,
     chapter: verse.chapter,
     verse: verse.verse,
-    verseText: verse.text,
+    verseText: storableVerseText(verse),
     at: new Date().toISOString(),
   };
 }
@@ -173,7 +183,7 @@ function payload(verse: Verse, userId: string) {
     book_name: verse.bookName,
     chapter: verse.chapter,
     verse: verse.verse,
-    verse_text: verse.text,
+    verse_text: storableVerseText(verse),
   };
 }
 

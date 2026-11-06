@@ -19,6 +19,11 @@
   the Vercel Preview build is confirmed.
 - **Housekeeping:** `prod/pre-main-cutover-306bf67` backup tag was never created; skip unless wanted.
 
+## YouVersion editions (NIV, AMP): branch `feature/youversion-editions` (local, uncommitted)
+NIV and AMP behind `VITE_YOUVERSION_TRANSLATIONS` (off by default). Design, limits and the open licence conditions:
+`docs/audit/YOUVERSION_YV1.md` (YV-1 to YV-4). Preview plan: `docs/audit/YOUVERSION_PREVIEW_CHECKLIST.md`.
+Next: owner approval to commit, then publisher answers for the Open items before any Preview use.
+
 ## Done and live
 - Free Bible Search (WEB/ASV/BSB), Reflection Journal (1C), Reader improvements and Saved hubs (1D),
   cross-references (1E), offline Bible reading (1F: IndexedDB downloads + service worker, in Production,

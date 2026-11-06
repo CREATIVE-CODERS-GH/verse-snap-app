@@ -1,3 +1,4 @@
+import { canExportImage, translationAttribution } from "./bible/translations";
 import type { Verse } from "./bible/types";
 
 /**
@@ -148,6 +149,8 @@ function wrap(context: CanvasRenderingContext2D, text: string, maxWidth: number)
 
 /** Draws the card exactly as previewed and returns a PNG. */
 export async function renderVerseCard(verse: Verse, options: CardOptions): Promise<Blob> {
+  if (!canExportImage(verse.translation))
+    throw new Error("Image export is not available for this translation");
   const theme = cardTheme(options.theme);
   const { width, height } = CARD_FORMATS[options.format];
   const type = CARD_TYPES[options.type];
@@ -206,9 +209,16 @@ export async function renderVerseCard(verse: Verse, options: CardOptions): Promi
   context.fillStyle = theme.text;
   context.fillText(chipText, pad + 22, pad + 38);
 
+  // A licensed edition carries its full publisher notice on the card, above the footer row.
+  const notice = translationAttribution(verse.translation)?.notice ?? "";
+  const noticeLineHeight = 32;
+  context.font = '500 24px "Inter", system-ui, sans-serif';
+  const noticeLines = notice ? wrap(context, notice, width - pad * 2) : [];
+  const noticeBlock = noticeLines.length > 0 ? noticeLines.length * noticeLineHeight + 20 : 0;
+
   // Verse, centred, shrinking until it fits.
   const maxWidth = width - pad * 2;
-  const available = height - pad * 2 - 320;
+  const available = height - pad * 2 - 320 - noticeBlock;
   let size = Math.round(width * 0.062 * options.scale);
   let lines: string[] = [];
   let lineHeight = 0;
@@ -229,6 +239,17 @@ export async function renderVerseCard(verse: Verse, options: CardOptions): Promi
   lines.forEach((line, index) => {
     context.fillText(line, width / 2, top + Math.round(lineHeight * 0.8) + index * lineHeight);
   });
+
+  // Publisher notice, left aligned above the footer row.
+  if (noticeLines.length > 0) {
+    context.textAlign = "left";
+    context.fillStyle = theme.muted;
+    context.font = '500 24px "Inter", system-ui, sans-serif';
+    const firstBaseline = height - pad - 34 - 20 - (noticeLines.length - 1) * noticeLineHeight;
+    noticeLines.forEach((line, index) => {
+      context.fillText(line, pad, firstBaseline + index * noticeLineHeight);
+    });
+  }
 
   // Footer: reference left, brand right.
   context.textAlign = "left";

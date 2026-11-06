@@ -3,6 +3,8 @@ import { findReferences } from "./find-references";
 import { BIBLE_BOOKS } from "./books";
 import { chapterCache } from "./chapter-cache";
 import { helloAoProvider } from "./helloao-provider";
+import { youVersionProvider } from "./youversion-provider";
+import { getYouVersionEdition, isRestrictedTranslation, readerTranslations } from "./translations";
 import { getOfflineChapter } from "./offline-manager";
 import {
   BibleServiceError,
@@ -11,6 +13,7 @@ import {
   type Translation,
   type Verse,
   type VerseRef,
+  coversVerse,
 } from "./types";
 
 /**
@@ -20,6 +23,17 @@ import {
  * connection.
  */
 const provider: BibleProvider = helloAoProvider;
+
+/**
+ * Licensed editions (YouVersion: NIV, AMP) are read live and never persisted: no offline download,
+ * no on-device chapter cache, no search index. Everything else keeps using HelloAO unchanged.
+ */
+function licensedProvider(translation: string): BibleProvider | null {
+  if (!isRestrictedTranslation(translation)) return null;
+  if (!getYouVersionEdition(translation))
+    throw new BibleServiceError("translation", "That translation is not available.");
+  return youVersionProvider;
+}
 
 export const DEFAULT_TRANSLATION = "KJAV";
 
@@ -31,6 +45,8 @@ async function loadChapter(
   ref: Omit<VerseRef, "verse">,
   translation: string,
 ): Promise<Chapter | null> {
+  const licensed = licensedProvider(translation);
+  if (licensed) return licensed.getChapter(ref, translation);
   // A translation downloaded for offline reading is read from the device, without the network.
   const downloaded = await getOfflineChapter(translation, ref.bookId, ref.chapter);
   if (downloaded) return downloaded;
@@ -78,7 +94,7 @@ export const bibleService = {
   findReferences,
 
   listTranslations(): Promise<Translation[]> {
-    return provider.listTranslations();
+    return Promise.resolve(readerTranslations());
   },
 
   getChapter(
@@ -90,7 +106,7 @@ export const bibleService = {
 
   async getVerse(ref: VerseRef, translation: string = DEFAULT_TRANSLATION): Promise<Verse | null> {
     const chapter = await loadChapter(ref, translation);
-    return chapter?.verses.find((verse) => verse.verse === ref.verse) ?? null;
+    return chapter?.verses.find((verse) => coversVerse(verse, ref.verse)) ?? null;
   },
 
   async getNeighbour(
@@ -98,6 +114,8 @@ export const bibleService = {
     direction: -1 | 1,
     translation: string = DEFAULT_TRANSLATION,
   ): Promise<Verse | null> {
+    const licensed = licensedProvider(translation);
+    if (licensed) return licensed.getNeighbour(ref, direction, translation);
     const local = await getOfflineChapter(translation, ref.bookId, ref.chapter);
     if (local) return offlineNeighbour(local, ref, direction, translation);
     try {

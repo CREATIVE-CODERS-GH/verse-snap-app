@@ -20,6 +20,7 @@ import {
 } from "@/components/reader-multi-parts";
 import { TextSizeSheet } from "@/components/chapter-sheets";
 import { CompareSheet } from "@/components/compare-sheet";
+import { PublisherNotice } from "@/components/publisher-notice";
 import {
   ERROR_TITLE_CLASS,
   ErrorIllustration,
@@ -49,7 +50,7 @@ import { BIBLE_BOOKS, findBook } from "@/lib/bible/books";
 import { shortBookName } from "@/lib/bible/book-labels";
 import { BibleServiceError, type Verse } from "@/lib/bible/types";
 import { bibleService } from "@/lib/bible/service";
-import { BIBLE_TRANSLATIONS, translationName } from "@/lib/bible/translations";
+import { BIBLE_TRANSLATIONS, canCopyText, translationName } from "@/lib/bible/translations";
 import { toChips } from "@/lib/bible/cross-references";
 import { useVerseCrossRefs } from "@/lib/bible/use-cross-references";
 import { trackEvent } from "@/lib/analytics";
@@ -512,7 +513,7 @@ function ChapterPage() {
   }, [selectedVerse, overlayOpen, closeAnnotation, sheetExpanded]);
 
   const handleCopy = async () => {
-    if (!selected) return;
+    if (!selected || !canCopyText(params.translation)) return;
     try {
       await copyText(verseShareText(selected));
       trackEvent("verse_copied");
@@ -659,6 +660,7 @@ function ChapterPage() {
                             isSelected ? (
                               <SelectionToolbar
                                 onCopy={() => void handleCopy()}
+                                copyDisabled={!canCopyText(params.translation)}
                                 onCompare={() => setCompareOpen(true)}
                                 onShare={() => setShareOpen(true)}
                               />
@@ -688,6 +690,7 @@ function ChapterPage() {
                     );
                   })}
                 </article>
+                <PublisherNotice translation={query.data.translation} />
               </>
             ) : networkProblem ? (
               <StateMessage
@@ -773,6 +776,7 @@ function ChapterPage() {
                 saveDisabled={toggleSave.isPending}
                 onToggleSave={() => toggleSave.mutate()}
                 onCopy={() => void handleCopy()}
+                copyDisabled={!canCopyText(params.translation)}
                 onCompare={() => setCompareOpen(true)}
               />
             }

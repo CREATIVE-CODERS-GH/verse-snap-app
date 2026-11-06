@@ -15,6 +15,7 @@ import {
   StopSquareIcon,
   VolumeIcon,
 } from "@/components/stitch-icons";
+import { PublisherNotice } from "@/components/publisher-notice";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences, type MicSensitivity, type Narrator } from "@/lib/preferences";
 import { useDeviceVoices } from "@/lib/narration/narration";
@@ -464,6 +465,12 @@ function VoiceAudioPage() {
                 <p className="text-center font-display text-[18px] italic leading-relaxed text-brand-text">
                   “{sampleText}”
                 </p>
+                {sample.data ? (
+                  <PublisherNotice
+                    translation={prefs.translation}
+                    className="mt-2 text-center text-[11px] leading-relaxed text-brand-text-muted"
+                  />
+                ) : null}
                 <div className="mt-2.5 flex items-center justify-center gap-1.5 text-center">
                   <span className="text-[12px] font-semibold uppercase tracking-wider text-brand-gold-text">
                     Psalm 23:1
