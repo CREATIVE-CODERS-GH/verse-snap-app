@@ -5,7 +5,13 @@ import { YOUVERSION_EDITIONS } from "./translations";
  * The React Query keys whose data holds Scripture text, by their first element. Every query that
  * returns a Verse or Chapter must use one of these roots with the translation code second.
  */
-export const SCRIPTURE_QUERY_ROOTS = ["chapter", "verse", "verse-neighbours"] as const;
+export const SCRIPTURE_QUERY_ROOTS = [
+  "chapter",
+  "verse",
+  "verse-neighbours",
+  // Discover's passage previews (youversion-discover.ts), keyed ["discover-preview", translation, ids].
+  "discover-preview",
+] as const;
 
 /**
  * Licensed editions (NIV, AMP) are not kept once the screen that asked for them has gone: the

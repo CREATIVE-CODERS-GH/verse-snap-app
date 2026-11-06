@@ -5,6 +5,12 @@ interface SearchFieldProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  /** Defaults keep Verse Snap's own search exactly as it was; Discover passes its own wording and limit. */
+  placeholder?: string;
+  label?: string;
+  maxLength?: number;
+  /** Extra fields for the no-JavaScript form GET (Discover keeps its mode and translation this way). */
+  hiddenFields?: Record<string, string>;
 }
 
 /**
@@ -12,10 +18,23 @@ interface SearchFieldProps {
  * Progressive enhancement: without JavaScript (or before hydration) the form is a plain GET to
  * /search?q=..., so a submission is never lost. Once the page is live, onSubmit takes over.
  */
-export function SearchField({ value, onChange, onSubmit }: SearchFieldProps) {
+export function SearchField({
+  value,
+  onChange,
+  onSubmit,
+  placeholder = "Search verses, references...",
+  label = "Bible reference or description",
+  maxLength = 500,
+  hiddenFields,
+}: SearchFieldProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   return (
     <form method="get" action="/search" onSubmit={onSubmit} role="search" className="w-full">
+      {hiddenFields
+        ? Object.entries(hiddenFields).map(([name, fieldValue]) => (
+            <input key={name} type="hidden" name={name} value={fieldValue} />
+          ))
+        : null}
       <div className="flex h-12 w-full items-center rounded-full border border-vs-border bg-vs-surface pl-1.5 pr-3 shadow-sm focus-within:border-vs-primary focus-within:ring-1 focus-within:ring-vs-primary">
         <button
           type="submit"
@@ -29,11 +48,11 @@ export function SearchField({ value, onChange, onSubmit }: SearchFieldProps) {
           name="q"
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          placeholder="Search verses, references..."
-          aria-label="Bible reference or description"
+          placeholder={placeholder}
+          aria-label={label}
           autoComplete="off"
           enterKeyHint="search"
-          maxLength={500}
+          maxLength={maxLength}
           className="ml-0.5 min-w-0 flex-1 border-0 bg-transparent p-0 text-[15px] font-medium text-vs-text placeholder:text-vs-icon-muted focus:outline-none focus:ring-0"
         />
         {value ? (

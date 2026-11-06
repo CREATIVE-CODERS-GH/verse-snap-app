@@ -23,6 +23,8 @@ import {
   SearchResultsList,
   UnindexedNotice,
 } from "@/components/search-results";
+import { DiscoverSearchPage } from "@/components/discover-search";
+import { SearchModeSwitch } from "@/components/search-mode-switch";
 import { SparkleIcon } from "@/components/stitch-icons";
 import {
   aiSearchQueryOptions,
@@ -57,11 +59,24 @@ import { searchScripture } from "@/lib/bible/search.functions";
 import { bibleService } from "@/lib/bible/service";
 import { usePreferences } from "@/lib/preferences";
 import { trackEvent } from "@/lib/analytics";
+import { YOUVERSION_DISCOVER_ENABLED } from "@/lib/bible/youversion-discover-schema";
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>): { q?: string } => {
+  // `mode=discover` (with an optional `t` edition) selects the YouVersion-powered Discover search; every
+  // other URL is Verse Snap's own search, exactly as before.
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { q?: string; mode?: "discover"; t?: string } => {
     const value = search["q"];
-    return typeof value === "string" && value.trim() ? { q: value } : {};
+    const mode = search["mode"] === "discover" ? ("discover" as const) : undefined;
+    const edition = search["t"];
+    return {
+      ...(typeof value === "string" && value.trim() ? { q: value } : {}),
+      ...(mode ? { mode } : {}),
+      ...(mode && typeof edition === "string" && /^[A-Z]{2,12}$/.test(edition)
+        ? { t: edition }
+        : {}),
+    };
   },
   head: () => ({
     meta: [
@@ -83,6 +98,16 @@ export const Route = createFileRoute("/search")({
 });
 
 function SearchPage() {
+  const { mode } = Route.useSearch();
+  return YOUVERSION_DISCOVER_ENABLED && mode === "discover" ? (
+    <DiscoverSearchPage />
+  ) : (
+    <VerseSnapSearchPage />
+  );
+}
+
+/** Verse Snap's own search: reference, keyword and phrase search. Unchanged apart from the mode switch. */
+function VerseSnapSearchPage() {
   const { q } = Route.useSearch();
   const [query, setQuery] = useState(q ?? "");
   const [submitted, setSubmitted] = useState(q ?? "");
@@ -364,6 +389,11 @@ function SearchPage() {
 
   return (
     <AppShell variant="stitch" hideNav header={<ScreenHeader title="Search" onBack={goBack} />}>
+      {YOUVERSION_DISCOVER_ENABLED ? (
+        <div className="pt-5">
+          <SearchModeSwitch mode="verse-snap" />
+        </div>
+      ) : null}
       <div className="pt-5">
         <SearchField
           value={query}

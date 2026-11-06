@@ -460,9 +460,12 @@ describe("the API key stays on the server", () => {
     const files = sourceFiles(join(process.cwd(), "src"));
     const readers = files.filter((file) => /YOUVERSION_APP_KEY/.test(readFileSync(file, "utf8")));
     const normalised = readers.map((file) => file.replace(/\\/g, "/"));
-    // Allowed: the server module, and comments/docs strings in the flag file.
+    // Allowed: the server modules (chapters, and Discover search, which also keeps its own check in
+    // youversion-discover.test.ts), and comments/docs strings in the flag file.
     for (const file of normalised) {
-      expect(file).toMatch(/(youversion(\.server|-schema|-limits)\.ts|test\/setup\.ts)$/);
+      expect(file).toMatch(
+        /(youversion(-discover)?\.server\.ts|youversion-(schema|limits)\.ts|test\/setup\.ts)$/,
+      );
     }
     const shell = readFileSync(
       join(process.cwd(), "src/lib/bible/youversion.functions.ts"),

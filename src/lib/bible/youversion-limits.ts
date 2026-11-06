@@ -6,7 +6,8 @@
  *  1. Per client: one reader cannot spend the whole allowance. Chapter navigation is one request per
  *     chapter, so the default (60 a minute) never gets in the way of normal reading.
  *  2. Cool-down: after YouVersion itself answers 429, no request is sent upstream until its
- *     Retry-After has passed (bounded), so a limit is never hammered.
+ *     Retry-After has passed (bounded), so a limit is never hammered. The reader and Discover share
+ *     the one `youVersionLimiter` cool-down, because they share one app key and one upstream quota.
  *  3. Global: a ceiling on upstream calls per minute for this server instance.
  *
  * LIMITATIONS (also in docs/audit/YOUVERSION_YV1.md): state lives in the memory of ONE server
@@ -36,7 +37,8 @@ export const DEFAULT_LIMITS: LimiterOptions = {
   global: 240,
   globalWindowMs: 60_000,
   maxClients: 5_000,
-  maxCooldownSeconds: 120,
+  // YouVersion has answered a burst with Retry-After: 300; honour up to five minutes.
+  maxCooldownSeconds: 300,
   defaultCooldownSeconds: 30,
 };
 
@@ -50,6 +52,8 @@ export interface YouVersionLimiter {
   checkUpstream(): LimitDecision;
   /** Blocks upstream calls after YouVersion answered 429. `retryAfter` is the header value, if any. */
   coolDown(retryAfter: string | null): void;
+  /** Seconds left of an upstream cool-down, or 0 when calls may go out. Does not count a request. */
+  cooldownRemaining(): number;
 }
 
 function seconds(ms: number): number {
@@ -111,6 +115,11 @@ export function createYouVersionLimiter(
       }
       upstream.push(at);
       return { ok: true };
+    },
+
+    cooldownRemaining() {
+      const left = blockedUntil - now();
+      return left > 0 ? seconds(left) : 0;
     },
 
     coolDown(retryAfter) {

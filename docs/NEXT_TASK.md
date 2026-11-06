@@ -19,10 +19,19 @@
   the Vercel Preview build is confirmed.
 - **Housekeeping:** `prod/pre-main-cutover-306bf67` backup tag was never created; skip unless wanted.
 
-## YouVersion editions (NIV, AMP): branch `feature/youversion-editions` (local, uncommitted)
-NIV and AMP behind `VITE_YOUVERSION_TRANSLATIONS` (off by default). Design, limits and the open licence conditions:
-`docs/audit/YOUVERSION_YV1.md` (YV-1 to YV-4). Preview plan: `docs/audit/YOUVERSION_PREVIEW_CHECKLIST.md`.
-Next: owner approval to commit, then publisher answers for the Open items before any Preview use.
+## YouVersion editions (NIV, AMP): merged to `main`
+NIV and AMP behind `VITE_YOUVERSION_TRANSLATIONS` (off by default; set in Vercel Preview for the branch and in
+Production). Design, limits and the open licence conditions: `docs/audit/YOUVERSION_YV1.md`. Preview plan:
+`docs/audit/YOUVERSION_PREVIEW_CHECKLIST.md`. Publisher answers for the Open items are still pending.
+
+## Discover Search: branch `feature/youversion-discover-search` (committed locally, not pushed)
+A YouVersion-powered mode on the Search screen beside Verse Snap search, behind `VITE_YOUVERSION_DISCOVER`
+(off by default). Design, verified endpoints, request volume, quota safeguards and blockers:
+`docs/audit/YOUVERSION_DISCOVER.md`; Stitch spec: `docs/design/DISCOVER_SEARCH_STITCH_SPEC.md`. Repeatable
+browser suite uses a local mock (`npm run test:e2e:youversion-discover`, no live traffic). **Blocker:** reader and
+Discover share one YouVersion key and quota (`429`, `Retry-After: 300` seen in testing): a separate Preview key and
+an agreed quota are needed before any Preview with real traffic or public use. Next: owner decision to push and
+set the Preview-only variables (see the doc).
 
 ## Done and live
 - Free Bible Search (WEB/ASV/BSB), Reflection Journal (1C), Reader improvements and Saved hubs (1D),

@@ -19,9 +19,9 @@ import type {
 } from "./youversion-protocol";
 import { getYouVersionEdition } from "./translations";
 import { isOnVercel, resolveClientIp } from "./ai/client-ip.server";
+import { resolveYouVersionBase } from "./youversion-base.server";
 import { youVersionLimiter, type YouVersionLimiter } from "./youversion-limits";
 
-const BASE_URL = "https://api.youversion.com";
 const TIMEOUT_MS = 12_000;
 
 const MESSAGES: Record<YouVersionFailureKind, string> = {
@@ -99,7 +99,7 @@ async function load(
   if (!usfm || !book || request.chapter > book.chapters) return fail("reference");
 
   const url =
-    `${BASE_URL}/v1/bibles/${edition.bibleId}/passages/${usfm}.${request.chapter}` +
+    `${resolveYouVersionBase(env).base}/v1/bibles/${edition.bibleId}/passages/${usfm}.${request.chapter}` +
     "?format=html&include_headings=false&include_notes=false";
 
   const upstream = limiter.checkUpstream();
