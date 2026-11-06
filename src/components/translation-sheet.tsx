@@ -168,10 +168,13 @@ export function TranslationOptions({
   onChange: (code: string) => void;
 }) {
   const offline = useOfflineDownloads();
+  // The picker lists editions A to Z by code. Only the display is sorted: the catalogue order (and the
+  // KJAV default) that Compare and the rest of the app rely on is unchanged.
+  const sorted = [...options].sort((a, b) => a.code.localeCompare(b.code));
   return (
     <fieldset className="mt-2 divide-y divide-vs-border">
       <legend className="sr-only">Choose your preferred Bible translation</legend>
-      {options.map((option) => {
+      {sorted.map((option) => {
         const downloadable = offline.supported && canDownloadOffline(option.code);
         const entry = offline.entry(option.code);
         return (

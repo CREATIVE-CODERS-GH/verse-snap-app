@@ -108,7 +108,28 @@ const storage = await ev(`(async () => {
   const licensedText = history.filter((e) => ['NIV', 'AMP'].includes(e.translation) && e.verseText).length;
   const dbs = (await indexedDB.databases?.()) ?? [];
   const cacheNames = (await caches?.keys?.()) ?? [];
-  return { licensedCached, licensedText, dbs: dbs.map((d) => d.name), cacheNames };
+  // Preview and Production builds ship the offline service worker, so app-shell caches are expected.
+  // What must never be in them is a licensed edition: no NIV/AMP chapter request, no server-function
+  // response, and no response body carrying a publisher notice or licensed text.
+  let cachedEntries = 0;
+  let licensedInCaches = 0;
+  for (const name of cacheNames) {
+    const cache = await caches.open(name);
+    for (const request of await cache.keys()) {
+      cachedEntries += 1;
+      const url = request.url;
+      if (/_serverFn|youversion|[/](NIV|AMP)[/]/i.test(url)) {
+        licensedInCaches += 1;
+        continue;
+      }
+      const response = await cache.match(request);
+      const type = response?.headers.get('content-type') ?? '';
+      if (!/text|json|javascript/.test(type)) continue;
+      const body = await response.clone().text();
+      if (/so loved the world|Biblica, Inc|Lockman Foundation/.test(body)) licensedInCaches += 1;
+    }
+  }
+  return { licensedCached, licensedText, dbs: dbs.map((d) => d.name), cacheNames, cachedEntries, licensedInCaches };
 })()`);
 check(
   "The on-device chapter cache holds no NIV or AMP chapter",
@@ -121,8 +142,8 @@ check(
   JSON.stringify(storage),
 );
 check(
-  "No offline database or service-worker cache holds Scripture",
-  storage.dbs.every((n) => !/bible|scripture/i.test(n ?? "")) && storage.cacheNames.length === 0,
+  "No offline database or service-worker cache holds licensed Scripture",
+  storage.dbs.every((n) => !/bible|scripture/i.test(n ?? "")) && storage.licensedInCaches === 0,
   JSON.stringify(storage),
 );
 check(

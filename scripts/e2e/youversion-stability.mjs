@@ -122,12 +122,12 @@ check(
   JSON.stringify(btn),
 );
 check("Card Studio (NIV): Copy is disabled", btn.copy === true, JSON.stringify(btn));
-check(
-  "Card Studio (NIV): the preview still carries the Biblica notice",
-  await ev(
-    "/Biblica/.test(document.querySelector('[data-testid=\"card-notice\"]')?.innerText ?? '')",
-  ),
-);
+// The notice renders after the export note on a slower (deployed) server, so wait for it rather than
+// reading it once.
+const nivNotice =
+  "/Biblica/.test(document.querySelector('[data-testid=\"card-notice\"]')?.innerText ?? '')";
+const nivNoticeShown = await waitFor(nivNotice, 15000);
+check("Card Studio (NIV): the preview still carries the Biblica notice", nivNoticeShown);
 
 // --- Card Studio: AMP exports with the notice drawn on the image --------------------------------
 await go("/card/AMP/john/3/16", "!!document.querySelector('[data-testid=\"card-notice\"]')");
