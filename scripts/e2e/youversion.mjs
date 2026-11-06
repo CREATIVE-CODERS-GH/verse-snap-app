@@ -110,9 +110,11 @@ const storage = await ev(`(async () => {
   const cacheNames = (await caches?.keys?.()) ?? [];
   // Preview and Production builds ship the offline service worker, so app-shell caches are expected.
   // What must never be in them is a licensed edition: no NIV/AMP chapter request, no server-function
-  // response, and no response body carrying a publisher notice or licensed text.
+  // response, and no response body carrying NIV or AMP John 3:16 wording. (The app's own code legitimately holds the
+  // publishers' notices, so a notice string is not evidence of cached Scripture.)
   let cachedEntries = 0;
   let licensedInCaches = 0;
+  const offenders = [];
   for (const name of cacheNames) {
     const cache = await caches.open(name);
     for (const request of await cache.keys()) {
@@ -120,16 +122,20 @@ const storage = await ev(`(async () => {
       const url = request.url;
       if (/_serverFn|youversion|[/](NIV|AMP)[/]/i.test(url)) {
         licensedInCaches += 1;
+        offenders.push(new URL(url).pathname);
         continue;
       }
       const response = await cache.match(request);
       const type = response?.headers.get('content-type') ?? '';
       if (!/text|json|javascript/.test(type)) continue;
       const body = await response.clone().text();
-      if (/so loved the world|Biblica, Inc|Lockman Foundation/.test(body)) licensedInCaches += 1;
+      if (/one and only Son|loved and dearly prized/.test(body)) {
+        licensedInCaches += 1;
+        offenders.push(new URL(url).pathname);
+      }
     }
   }
-  return { licensedCached, licensedText, dbs: dbs.map((d) => d.name), cacheNames, cachedEntries, licensedInCaches };
+  return { licensedCached, licensedText, dbs: dbs.map((d) => d.name), cacheNames, cachedEntries, licensedInCaches, offenders };
 })()`);
 check(
   "The on-device chapter cache holds no NIV or AMP chapter",
